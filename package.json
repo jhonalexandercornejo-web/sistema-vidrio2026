@@ -1,0 +1,17 @@
+{
+  "name": "sistema-vidrio",
+  "version": "1.0.0",
+  "description": "Control de producción de vidrio templado",
+  "main": "servidor.js",
+  "scripts": {
+    "start": "node servidor.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.4.1",
+    "express": "^5.1.0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}

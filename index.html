@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vidrio Templado - Control de Producción</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+    <h1>VIDRIO TEMPLADO</h1>
+    <p>CONTROL DE PRODUCCIÓN</p>
+</header>
+
+<main>
+    <h2>PROCESO DE VIDRIO TEMPLADO</h2>
+
+    <section class="resumen">
+        <div class="card"><span>TOTAL OP</span><strong id="total">0</strong></div>
+        <div class="card"><span>PENDIENTES</span><strong id="pendientes">0</strong></div>
+        <div class="card"><span>EN PROCESO</span><strong id="proceso">0</strong></div>
+        <div class="card"><span>TERMINADOS</span><strong id="terminados">0</strong></div>
+    </section>
+
+    <section class="panel">
+        <h2>REGISTRAR PEDIDO</h2>
+        <div class="formulario">
+            <div><label>OP</label><input id="op" type="text"></div>
+            <div><label>CLIENTE</label><input id="cliente" type="text"></div>
+            <div><label>FECHA INGRESO</label><input id="fechaIngreso" type="date"></div>
+            <div><label>FECHA ENTREGA</label><input id="fechaEntrega" type="date"></div>
+            <div><label>HORA ENTREGA</label><input id="horaEntrega" type="time"></div>
+            <div><label>DESCRIPCIÓN</label><input id="descripcion" type="text"></div>
+            <div>
+                <label>PROCESO ESPECIAL</label>
+                <select id="procesoEspecial">
+                    <option value="NINGUNO">NINGUNO</option>
+                    <option value="ENTALLE">ENTALLE</option>
+                    <option value="LIMPIO">LIMPIO</option>
+                    <option value="ENTALLE Y LIMPIO">ENTALLE Y LIMPIO</option>
+                </select>
+            </div>
+            <div><label>CANTIDAD</label><input id="cantidad" type="number" min="0"></div>
+            <div><label>METROS</label><input id="metros" type="number" min="0" step="0.01"></div>
+        </div>
+        <button class="btn-principal" onclick="guardarPedido()">REGISTRAR PEDIDO</button>
+    </section>
+
+    <section class="panel">
+        <h2>BUSCADOR DE PEDIDOS</h2>
+        <div class="buscador">
+            <input id="buscar" type="text" placeholder="Buscar por OP o cliente..." oninput="buscarPedido()">
+        </div>
+        <div id="resultado"></div>
+    </section>
+
+    <section class="panel">
+        <h2>PROCESO DEL VIDRIO</h2>
+        <div id="produccion"></div>
+    </section>
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>
