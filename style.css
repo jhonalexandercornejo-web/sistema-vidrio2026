@@ -340,3 +340,25 @@ select:focus {
 .proceso-busqueda.terminado:hover {
     background: #b9151b;
 }
+.acciones-pedido {
+    margin-top: 15px;
+    text-align: right;
+}
+
+.btn-eliminar {
+    background: #dc2626;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-eliminar:hover {
+    background: #b91c1c;
+}
+
+.btn-eliminar:active {
+    transform: scale(0.98);
+}
