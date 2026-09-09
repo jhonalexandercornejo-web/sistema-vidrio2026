@@ -1,3 +1,4 @@
+```css
 * {
     box-sizing: border-box;
 }
@@ -5,18 +6,19 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: #f3f4f6;
+    background: #f3f6fa;
     color: #222;
 }
 
 /* ENCABEZADO */
 header {
-    background: #1f2937;
+    background: #0b3d91;
     color: white;
     padding: 18px 30px;
     display: flex;
     align-items: center;
     gap: 20px;
+    border-bottom: 5px solid #d71920;
 }
 
 .logo {
@@ -39,7 +41,7 @@ header h1 {
 
 header p {
     margin-top: 5px;
-    color: #d1d5db;
+    color: #dbeafe;
     font-size: 14px;
 }
 
@@ -52,6 +54,7 @@ main {
 
 main > h2 {
     margin-bottom: 20px;
+    color: #0b3d91;
 }
 
 /* RESUMEN */
@@ -67,7 +70,19 @@ main > h2 {
     padding: 18px;
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0,0,0,.08);
-    border-top: 4px solid #ed8500;
+    border-top: 4px solid #0b3d91;
+}
+
+.card:nth-child(2) {
+    border-top-color: #d71920;
+}
+
+.card:nth-child(3) {
+    border-top-color: #0b3d91;
+}
+
+.card:nth-child(4) {
+    border-top-color: #d71920;
 }
 
 .card span {
@@ -80,6 +95,7 @@ main > h2 {
     display: block;
     font-size: 30px;
     margin-top: 8px;
+    color: #0b3d91;
 }
 
 /* PANELES */
@@ -89,11 +105,12 @@ main > h2 {
     border-radius: 10px;
     margin-bottom: 20px;
     box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    border-left: 4px solid #0b3d91;
 }
 
 .panel h2 {
     margin-top: 0;
-    color: #1f2937;
+    color: #0b3d91;
 }
 
 /* FORMULARIO */
@@ -108,13 +125,14 @@ label {
     font-size: 12px;
     font-weight: bold;
     margin-bottom: 6px;
+    color: #0b3d91;
 }
 
 input,
 select {
     width: 100%;
     height: 40px;
-    border: 1px solid #ccc;
+    border: 1px solid #cbd5e1;
     border-radius: 5px;
     padding: 0 10px;
     font-size: 14px;
@@ -124,14 +142,14 @@ select {
 input:focus,
 select:focus {
     outline: none;
-    border-color: #ed8500;
-    box-shadow: 0 0 0 2px rgba(237,133,0,.15);
+    border-color: #0b3d91;
+    box-shadow: 0 0 0 2px rgba(11,61,145,.15);
 }
 
 /* BOTÓN PRINCIPAL */
 .btn-principal {
     margin-top: 18px;
-    background: #ed8500;
+    background: #d71920;
     color: white;
     border: 0;
     padding: 12px 20px;
@@ -141,7 +159,7 @@ select:focus {
 }
 
 .btn-principal:hover {
-    background: #d87500;
+    background: #b9151b;
 }
 
 /* BUSCADOR */
@@ -151,11 +169,12 @@ select:focus {
 
 /* TARJETAS DE OP */
 .op-card {
-    border: 1px solid #ddd;
+    border: 1px solid #d5dbe3;
     border-radius: 8px;
     padding: 15px;
     margin-bottom: 12px;
     background: #fafafa;
+    border-left: 4px solid #0b3d91;
 }
 
 .op-cabecera {
@@ -168,6 +187,7 @@ select:focus {
 
 .op-cabecera strong {
     font-size: 18px;
+    color: #0b3d91;
 }
 
 /* PROCESOS */
@@ -180,18 +200,27 @@ select:focus {
 .proceso {
     padding: 10px 13px;
     border-radius: 5px;
-    background: #e5e7eb;
+    background: #dbeafe;
+    color: #0b3d91;
     font-size: 13px;
     font-weight: bold;
     cursor: pointer;
     user-select: none;
+    border: 1px solid #93c5fd;
 }
 
+.proceso:hover {
+    background: #bfdbfe;
+}
+
+/* PROCESO TERMINADO */
 .proceso.terminado {
-    background: #bde7c5;
-    color: #155724;
+    background: #d71920;
+    color: white;
+    border-color: #d71920;
 }
 
+/* DETALLE */
 .detalle-op {
     margin-top: 12px;
     font-size: 13px;
@@ -200,30 +229,35 @@ select:focus {
 
 /* RESULTADOS */
 .resultado {
-    border: 1px solid #ddd;
+    border: 1px solid #d5dbe3;
     border-radius: 8px;
     padding: 15px;
     margin-top: 12px;
+    border-left: 4px solid #d71920;
 }
 
 .resultado h3 {
     margin-top: 0;
+    color: #0b3d91;
 }
 
 .estado-pedido {
     margin-top: 15px;
     padding: 15px;
-    background: #f5f5f5;
+    background: #eef4ff;
     border-radius: 8px;
     text-align: center;
+    border: 1px solid #c7d7f5;
 }
 
 .estado-grande {
     font-size: 22px;
     font-weight: bold;
     margin-top: 8px;
+    color: #0b3d91;
 }
 
+/* PROCESOS DE BÚSQUEDA */
 .procesos-busqueda {
     display: flex;
     flex-wrap: wrap;
@@ -233,15 +267,18 @@ select:focus {
 
 .proceso-busqueda {
     padding: 8px 12px;
-    background: #e5e5e5;
+    background: #dbeafe;
+    color: #0b3d91;
     border-radius: 5px;
     font-size: 13px;
     font-weight: bold;
+    border: 1px solid #93c5fd;
 }
 
 .proceso-busqueda.terminado {
-    background: #d4edda;
-    color: #155724;
+    background: #d71920;
+    color: white;
+    border-color: #d71920;
 }
 
 /* CELULAR */
@@ -279,3 +316,4 @@ select:focus {
         font-size: 12px;
     }
 }
+```
