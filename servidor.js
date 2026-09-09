@@ -53,6 +53,11 @@ function convertirPedido(row) {
     };
 }
 
+
+// ===============================
+// OBTENER TODOS LOS PEDIDOS
+// ===============================
+
 app.get("/api/pedidos", async (req, res) => {
     try {
         const resultado = await pool.query(`
@@ -65,15 +70,23 @@ app.get("/api/pedidos", async (req, res) => {
         `);
 
         res.json(resultado.rows.map(convertirPedido));
+
     } catch (error) {
         console.error(error);
+
         res.status(500).json({
             error: "No se pudieron cargar los pedidos."
         });
     }
 });
 
+
+// ===============================
+// CREAR PEDIDO
+// ===============================
+
 app.post("/api/pedidos", async (req, res) => {
+
     const {
         op,
         cliente,
@@ -93,6 +106,7 @@ app.post("/api/pedidos", async (req, res) => {
     }
 
     try {
+
         const resultado = await pool.query(`
             INSERT INTO pedidos (
                 op,
@@ -119,9 +133,12 @@ app.post("/api/pedidos", async (req, res) => {
             Number(metros) || 0
         ]);
 
-        res.status(201).json(convertirPedido(resultado.rows[0]));
+        res.status(201).json(
+            convertirPedido(resultado.rows[0])
+        );
 
     } catch (error) {
+
         console.error(error);
 
         if (error.code === "23505") {
@@ -136,7 +153,13 @@ app.post("/api/pedidos", async (req, res) => {
     }
 });
 
+
+// ===============================
+// ACTUALIZAR PROCESO
+// ===============================
+
 app.put("/api/pedidos/:id", async (req, res) => {
+
     const id = Number(req.params.id);
 
     const camposPermitidos = [
@@ -149,7 +172,9 @@ app.put("/api/pedidos/:id", async (req, res) => {
     ];
 
     const cambios = Object.entries(req.body)
-        .filter(([campo]) => camposPermitidos.includes(campo));
+        .filter(([campo]) =>
+            camposPermitidos.includes(campo)
+        );
 
     if (cambios.length === 0) {
         return res.status(400).json({
@@ -158,10 +183,13 @@ app.put("/api/pedidos/:id", async (req, res) => {
     }
 
     try {
+
         const valores = [];
 
         const sets = cambios.map(([campo, valor], indice) => {
+
             valores.push(valor ? 1 : 0);
+
             return `"${campo}" = $${indice + 1}`;
         });
 
@@ -180,23 +208,89 @@ app.put("/api/pedidos/:id", async (req, res) => {
             });
         }
 
-        res.json(convertirPedido(resultado.rows[0]));
+        res.json(
+            convertirPedido(resultado.rows[0])
+        );
 
     } catch (error) {
+
         console.error(error);
+
         res.status(500).json({
             error: "No se pudo actualizar el pedido."
         });
     }
 });
 
+
+// ===============================
+// ELIMINAR PEDIDO
+// ===============================
+
+app.delete("/api/pedidos/:id", async (req, res) => {
+
+    const id = Number(req.params.id);
+
+    if (!Number.isInteger(id)) {
+        return res.status(400).json({
+            error: "ID de pedido inválido."
+        });
+    }
+
+    try {
+
+        const resultado = await pool.query(
+            `
+            DELETE FROM pedidos
+            WHERE id = $1
+            RETURNING *
+            `,
+            [id]
+        );
+
+        if (resultado.rowCount === 0) {
+            return res.status(404).json({
+                error: "Pedido no encontrado."
+            });
+        }
+
+        res.json({
+            mensaje: "Pedido eliminado correctamente."
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            error: "No se pudo eliminar el pedido."
+        });
+    }
+});
+
+
+// ===============================
+// INICIAR SERVIDOR
+// ===============================
+
 crearTabla()
     .then(() => {
+
         app.listen(PORT, () => {
-            console.log(`Sistema funcionando en http://localhost:${PORT}`);
+
+            console.log(
+                `Sistema funcionando en http://localhost:${PORT}`
+            );
+
         });
+
     })
     .catch((error) => {
-        console.error("Error conectando con Neon:", error);
+
+        console.error(
+            "Error conectando con Neon:",
+            error
+        );
+
         process.exit(1);
     });
