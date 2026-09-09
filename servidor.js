@@ -1,38 +1,43 @@
 const express = require("express");
 const path = require("path");
-const Database = require("better-sqlite3");
+const { Pool } = require("pg");
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
-const db = new Database("base_datos.db");
-
-db.pragma("journal_mode = WAL");
-
-db.exec(`
-    CREATE TABLE IF NOT EXISTS pedidos (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        op TEXT NOT NULL UNIQUE,
-        cliente TEXT NOT NULL,
-        fechaIngreso TEXT,
-        fechaEntrega TEXT,
-        horaEntrega TEXT,
-        descripcion TEXT,
-        procesoEspecial TEXT DEFAULT 'NINGUNO',
-        cantidad REAL DEFAULT 0,
-        metros REAL DEFAULT 0,
-        corte INTEGER DEFAULT 0,
-        entalle INTEGER DEFAULT 0,
-        limpios INTEGER DEFAULT 0,
-        templado INTEGER DEFAULT 0,
-        terminado INTEGER DEFAULT 0,
-        despacho INTEGER DEFAULT 0,
-        creadoEn TEXT DEFAULT CURRENT_TIMESTAMP
-    )
-`);
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+        rejectUnauthorized: false
+    }
+});
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
+
+async function crearTabla() {
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS pedidos (
+            id SERIAL PRIMARY KEY,
+            op TEXT NOT NULL UNIQUE,
+            cliente TEXT NOT NULL,
+            "fechaIngreso" TEXT,
+            "fechaEntrega" TEXT,
+            "horaEntrega" TEXT,
+            descripcion TEXT,
+            "procesoEspecial" TEXT DEFAULT 'NINGUNO',
+            cantidad REAL DEFAULT 0,
+            metros REAL DEFAULT 0,
+            corte INTEGER DEFAULT 0,
+            entalle INTEGER DEFAULT 0,
+            limpios INTEGER DEFAULT 0,
+            templado INTEGER DEFAULT 0,
+            terminado INTEGER DEFAULT 0,
+            despacho INTEGER DEFAULT 0,
+            "creadoEn" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    `);
+}
 
 function convertirPedido(row) {
     if (!row) return null;
@@ -48,20 +53,27 @@ function convertirPedido(row) {
     };
 }
 
-app.get("/api/pedidos", (req, res) => {
-    const rows = db.prepare(`
-        SELECT * FROM pedidos
-        ORDER BY
-            CASE WHEN fechaEntrega IS NULL OR fechaEntrega = '' THEN 1 ELSE 0 END,
-            fechaEntrega ASC,
-            CASE WHEN horaEntrega IS NULL OR horaEntrega = '' THEN 1 ELSE 0 END,
-            horaEntrega ASC
-    `).all();
+app.get("/api/pedidos", async (req, res) => {
+    try {
+        const resultado = await pool.query(`
+            SELECT * FROM pedidos
+            ORDER BY
+                CASE WHEN "fechaEntrega" IS NULL OR "fechaEntrega" = '' THEN 1 ELSE 0 END,
+                "fechaEntrega" ASC,
+                CASE WHEN "horaEntrega" IS NULL OR "horaEntrega" = '' THEN 1 ELSE 0 END,
+                "horaEntrega" ASC
+        `);
 
-    res.json(rows.map(convertirPedido));
+        res.json(resultado.rows.map(convertirPedido));
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            error: "No se pudieron cargar los pedidos."
+        });
+    }
 });
 
-app.post("/api/pedidos", (req, res) => {
+app.post("/api/pedidos", async (req, res) => {
     const {
         op,
         cliente,
@@ -81,22 +93,21 @@ app.post("/api/pedidos", (req, res) => {
     }
 
     try {
-        const stmt = db.prepare(`
+        const resultado = await pool.query(`
             INSERT INTO pedidos (
                 op,
                 cliente,
-                fechaIngreso,
-                fechaEntrega,
-                horaEntrega,
+                "fechaIngreso",
+                "fechaEntrega",
+                "horaEntrega",
                 descripcion,
-                procesoEspecial,
+                "procesoEspecial",
                 cantidad,
                 metros
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `);
-
-        const info = stmt.run(
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+            RETURNING *
+        `, [
             op,
             cliente,
             fechaIngreso || "",
@@ -106,16 +117,14 @@ app.post("/api/pedidos", (req, res) => {
             procesoEspecial || "NINGUNO",
             Number(cantidad) || 0,
             Number(metros) || 0
-        );
+        ]);
 
-        const pedido = db.prepare(
-            "SELECT * FROM pedidos WHERE id = ?"
-        ).get(info.lastInsertRowid);
-
-        res.status(201).json(convertirPedido(pedido));
+        res.status(201).json(convertirPedido(resultado.rows[0]));
 
     } catch (error) {
-        if (error.code === "SQLITE_CONSTRAINT_UNIQUE") {
+        console.error(error);
+
+        if (error.code === "23505") {
             return res.status(409).json({
                 error: "Esa OP ya existe."
             });
@@ -127,7 +136,7 @@ app.post("/api/pedidos", (req, res) => {
     }
 });
 
-app.put("/api/pedidos/:id", (req, res) => {
+app.put("/api/pedidos/:id", async (req, res) => {
     const id = Number(req.params.id);
 
     const camposPermitidos = [
@@ -148,32 +157,46 @@ app.put("/api/pedidos/:id", (req, res) => {
         });
     }
 
-    const sets = cambios.map(([campo]) => `${campo} = ?`).join(", ");
-    const valores = cambios.map(([, valor]) => valor ? 1 : 0);
+    try {
+        const valores = [];
 
-    valores.push(id);
+        const sets = cambios.map(([campo, valor], indice) => {
+            valores.push(valor ? 1 : 0);
+            return `"${campo}" = $${indice + 1}`;
+        });
 
-    const stmt = db.prepare(`
-        UPDATE pedidos
-        SET ${sets}
-        WHERE id = ?
-    `);
+        valores.push(id);
 
-    const info = stmt.run(...valores);
+        const resultado = await pool.query(`
+            UPDATE pedidos
+            SET ${sets.join(", ")}
+            WHERE id = $${valores.length}
+            RETURNING *
+        `, valores);
 
-    if (info.changes === 0) {
-        return res.status(404).json({
-            error: "Pedido no encontrado."
+        if (resultado.rowCount === 0) {
+            return res.status(404).json({
+                error: "Pedido no encontrado."
+            });
+        }
+
+        res.json(convertirPedido(resultado.rows[0]));
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            error: "No se pudo actualizar el pedido."
         });
     }
-
-    const pedido = db.prepare(
-        "SELECT * FROM pedidos WHERE id = ?"
-    ).get(id);
-
-    res.json(convertirPedido(pedido));
 });
 
-app.listen(PORT, () => {
-    console.log(`Sistema funcionando en http://localhost:${PORT}`);
-});
+crearTabla()
+    .then(() => {
+        app.listen(PORT, () => {
+            console.log(`Sistema funcionando en http://localhost:${PORT}`);
+        });
+    })
+    .catch((error) => {
+        console.error("Error conectando con Neon:", error);
+        process.exit(1);
+    });
