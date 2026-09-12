@@ -1,65 +1,317 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vidrio Templado - Control de Producción</title>
-    <link rel="stylesheet" href="style.css">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Control de Pedidos de Vidrio
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
 </head>
+
+
 <body>
+
 <header>
-    <img src="https://maqvid.com/wp-content/uploads/2024/05/Zakata.jpeg" alt="ZAKATA GLASS" class="logo">
-    <h1>VIDRIO TEMPLADO</h1>
-    <p>CONTROL DE PRODUCCIÓN</p>
+
+    <img
+        src="https://maqvid.com/wp-content/uploads/2024/05/Zakata.jpeg"
+        alt="ZAKATA GLASS"
+        class="logo"
+    >
+
+    <div>
+
+        <h1>
+            VIDRIO TEMPLADO
+        </h1>
+
+        <p>
+            CONTROL DE PRODUCCIÓN
+        </p>
+
+    </div>
+
 </header>
+
+
 <main>
-    <h2>PROCESO DE VIDRIO TEMPLADO</h2>
+
+    <h1 class="titulo-principal">
+        CONTROL DE PEDIDOS DE VIDRIO
+    </h1>
+
+
+    <!-- RESUMEN -->
 
     <section class="resumen">
-        <div class="card"><span>TOTAL OP</span><strong id="total">0</strong></div>
-        <div class="card"><span>PENDIENTES</span><strong id="pendientes">0</strong></div>
-        <div class="card"><span>EN PROCESO</span><strong id="proceso">0</strong></div>
-        <div class="card"><span>TERMINADOS</span><strong id="terminados">0</strong></div>
+
+        <div class="card-resumen">
+
+            <span>
+                TOTAL OP
+            </span>
+
+            <strong id="total">
+                0
+            </strong>
+
+        </div>
+
+
+        <div class="card-resumen">
+
+            <span>
+                PENDIENTES
+            </span>
+
+            <strong id="pendientes">
+                0
+            </strong>
+
+        </div>
+
+
+        <div class="card-resumen">
+
+            <span>
+                EN PROCESO
+            </span>
+
+            <strong id="proceso">
+                0
+            </strong>
+
+        </div>
+
+
+        <div class="card-resumen">
+
+            <span>
+                TERMINADOS
+            </span>
+
+            <strong id="terminados">
+                0
+            </strong>
+
+        </div>
+
     </section>
 
-    <section class="panel">
-        <h2>REGISTRAR PEDIDO</h2>
-        <div class="formulario">
-            <div><label>OP</label><input id="op" type="text"></div>
-            <div><label>CLIENTE</label><input id="cliente" type="text"></div>
-            <div><label>FECHA INGRESO</label><input id="fechaIngreso" type="date"></div>
-            <div><label>FECHA ENTREGA</label><input id="fechaEntrega" type="date"></div>
-            <div><label>HORA ENTREGA</label><input id="horaEntrega" type="time"></div>
-            <div><label>DESCRIPCIÓN</label><input id="descripcion" type="text"></div>
+
+
+    <!-- REGISTRO -->
+
+    <section
+        class="panel"
+        id="panelRegistro"
+    >
+
+        <h2 id="tituloFormulario">
+            REGISTRO DE PEDIDOS
+        </h2>
+
+
+        <div class="datos-pedido">
+
             <div>
-                <label>PROCESO ESPECIAL</label>
-                <select id="procesoEspecial">
-                    <option value="NINGUNO">NINGUNO</option>
-                    <option value="ENTALLE">ENTALLE</option>
-                    <option value="LIMPIO">LIMPIO</option>
-                    <option value="ENTALLE Y LIMPIO">ENTALLE Y LIMPIO</option>
-                </select>
+
+                <label>
+                    OP
+                </label>
+
+                <input
+                    id="op"
+                    type="text"
+                    placeholder="V003"
+                >
+
             </div>
-            <div><label>CANTIDAD</label><input id="cantidad" type="number" min="0"></div>
-            <div><label>METROS</label><input id="metros" type="number" min="0" step="0.01"></div>
+
+
+            <div>
+
+                <label>
+                    NOMBRE
+                </label>
+
+                <input
+                    id="cliente"
+                    type="text"
+                    placeholder="Cliente"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label>
+                    FECHA DE INGRESO
+                </label>
+
+                <input
+                    id="fechaIngreso"
+                    type="date"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label>
+                    HORA DE ENTREGA
+                </label>
+
+                <input
+                    id="horaEntrega"
+                    type="time"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label>
+                    FECHA DE ENTREGA
+                </label>
+
+                <input
+                    id="fechaEntrega"
+                    type="date"
+                >
+
+            </div>
+
+
+            <div class="aviso-registro">
+
+                La fecha y la hora de registro se asignan automáticamente al guardar y no se pueden editar.
+
+            </div>
+
         </div>
-        <button class="btn-principal" onclick="guardarPedido()">REGISTRAR PEDIDO</button>
+
+
+        <div class="descripcion">
+
+            <label>
+                DESCRIPCIÓN
+            </label>
+
+            <textarea
+                id="descripcion"
+                placeholder="Detalles del pedido..."
+            ></textarea>
+
+        </div>
+
+
+
+        <!-- VIDRIOS -->
+
+        <div class="contenedor-vidrios">
+
+            <div class="titulo-vidrios">
+
+                <h3>
+                    VIDRIOS DEL PEDIDO
+                </h3>
+
+                <button
+                    type="button"
+                    class="btn-agregar"
+                    onclick="agregarVidrio()"
+                >
+                    + AGREGAR VIDRIO
+                </button>
+
+            </div>
+
+
+            <div id="listaVidrios"></div>
+
+        </div>
+
+
+
+        <div class="acciones-formulario">
+
+            <button
+                id="btnGuardar"
+                class="btn-principal"
+                onclick="guardarPedido()"
+            >
+                REGISTRAR PEDIDO
+            </button>
+
+
+            <button
+                id="btnCancelarEdicion"
+                class="btn-cancelar oculto"
+                onclick="cancelarEdicion()"
+            >
+                CANCELAR
+            </button>
+
+        </div>
+
     </section>
 
+
+
+    <!-- BUSCADOR -->
+
     <section class="panel">
-        <h2>BUSCADOR DE PEDIDOS</h2>
-        <div class="buscador">
-            <input id="buscar" type="text" placeholder="Buscar por OP o cliente..." oninput="buscarPedido()">
-        </div>
+
+        <h2>
+            BUSCADOR DE PEDIDOS
+        </h2>
+
+        <input
+            id="buscar"
+            class="buscador"
+            type="text"
+            placeholder="Buscar por OP o cliente..."
+            oninput="buscarPedido()"
+        >
+
         <div id="resultado"></div>
+
     </section>
 
+
+
+    <!-- PRODUCCIÓN -->
+
     <section class="panel">
-        <h2>PROCESO DEL VIDRIO</h2>
+
+        <h2>
+            PROCESO DEL VIDRIO
+        </h2>
+
         <div id="produccion"></div>
+
     </section>
+
 </main>
 
+
 <script src="script.js"></script>
+
 </body>
+
 </html>
