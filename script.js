@@ -6,9 +6,82 @@ let paginaActual = 1;
 
 let totalPaginas = 1;
 
-let limitePorPagina = 50;
+const limitePorPagina = 50;
 
 let busquedaActual = "";
+
+
+// ===============================
+// TIPOS DE VIDRIO Y ESPESORES
+// ===============================
+
+const tiposVidrio = {
+
+    "INCOLORO": [
+        "3",
+        "4",
+        "5",
+        "6",
+        "8",
+        "10",
+        "12"
+    ],
+
+    "INCOLORO AL ACIDO": [
+        "6",
+        "8"
+    ],
+
+    "GRIS": [
+        "4",
+        "5",
+        "6",
+        "8",
+        "10"
+    ],
+
+    "VERDE": [
+        "4"
+    ],
+
+    "BRONCE": [
+        "6",
+        "8",
+        "10"
+    ],
+
+    "REFLEJANTE AZUL": [
+        "4"
+    ],
+
+    "GRIS REFLEJANTE": [
+        "5.5"
+    ],
+
+    "BRONCE REFLEJANTE": [
+        "6",
+        "8",
+        "10"
+    ],
+
+    "INC REFLEJANTE": [
+        "6",
+        "8"
+    ],
+
+    "REFL LIGHT BLUE": [
+        "6",
+        "8"
+    ],
+
+    "DARCK BLUE": [
+        "6"
+    ],
+
+    "ARTIC BLUE": [
+        "6"
+    ]
+};
 
 
 // ===============================
@@ -53,10 +126,16 @@ function formatearCreadoEn(fecha) {
     }
 
 
-    const objetoFecha = new Date(fecha);
+    const objetoFecha =
+        new Date(fecha);
 
 
-    if (isNaN(objetoFecha.getTime())) {
+    if (
+        isNaN(
+            objetoFecha.getTime()
+        )
+    ) {
+
         return fecha;
     }
 
@@ -77,20 +156,104 @@ function formatearCreadoEn(fecha) {
 
 
 // ===============================
+// ACTUALIZAR ESPESORES
+// ===============================
+
+function actualizarEspesores(
+    selectTipo,
+    espesorSeleccionado = null
+) {
+
+    const fila =
+        selectTipo.closest(
+            ".fila-vidrio"
+        );
+
+
+    const selectEspesor =
+        fila.querySelector(
+            ".espesor"
+        );
+
+
+    const tipo =
+        selectTipo.value;
+
+
+    const espesores =
+        tiposVidrio[tipo] || [];
+
+
+    selectEspesor.innerHTML = "";
+
+
+    espesores.forEach(
+        espesor => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                espesor;
+
+
+            option.textContent =
+                `${espesor} mm`;
+
+
+            selectEspesor.appendChild(
+                option
+            );
+        }
+    );
+
+
+    if (
+        espesorSeleccionado !== null
+        &&
+        espesores.includes(
+            String(
+                espesorSeleccionado
+            )
+        )
+    ) {
+
+        selectEspesor.value =
+            String(
+                espesorSeleccionado
+            );
+    }
+}
+
+
+// ===============================
 // CREAR FILA VIDRIO
 // ===============================
 
 function agregarVidrio(datos = {}) {
 
     const lista =
-        document.getElementById("listaVidrios");
+        document.getElementById(
+            "listaVidrios"
+        );
+
+
+    if (!lista) {
+        return;
+    }
 
 
     const fila =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
 
-    fila.className = "fila-vidrio";
+    fila.className =
+        "fila-vidrio";
 
 
     fila.innerHTML = `
@@ -101,14 +264,17 @@ function agregarVidrio(datos = {}) {
                 TIPO DE VIDRIO
             </label>
 
-            <select class="tipoVidrio">
+            <select
+                class="tipoVidrio"
+                onchange="actualizarEspesores(this)"
+            >
 
                 <option value="INCOLORO">
                     INCOLORO
                 </option>
 
-                <option value="BRONCE">
-                    BRONCE
+                <option value="INCOLORO AL ACIDO">
+                    INCOLORO AL ACIDO
                 </option>
 
                 <option value="GRIS">
@@ -119,20 +285,36 @@ function agregarVidrio(datos = {}) {
                     VERDE
                 </option>
 
-                <option value="AZUL">
-                    AZUL
+                <option value="BRONCE">
+                    BRONCE
                 </option>
 
-                <option value="REFLECTIVO">
-                    REFLECTIVO
+                <option value="REFLEJANTE AZUL">
+                    REFLEJANTE AZUL
                 </option>
 
-                <option value="LAMINADO">
-                    LAMINADO
+                <option value="GRIS REFLEJANTE">
+                    GRIS REFLEJANTE
                 </option>
 
-                <option value="OTRO">
-                    OTRO
+                <option value="BRONCE REFLEJANTE">
+                    BRONCE REFLEJANTE
+                </option>
+
+                <option value="INC REFLEJANTE">
+                    INC REFLEJANTE
+                </option>
+
+                <option value="REFL LIGHT BLUE">
+                    REFL LIGHT BLUE (AZUL CLARO)
+                </option>
+
+                <option value="DARCK BLUE">
+                    DARCK BLUE (AZUL CHILLON)
+                </option>
+
+                <option value="ARTIC BLUE">
+                    ARTIC BLUE (VERDOSO)
                 </option>
 
             </select>
@@ -146,40 +328,9 @@ function agregarVidrio(datos = {}) {
                 ESPESOR (MM)
             </label>
 
-            <select class="espesor">
-
-                <option value="4">
-                    4 mm
-                </option>
-
-                <option value="5">
-                    5 mm
-                </option>
-
-                <option value="6">
-                    6 mm
-                </option>
-
-                <option value="8">
-                    8 mm
-                </option>
-
-                <option value="10">
-                    10 mm
-                </option>
-
-                <option value="12">
-                    12 mm
-                </option>
-
-                <option value="15">
-                    15 mm
-                </option>
-
-                <option value="19">
-                    19 mm
-                </option>
-
+            <select
+                class="espesor"
+            >
             </select>
 
         </div>
@@ -223,7 +374,9 @@ function agregarVidrio(datos = {}) {
                 PROCESO ESPECIAL
             </label>
 
-            <select class="procesoEspecialVidrio">
+            <select
+                class="procesoEspecialVidrio"
+            >
 
                 <option value="NINGUNO">
                     NINGUNO
@@ -257,27 +410,60 @@ function agregarVidrio(datos = {}) {
     `;
 
 
-    lista.appendChild(fila);
+    lista.appendChild(
+        fila
+    );
 
 
-    fila.querySelector(".tipoVidrio").value =
+    const selectTipo =
+        fila.querySelector(
+            ".tipoVidrio"
+        );
+
+
+    const tipoGuardado =
         datos.tipoVidrio || "INCOLORO";
 
 
-    fila.querySelector(".espesor").value =
-        String(datos.espesor || "8");
+    if (
+        tiposVidrio[
+            tipoGuardado
+        ]
+    ) {
+
+        selectTipo.value =
+            tipoGuardado;
+
+    } else {
+
+        selectTipo.value =
+            "INCOLORO";
+    }
 
 
-    fila.querySelector(".cantidadVidrio").value =
+    actualizarEspesores(
+        selectTipo,
+        datos.espesor || null
+    );
+
+
+    fila.querySelector(
+        ".cantidadVidrio"
+    ).value =
         datos.cantidad ?? "";
 
 
-    fila.querySelector(".metrosVidrio").value =
+    fila.querySelector(
+        ".metrosVidrio"
+    ).value =
         datos.metros ?? "";
 
 
-    fila.querySelector(".procesoEspecialVidrio").value =
-        datos.procesoEspecial || "NINGUNO";
+    fila.querySelector(
+        ".procesoEspecialVidrio"
+    ).value =
+        datos.procesoEspecial
+        || "NINGUNO";
 }
 
 
@@ -288,14 +474,20 @@ function agregarVidrio(datos = {}) {
 function quitarVidrio(boton) {
 
     const lista =
-        document.getElementById("listaVidrios");
+        document.getElementById(
+            "listaVidrios"
+        );
 
 
     const filas =
-        lista.querySelectorAll(".fila-vidrio");
+        lista.querySelectorAll(
+            ".fila-vidrio"
+        );
 
 
-    if (filas.length <= 1) {
+    if (
+        filas.length <= 1
+    ) {
 
         alert(
             "El pedido debe tener al menos un vidrio."
@@ -305,7 +497,9 @@ function quitarVidrio(boton) {
     }
 
 
-    boton.closest(".fila-vidrio").remove();
+    boton.closest(
+        ".fila-vidrio"
+    ).remove();
 }
 
 
@@ -316,34 +510,48 @@ function quitarVidrio(boton) {
 function obtenerVidriosFormulario() {
 
     const filas =
-        document.querySelectorAll(".fila-vidrio");
+        document.querySelectorAll(
+            ".fila-vidrio"
+        );
 
 
-    return Array.from(filas).map(fila => {
+    return Array
+        .from(filas)
+        .map(fila => {
 
-        return {
+            return {
 
-            tipoVidrio:
-                fila.querySelector(".tipoVidrio").value,
+                tipoVidrio:
+                    fila.querySelector(
+                        ".tipoVidrio"
+                    ).value,
 
-            espesor:
-                fila.querySelector(".espesor").value,
+                espesor:
+                    fila.querySelector(
+                        ".espesor"
+                    ).value,
 
-            cantidad:
-                Number(
-                    fila.querySelector(".cantidadVidrio").value
-                ) || 0,
+                cantidad:
+                    Number(
+                        fila.querySelector(
+                            ".cantidadVidrio"
+                        ).value
+                    ) || 0,
 
-            metros:
-                Number(
-                    fila.querySelector(".metrosVidrio").value
-                ) || 0,
+                metros:
+                    Number(
+                        fila.querySelector(
+                            ".metrosVidrio"
+                        ).value
+                    ) || 0,
 
-            procesoEspecial:
-                fila.querySelector(".procesoEspecialVidrio").value
-        };
+                procesoEspecial:
+                    fila.querySelector(
+                        ".procesoEspecialVidrio"
+                    ).value
+            };
 
-    });
+        });
 }
 
 
@@ -356,26 +564,43 @@ async function guardarPedido() {
     const pedido = {
 
         op:
-            document.getElementById("op")
+            document
+                .getElementById("op")
                 .value
                 .trim(),
 
         cliente:
-            document.getElementById("cliente")
+            document
+                .getElementById("cliente")
                 .value
                 .trim(),
 
         fechaIngreso:
-            document.getElementById("fechaIngreso").value,
+            document
+                .getElementById(
+                    "fechaIngreso"
+                )
+                .value,
 
         horaEntrega:
-            document.getElementById("horaEntrega").value,
+            document
+                .getElementById(
+                    "horaEntrega"
+                )
+                .value,
 
         fechaEntrega:
-            document.getElementById("fechaEntrega").value,
+            document
+                .getElementById(
+                    "fechaEntrega"
+                )
+                .value,
 
         descripcion:
-            document.getElementById("descripcion")
+            document
+                .getElementById(
+                    "descripcion"
+                )
                 .value
                 .trim(),
 
@@ -384,7 +609,11 @@ async function guardarPedido() {
     };
 
 
-    if (!pedido.op || !pedido.cliente) {
+    if (
+        !pedido.op
+        ||
+        !pedido.cliente
+    ) {
 
         alert(
             "La OP y el nombre son obligatorios."
@@ -394,7 +623,9 @@ async function guardarPedido() {
     }
 
 
-    if (pedido.vidrios.length === 0) {
+    if (
+        pedido.vidrios.length === 0
+    ) {
 
         alert(
             "Debes agregar al menos un vidrio."
@@ -412,7 +643,11 @@ async function guardarPedido() {
                 `/api/pedidos/${pedidoEditando}/datos`,
                 {
                     method: "PUT",
-                    body: JSON.stringify(pedido)
+
+                    body:
+                        JSON.stringify(
+                            pedido
+                        )
                 }
             );
 
@@ -427,7 +662,11 @@ async function guardarPedido() {
                 "/api/pedidos",
                 {
                     method: "POST",
-                    body: JSON.stringify(pedido)
+
+                    body:
+                        JSON.stringify(
+                            pedido
+                        )
                 }
             );
 
@@ -447,10 +686,13 @@ async function guardarPedido() {
 
 
         const buscar =
-            document.getElementById("buscar");
+            document.getElementById(
+                "buscar"
+            );
 
 
         if (buscar) {
+
             buscar.value = "";
         }
 
@@ -460,9 +702,14 @@ async function guardarPedido() {
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            error
+        );
 
-        alert(error.message);
+
+        alert(
+            error.message
+        );
     }
 }
 
@@ -473,20 +720,41 @@ async function guardarPedido() {
 
 function limpiarFormulario() {
 
-    document.getElementById("op").value = "";
-
-    document.getElementById("cliente").value = "";
-
-    document.getElementById("fechaIngreso").value = "";
-
-    document.getElementById("horaEntrega").value = "";
-
-    document.getElementById("fechaEntrega").value = "";
-
-    document.getElementById("descripcion").value = "";
+    document
+        .getElementById("op")
+        .value = "";
 
 
-    document.getElementById("listaVidrios").innerHTML = "";
+    document
+        .getElementById("cliente")
+        .value = "";
+
+
+    document
+        .getElementById("fechaIngreso")
+        .value = "";
+
+
+    document
+        .getElementById("horaEntrega")
+        .value = "";
+
+
+    document
+        .getElementById("fechaEntrega")
+        .value = "";
+
+
+    document
+        .getElementById("descripcion")
+        .value = "";
+
+
+    document
+        .getElementById(
+            "listaVidrios"
+        )
+        .innerHTML = "";
 
 
     agregarVidrio();
@@ -505,7 +773,9 @@ async function cargarDatos() {
             `/api/pedidos-paginados?page=${paginaActual}&limit=${limitePorPagina}`;
 
 
-        if (busquedaActual) {
+        if (
+            busquedaActual
+        ) {
 
             url +=
                 `&buscar=${encodeURIComponent(
@@ -519,8 +789,12 @@ async function cargarDatos() {
 
 
         pedidos =
-            Array.isArray(respuesta.pedidos)
+            Array.isArray(
+                respuesta.pedidos
+            )
+
                 ? respuesta.pedidos
+
                 : [];
 
 
@@ -545,7 +819,9 @@ async function cargarDatos() {
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            error
+        );
 
 
         alert(
@@ -559,59 +835,87 @@ async function cargarDatos() {
 // MOSTRAR VIDRIOS
 // ===============================
 
-function crearResumenVidrios(vidrios = []) {
+function crearResumenVidrios(
+    vidrios = []
+) {
 
-    if (!vidrios.length) {
+    if (
+        !vidrios.length
+    ) {
 
         return `
+
             <div class="vidrio-resumen">
+
                 Sin información de vidrio
+
             </div>
+
         `;
     }
 
 
-    return vidrios.map(vidrio => {
+    return vidrios
+        .map(vidrio => {
 
-        const especial =
-            vidrio.procesoEspecial &&
-            vidrio.procesoEspecial !== "NINGUNO"
+            const especial =
+                vidrio.procesoEspecial
+                &&
+                vidrio.procesoEspecial
+                !== "NINGUNO"
 
-                ? `
-                    <span class="etiqueta-especial">
-                        ${vidrio.procesoEspecial}
+                    ? `
+
+                        <span class="etiqueta-especial">
+
+                            ${vidrio.procesoEspecial}
+
+                        </span>
+
+                    `
+
+                    : "";
+
+
+            return `
+
+                <div class="vidrio-resumen">
+
+                    <strong>
+
+                        ${vidrio.tipoVidrio || "INCOLORO"}
+
+                        ${vidrio.espesor || "-"} mm
+
+                    </strong>
+
+
+                    <span>
+
+                        -
+
+                        ${vidrio.cantidad || 0} und
+
                     </span>
-                `
-
-                : "";
 
 
-        return `
+                    <span>
 
-            <div class="vidrio-resumen">
+                        -
 
-                <strong>
-                    ${vidrio.tipoVidrio || "INCOLORO"}
-                    ${vidrio.espesor || "-"} mm
-                </strong>
+                        ${vidrio.metros || 0} m
 
-                <span>
-                    -
-                    ${vidrio.cantidad || 0} und
-                </span>
+                    </span>
 
-                <span>
-                    -
-                    ${vidrio.metros || 0} m
-                </span>
 
-                ${especial}
+                    ${especial}
 
-            </div>
+                </div>
 
-        `;
+            `;
 
-    }).join("");
+        })
+        .join("");
 }
 
 
@@ -622,15 +926,20 @@ function crearResumenVidrios(vidrios = []) {
 function mostrarProduccion() {
 
     const contenedor =
-        document.getElementById("produccion");
+        document.getElementById(
+            "produccion"
+        );
 
 
     if (!contenedor) {
+
         return;
     }
 
 
-    if (pedidos.length === 0) {
+    if (
+        pedidos.length === 0
+    ) {
 
         contenedor.innerHTML =
             "<p>No hay pedidos encontrados.</p>";
@@ -640,146 +949,168 @@ function mostrarProduccion() {
 
 
     contenedor.innerHTML =
-        pedidos.map(pedido => {
+        pedidos
+            .map(pedido => {
 
-            return `
+                return `
 
-                <div class="op-card" id="pedido-${pedido.id}">
+                    <div
+                        class="op-card"
+                        id="pedido-${pedido.id}"
+                    >
 
-                    <div class="op-cabecera">
+                        <div class="op-cabecera">
 
-                        <strong>
-                            OP ${pedido.op}
-                        </strong>
+                            <strong>
+                                OP ${pedido.op}
+                            </strong>
 
-                        <strong>
-                            ${pedido.cliente}
-                        </strong>
+                            <strong>
+                                ${pedido.cliente}
+                            </strong>
 
-                        <span>
-                            Ingreso:
-                            ${pedido.fechaIngreso || "-"}
-                        </span>
+                            <span>
 
-                        <span>
-                            🕐 hora de entrega:
-                            ${pedido.horaEntrega || "SIN HORA"}
-                        </span>
+                                Ingreso:
 
-                        <span>
-                            📅 fecha de entrega:
-                            ${pedido.fechaEntrega || "SIN FECHA"}
-                        </span>
+                                ${pedido.fechaIngreso || "-"}
 
-                    </div>
+                            </span>
 
+                            <span>
 
-                    ${
-                        pedido.descripcion
-                            ? `
-                                <div class="descripcion-card">
-                                    ${pedido.descripcion}
-                                </div>
-                              `
-                            : ""
-                    }
+                                🕐 hora de entrega:
 
+                                ${pedido.horaEntrega || "SIN HORA"}
 
-                    <div class="resumen-vidrios">
+                            </span>
 
-                        ${crearResumenVidrios(
-                            pedido.vidrios
-                        )}
+                            <span>
 
-                    </div>
+                                📅 fecha de entrega:
+
+                                ${pedido.fechaEntrega || "SIN FECHA"}
+
+                            </span>
+
+                        </div>
 
 
-                    <div class="procesos">
+                        ${
+                            pedido.descripcion
 
-                        ${crearProceso(
-                            pedido,
-                            "corte",
-                            "CORTE"
-                        )}
+                                ? `
 
-                        ${crearProceso(
-                            pedido,
-                            "entalle",
-                            "ENTALLE"
-                        )}
+                                    <div class="descripcion-card">
 
-                        ${crearProceso(
-                            pedido,
-                            "limpios",
-                            "LIMPIOS"
-                        )}
+                                        ${pedido.descripcion}
 
-                        ${crearProceso(
-                            pedido,
-                            "templado",
-                            "TEMPLADO"
-                        )}
+                                    </div>
 
-                        ${crearProceso(
-                            pedido,
-                            "terminado",
-                            "TERMINADO"
-                        )}
+                                  `
 
-                        ${crearProceso(
-                            pedido,
-                            "despacho",
-                            "DESPACHO"
-                        )}
-
-                    </div>
+                                : ""
+                        }
 
 
-                    <div class="detalle-op">
+                        <div class="resumen-vidrios">
 
-                        📝 Registrado:
-
-                        <strong>
-                            ${formatearCreadoEn(
-                                pedido.creadoEn
+                            ${crearResumenVidrios(
+                                pedido.vidrios
                             )}
-                        </strong>
+
+                        </div>
+
+
+                        <div class="procesos">
+
+                            ${crearProceso(
+                                pedido,
+                                "corte",
+                                "CORTE"
+                            )}
+
+                            ${crearProceso(
+                                pedido,
+                                "entalle",
+                                "ENTALLE"
+                            )}
+
+                            ${crearProceso(
+                                pedido,
+                                "limpios",
+                                "LIMPIOS"
+                            )}
+
+                            ${crearProceso(
+                                pedido,
+                                "templado",
+                                "TEMPLADO"
+                            )}
+
+                            ${crearProceso(
+                                pedido,
+                                "terminado",
+                                "TERMINADO"
+                            )}
+
+                            ${crearProceso(
+                                pedido,
+                                "despacho",
+                                "DESPACHO"
+                            )}
+
+                        </div>
+
+
+                        <div class="detalle-op">
+
+                            📝 Registrado:
+
+                            <strong>
+
+                                ${formatearCreadoEn(
+                                    pedido.creadoEn
+                                )}
+
+                            </strong>
+
+                        </div>
+
+
+                        <div class="acciones-pedido">
+
+                            <button
+                                class="btn-editar"
+                                onclick="cotizarPedido(${pedido.id})"
+                            >
+                                💰 Cotizar
+                            </button>
+
+
+                            <button
+                                class="btn-editar"
+                                onclick="editarPedido(${pedido.id})"
+                            >
+                                ✎ Editar pedido
+                            </button>
+
+
+                            <button
+                                class="btn-eliminar"
+                                onclick="eliminarPedido(${pedido.id})"
+                            >
+                                🗑 Eliminar
+                            </button>
+
+                        </div>
 
                     </div>
 
+                `;
 
-                    <div class="acciones-pedido">
-
-                        <button
-                            class="btn-editar"
-                            onclick="cotizarPedido(${pedido.id})"
-                        >
-                            💰 Cotizar
-                        </button>
-
-
-                        <button
-                            class="btn-editar"
-                            onclick="editarPedido(${pedido.id})"
-                        >
-                            ✎ Editar pedido
-                        </button>
-
-
-                        <button
-                            class="btn-eliminar"
-                            onclick="eliminarPedido(${pedido.id})"
-                        >
-                            🗑 Eliminar
-                        </button>
-
-                    </div>
-
-                </div>
-
-            `;
-
-        }).join("");
+            })
+            .join("");
 }
 
 
@@ -794,19 +1125,27 @@ function crearProceso(
 ) {
 
     const activo =
-        Boolean(pedido[campo]);
+        Boolean(
+            pedido[campo]
+        );
 
 
     return `
 
         <div
-            class="proceso ${activo ? "terminado" : ""}"
+
+            class="proceso ${
+                activo
+                    ? "terminado"
+                    : ""
+            }"
 
             onclick="cambiarProceso(
                 ${pedido.id},
                 '${campo}',
                 ${!activo}
             )"
+
         >
 
             ${activo ? "✓ " : ""}
@@ -836,9 +1175,13 @@ async function cambiarProceso(
             {
                 method: "PUT",
 
-                body: JSON.stringify({
-                    [campo]: valor
-                })
+                body:
+                    JSON.stringify({
+
+                        [campo]:
+                            valor
+
+                    })
             }
         );
 
@@ -848,9 +1191,14 @@ async function cambiarProceso(
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            error
+        );
 
-        alert(error.message);
+
+        alert(
+            error.message
+        );
     }
 }
 
@@ -863,7 +1211,10 @@ function cotizarPedido(id) {
 
     const pedido =
         pedidos.find(
-            p => Number(p.id) === Number(id)
+            p =>
+                Number(p.id)
+                ===
+                Number(id)
         );
 
 
@@ -895,15 +1246,22 @@ function cotizarPedido(id) {
             pedido.descripcion || "",
 
         vidrios:
-            Array.isArray(pedido.vidrios)
+            Array.isArray(
+                pedido.vidrios
+            )
+
                 ? pedido.vidrios
+
                 : []
     };
 
 
     localStorage.setItem(
         "pedidoParaCotizar",
-        JSON.stringify(datosCotizacion)
+
+        JSON.stringify(
+            datosCotizacion
+        )
     );
 
 
@@ -922,7 +1280,10 @@ function editarPedido(id) {
 
     const pedido =
         pedidos.find(
-            p => Number(p.id) === Number(id)
+            p =>
+                Number(p.id)
+                ===
+                Number(id)
         );
 
 
@@ -940,47 +1301,73 @@ function editarPedido(id) {
         pedido.id;
 
 
-    document.getElementById("op").value =
+    document
+        .getElementById("op")
+        .value =
         pedido.op || "";
 
 
-    document.getElementById("cliente").value =
+    document
+        .getElementById("cliente")
+        .value =
         pedido.cliente || "";
 
 
-    document.getElementById("fechaIngreso").value =
+    document
+        .getElementById(
+            "fechaIngreso"
+        )
+        .value =
         pedido.fechaIngreso || "";
 
 
-    document.getElementById("horaEntrega").value =
+    document
+        .getElementById(
+            "horaEntrega"
+        )
+        .value =
         pedido.horaEntrega || "";
 
 
-    document.getElementById("fechaEntrega").value =
+    document
+        .getElementById(
+            "fechaEntrega"
+        )
+        .value =
         pedido.fechaEntrega || "";
 
 
-    document.getElementById("descripcion").value =
+    document
+        .getElementById(
+            "descripcion"
+        )
+        .value =
         pedido.descripcion || "";
 
 
     const lista =
-        document.getElementById("listaVidrios");
+        document.getElementById(
+            "listaVidrios"
+        );
 
 
     lista.innerHTML = "";
 
 
     if (
-        pedido.vidrios &&
+        pedido.vidrios
+        &&
         pedido.vidrios.length
     ) {
 
-        pedido.vidrios.forEach(vidrio => {
+        pedido.vidrios.forEach(
+            vidrio => {
 
-            agregarVidrio(vidrio);
-
-        });
+                agregarVidrio(
+                    vidrio
+                );
+            }
+        );
 
     } else {
 
@@ -988,26 +1375,41 @@ function editarPedido(id) {
     }
 
 
-    document.getElementById("tituloFormulario")
+    document
+        .getElementById(
+            "tituloFormulario"
+        )
         .textContent =
         `EDITANDO OP ${pedido.op}`;
 
 
-    document.getElementById("btnGuardar")
+    document
+        .getElementById(
+            "btnGuardar"
+        )
         .textContent =
         "GUARDAR CAMBIOS";
 
 
-    document.getElementById(
-        "btnCancelarEdicion"
-    ).classList.remove("oculto");
+    document
+        .getElementById(
+            "btnCancelarEdicion"
+        )
+        .classList
+        .remove(
+            "oculto"
+        );
 
 
-    document.getElementById(
-        "panelRegistro"
-    ).scrollIntoView({
-        behavior: "smooth"
-    });
+    document
+        .getElementById(
+            "panelRegistro"
+        )
+        .scrollIntoView({
+
+            behavior: "smooth"
+
+        });
 }
 
 
@@ -1023,19 +1425,30 @@ function cancelarEdicion() {
     limpiarFormulario();
 
 
-    document.getElementById("tituloFormulario")
+    document
+        .getElementById(
+            "tituloFormulario"
+        )
         .textContent =
         "REGISTRO DE PEDIDOS";
 
 
-    document.getElementById("btnGuardar")
+    document
+        .getElementById(
+            "btnGuardar"
+        )
         .textContent =
         "REGISTRAR PEDIDO";
 
 
-    document.getElementById(
-        "btnCancelarEdicion"
-    ).classList.add("oculto");
+    document
+        .getElementById(
+            "btnCancelarEdicion"
+        )
+        .classList
+        .add(
+            "oculto"
+        );
 }
 
 
@@ -1052,6 +1465,7 @@ async function eliminarPedido(id) {
 
 
     if (!confirmar) {
+
         return;
     }
 
@@ -1061,13 +1475,15 @@ async function eliminarPedido(id) {
         await api(
             `/api/pedidos/${id}`,
             {
-                method: "DELETE"
+                method:
+                    "DELETE"
             }
         );
 
 
         if (
-            pedidos.length === 1 &&
+            pedidos.length === 1
+            &&
             paginaActual > 1
         ) {
 
@@ -1080,24 +1496,32 @@ async function eliminarPedido(id) {
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            error
+        );
 
-        alert(error.message);
+
+        alert(
+            error.message
+        );
     }
 }
 
 
 // ===============================
-// BUSCAR
+// BUSCAR PEDIDO
 // ===============================
 
 async function buscarPedido() {
 
     const input =
-        document.getElementById("buscar");
+        document.getElementById(
+            "buscar"
+        );
 
 
     if (!input) {
+
         return;
     }
 
@@ -1107,10 +1531,13 @@ async function buscarPedido() {
 
 
     const resultado =
-        document.getElementById("resultado");
+        document.getElementById(
+            "resultado"
+        );
 
 
     if (resultado) {
+
         resultado.innerHTML = "";
     }
 
@@ -1126,15 +1553,21 @@ async function buscarPedido() {
 
 
     if (!texto) {
+
         return;
     }
 
 
     const pedidoExacto =
-        pedidos.find(pedido =>
-            String(pedido.op)
-                .toLowerCase() ===
-            texto.toLowerCase()
+        pedidos.find(
+            pedido =>
+
+                String(
+                    pedido.op
+                )
+                .toLowerCase()
+                ===
+                texto.toLowerCase()
         );
 
 
@@ -1154,10 +1587,13 @@ async function buscarPedido() {
 async function limpiarBusqueda() {
 
     const buscar =
-        document.getElementById("buscar");
+        document.getElementById(
+            "buscar"
+        );
 
 
     if (buscar) {
+
         buscar.value = "";
     }
 
@@ -1172,7 +1608,7 @@ async function limpiarBusqueda() {
 
 
 // ===============================
-// IR DIRECTAMENTE AL PEDIDO
+// IR AL PEDIDO
 // ===============================
 
 function irAlPedido(id) {
@@ -1184,19 +1620,23 @@ function irAlPedido(id) {
 
 
     if (!tarjeta) {
+
         return;
     }
 
 
     tarjeta.scrollIntoView({
+
         behavior: "smooth",
+
         block: "center"
+
     });
 }
 
 
 // ===============================
-// RESUMEN GENERAL DESDE POSTGRESQL
+// RESUMEN GENERAL
 // ===============================
 
 async function actualizarResumen() {
@@ -1209,22 +1649,34 @@ async function actualizarResumen() {
             );
 
 
-        document.getElementById("total")
+        document
+            .getElementById(
+                "total"
+            )
             .textContent =
             resumen.total || 0;
 
 
-        document.getElementById("pendientes")
+        document
+            .getElementById(
+                "pendientes"
+            )
             .textContent =
             resumen.pendientes || 0;
 
 
-        document.getElementById("proceso")
+        document
+            .getElementById(
+                "proceso"
+            )
             .textContent =
             resumen.proceso || 0;
 
 
-        document.getElementById("terminados")
+        document
+            .getElementById(
+                "terminados"
+            )
             .textContent =
             resumen.terminados || 0;
 
@@ -1243,7 +1695,9 @@ async function actualizarResumen() {
 // PAGINACIÓN
 // ===============================
 
-function mostrarPaginacion(totalPedidos) {
+function mostrarPaginacion(
+    totalPedidos
+) {
 
     let contenedor =
         document.getElementById(
@@ -1266,17 +1720,22 @@ function mostrarPaginacion(totalPedidos) {
         contenedor.style.display =
             "flex";
 
+
         contenedor.style.justifyContent =
             "center";
+
 
         contenedor.style.alignItems =
             "center";
 
+
         contenedor.style.gap =
             "10px";
 
+
         contenedor.style.flexWrap =
             "wrap";
+
 
         contenedor.style.margin =
             "25px 0";
@@ -1298,7 +1757,9 @@ function mostrarPaginacion(totalPedidos) {
     }
 
 
-    if (totalPedidos === 0) {
+    if (
+        totalPedidos === 0
+    ) {
 
         contenedor.innerHTML = "";
 
@@ -1311,28 +1772,45 @@ function mostrarPaginacion(totalPedidos) {
         <button
             type="button"
             onclick="paginaAnterior()"
-            ${paginaActual <= 1 ? "disabled" : ""}
+            ${
+                paginaActual <= 1
+                    ? "disabled"
+                    : ""
+            }
         >
             ← ANTERIOR
         </button>
 
 
         <strong>
+
             Página ${paginaActual}
             de ${totalPaginas}
+
         </strong>
 
 
         <span>
+
             ${totalPedidos}
-            pedido${totalPedidos === 1 ? "" : "s"}
+
+            pedido${
+                totalPedidos === 1
+                    ? ""
+                    : "s"
+            }
+
         </span>
 
 
         <button
             type="button"
             onclick="paginaSiguiente()"
-            ${paginaActual >= totalPaginas ? "disabled" : ""}
+            ${
+                paginaActual >= totalPaginas
+                    ? "disabled"
+                    : ""
+            }
         >
             SIGUIENTE →
         </button>
@@ -1347,7 +1825,10 @@ function mostrarPaginacion(totalPedidos) {
 
 async function paginaAnterior() {
 
-    if (paginaActual <= 1) {
+    if (
+        paginaActual <= 1
+    ) {
+
         return;
     }
 
@@ -1371,6 +1852,7 @@ async function paginaSiguiente() {
     if (
         paginaActual >= totalPaginas
     ) {
+
         return;
     }
 
@@ -1398,19 +1880,23 @@ function irArribaPedidos() {
 
 
     if (!produccion) {
+
         return;
     }
 
 
     produccion.scrollIntoView({
+
         behavior: "smooth",
+
         block: "start"
+
     });
 }
 
 
 // ===============================
-// ENTER EN BUSCADOR
+// PREPARAR BUSCADOR
 // ===============================
 
 function prepararBuscador() {
@@ -1422,12 +1908,14 @@ function prepararBuscador() {
 
 
     if (!buscar) {
+
         return;
     }
 
 
     buscar.addEventListener(
         "keydown",
+
         function (evento) {
 
             if (
@@ -1435,6 +1923,7 @@ function prepararBuscador() {
             ) {
 
                 evento.preventDefault();
+
 
                 buscarPedido();
             }
@@ -1444,10 +1933,12 @@ function prepararBuscador() {
 
     buscar.addEventListener(
         "input",
+
         function () {
 
             if (
-                buscar.value.trim() === "" &&
+                buscar.value.trim() === ""
+                &&
                 busquedaActual !== ""
             ) {
 
