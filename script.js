@@ -1058,7 +1058,7 @@ function buscarPedido() {
                         </strong>
 
                         <span>
-                            🕐 hora de entrga
+                            🕐 hora de entrega:
                             ${pedido.horaEntrega || "-"}
                         </span>
 
