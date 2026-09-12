@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Cotizaciones - Zakata Glass
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+</head>
+
+
+<body>
+
+<header>
+
+    <img
+        src="https://maqvid.com/wp-content/uploads/2024/05/Zakata.jpeg"
+        alt="ZAKATA GLASS"
+        class="logo"
+    >
+
+    <div>
+
+        <h1>
+            VIDRIO TEMPLADO
+        </h1>
+
+        <p>
+            COTIZACIONES
+        </p>
+
+    </div>
+
+</header>
+
+
+<main>
+
+    <div class="cabecera-cotizacion">
+
+        <div>
+
+            <h1>
+                COTIZADOR DE VIDRIOS
+            </h1>
+
+            <p>
+                Calcula automáticamente metros cuadrados y precios.
+            </p>
+
+        </div>
+
+
+        <a
+            href="index.html"
+            class="btn-volver"
+        >
+            ← VOLVER A PEDIDOS
+        </a>
+
+    </div>
+
+
+    <!-- DATOS DE LA COTIZACIÓN -->
+
+    <section class="panel">
+
+        <h2>
+            DATOS DE LA COTIZACIÓN
+        </h2>
+
+
+        <div class="datos-cotizacion">
+
+            <div>
+
+                <label>
+                    N° COTIZACIÓN
+                </label>
+
+                <input
+                    id="numeroCotizacion"
+                    type="text"
+                    readonly
+                >
+
+            </div>
+
+
+            <div>
+
+                <label>
+                    CLIENTE
+                </label>
+
+                <input
+                    id="clienteCotizacion"
+                    type="text"
+                    placeholder="Nombre del cliente"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label>
+                    FECHA
+                </label>
+
+                <input
+                    id="fechaCotizacion"
+                    type="date"
+                >
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- VIDRIOS -->
+
+    <section class="panel">
+
+        <div class="titulo-cotizacion">
+
+            <h2>
+                VIDRIOS A COTIZAR
+            </h2>
+
+
+            <button
+                class="btn-agregar"
+                onclick="agregarFilaCotizacion()"
+            >
+                + AGREGAR VIDRIO
+            </button>
+
+        </div>
+
+
+        <div id="listaCotizacion"></div>
+
+    </section>
+
+
+    <!-- OBSERVACIONES -->
+
+    <section class="panel">
+
+        <h2>
+            OBSERVACIONES
+        </h2>
+
+
+        <textarea
+            id="observacionesCotizacion"
+            class="observaciones-cotizacion"
+            placeholder="Ejemplo: incluye instalación, entrega, perforaciones, etc."
+        ></textarea>
+
+    </section>
+
+
+    <!-- TOTALES -->
+
+    <section class="panel">
+
+        <div class="resumen-cotizacion">
+
+            <div class="linea-total">
+
+                <span>
+                    TOTAL M²
+                </span>
+
+                <strong id="totalMetrosCotizacion">
+                    0.00 m²
+                </strong>
+
+            </div>
+
+
+            <div class="linea-total">
+
+                <span>
+                    SUBTOTAL
+                </span>
+
+                <strong id="subtotalCotizacion">
+                    S/ 0.00
+                </strong>
+
+            </div>
+
+
+            <div class="linea-total igv-linea">
+
+                <label>
+
+                    <input
+                        type="checkbox"
+                        id="aplicarIgv"
+                        onchange="calcularCotizacion()"
+                    >
+
+                    APLICAR IGV 18%
+
+                </label>
+
+
+                <strong id="igvCotizacion">
+                    S/ 0.00
+                </strong>
+
+            </div>
+
+
+            <div class="linea-total total-final">
+
+                <span>
+                    TOTAL
+                </span>
+
+                <strong id="totalCotizacion">
+                    S/ 0.00
+                </strong>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- BOTONES -->
+
+    <section class="acciones-cotizacion">
+
+        <button
+            class="btn-principal"
+            onclick="imprimirCotizacion()"
+        >
+            🖨 IMPRIMIR COTIZACIÓN
+        </button>
+
+
+        <button
+            class="btn-nueva-cotizacion"
+            onclick="nuevaCotizacion()"
+        >
+            + NUEVA COTIZACIÓN
+        </button>
+
+    </section>
+
+</main>
+
+
+<script src="cotizaciones.js"></script>
+
+</body>
+
+</html>
