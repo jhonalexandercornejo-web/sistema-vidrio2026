@@ -453,7 +453,6 @@ app.get(
             let pagina =
                 Number(req.query.page) || 1;
 
-
             let limite =
                 Number(req.query.limit) || 50;
 
@@ -486,6 +485,10 @@ app.get(
                 );
 
 
+            // ===============================
+            // CONTAR PEDIDOS
+            // ===============================
+
             const resultadoTotal =
                 await pool.query(`
 
@@ -504,6 +507,10 @@ app.get(
                 resultadoTotal.rows[0]
                     ?.total || 0;
 
+
+            // ===============================
+            // PAGINACIÓN
+            // ===============================
 
             const valoresPedidos =
                 [...valores];
@@ -527,66 +534,28 @@ app.get(
                 valoresPedidos.length;
 
 
+            // ===============================
+            // OBTENER PEDIDOS
+            // ===============================
+
             const resultado =
                 await pool.query(`
-
-                    WITH pedidos_pagina AS (
-
-                        SELECT
-                            p.*
-
-                        FROM pedidos p
-
-                        ${whereSQL}
-
-                        ORDER BY
-
-                            CASE
-
-                                WHEN
-                                    p."fechaEntrega" IS NULL
-                                    OR
-                                    p."fechaEntrega" = ''
-
-                                THEN 1
-
-                                ELSE 0
-
-                            END,
-
-                            p."fechaEntrega" ASC,
-
-
-                            CASE
-
-                                WHEN
-                                    p."horaEntrega" IS NULL
-                                    OR
-                                    p."horaEntrega" = ''
-
-                                THEN 1
-
-                                ELSE 0
-
-                            END,
-
-                            p."horaEntrega" ASC,
-
-                            p.id DESC
-
-                        LIMIT
-                            $${parametroLimite}
-
-                        OFFSET
-                            $${parametroOffset}
-
-                    )
 
                     SELECT
 
                         p.*,
 
                         COALESCE(
+                            vdatos.vidrios,
+                            '[]'::json
+                        ) AS vidrios
+
+                    FROM pedidos p
+
+
+                    LEFT JOIN LATERAL (
+
+                        SELECT
 
                             json_agg(
 
@@ -614,38 +583,17 @@ app.get(
 
                                 ORDER BY v.id
 
-                            )
+                            ) AS vidrios
 
-                            FILTER (
-                                WHERE v.id IS NOT NULL
-                            ),
+                        FROM vidrios v
 
-                            '[]'
+                        WHERE
+                            v."pedidoId" = p.id
 
-                        ) AS vidrios
-
-                    FROM pedidos_pagina p
-
-                    LEFT JOIN vidrios v
-
-                    ON
-                        v."pedidoId" = p.id
+                    ) vdatos ON TRUE
 
 
-                    GROUP BY p.id,
-                             p.op,
-                             p.cliente,
-                             p."fechaIngreso",
-                             p."fechaEntrega",
-                             p."horaEntrega",
-                             p.descripcion,
-                             p.corte,
-                             p.entalle,
-                             p.limpios,
-                             p.templado,
-                             p.terminado,
-                             p.despacho,
-                             p."creadoEn"
+                    ${whereSQL}
 
 
                     ORDER BY
@@ -683,6 +631,13 @@ app.get(
 
                         p.id DESC
 
+
+                    LIMIT
+                        $${parametroLimite}
+
+                    OFFSET
+                        $${parametroOffset}
+
                 `, valoresPedidos);
 
 
@@ -702,18 +657,28 @@ app.get(
                         convertirPedido
                     ),
 
-                pagina,
+                pagina:
 
-                limite,
+                    pagina,
 
-                total,
+                limite:
 
-                totalPaginas,
+                    limite,
+
+                total:
+
+                    total,
+
+                totalPaginas:
+
+                    totalPaginas,
 
                 tieneAnterior:
+
                     pagina > 1,
 
                 tieneSiguiente:
+
                     pagina < totalPaginas
 
             });
@@ -721,7 +686,10 @@ app.get(
 
         } catch (error) {
 
-            console.error(error);
+            console.error(
+                "ERROR PEDIDOS PAGINADOS:",
+                error
+            );
 
 
             res.status(500).json({
