@@ -627,12 +627,12 @@ function mostrarProduccion() {
                         </span>
 
                         <span>
-                            🕐
+                            🕐 hora de entrega:
                             ${pedido.horaEntrega || "SIN HORA"}
                         </span>
 
                         <span>
-                            📅
+                            📅 fecha de entrega:
                             ${pedido.fechaEntrega || "SIN FECHA"}
                         </span>
 
