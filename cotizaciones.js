@@ -9,29 +9,185 @@ document.addEventListener(
     "DOMContentLoaded",
     function () {
 
-        generarNumeroCotizacion();
-
         colocarFechaHoy();
 
-        agregarFilaCotizacion();
+        cargarPedidoParaCotizar();
     }
 );
 
 
 // ===============================
-// NÚMERO DE COTIZACIÓN
+// FECHA ACTUAL
 // ===============================
 
+function colocarFechaHoy() {
 
+    const fecha = new Date();
+
+    const anio =
+        fecha.getFullYear();
+
+    const mes =
+        String(
+            fecha.getMonth() + 1
+        ).padStart(2, "0");
+
+    const dia =
+        String(
+            fecha.getDate()
+        ).padStart(2, "0");
+
+    document.getElementById(
+        "fechaCotizacion"
+    ).value =
+        `${anio}-${mes}-${dia}`;
+}
+
+
+// ===============================
+// CARGAR PEDIDO DESDE CONTROL
+// ===============================
+
+function cargarPedidoParaCotizar() {
+
+    const guardado =
+        localStorage.getItem(
+            "pedidoParaCotizar"
+        );
+
+
+    if (!guardado) {
+
+        agregarFilaCotizacion();
+
+        return;
+    }
+
+
+    try {
+
+        const pedido =
+            JSON.parse(guardado);
+
+
+        // CLIENTE
+        document.getElementById(
+            "clienteCotizacion"
+        ).value =
+            pedido.cliente || "";
+
+
+        // NÚMERO DE COTIZACIÓN / OP
+        const numero =
+            document.getElementById(
+                "numeroCotizacion"
+            );
+
+
+        if (
+            numero &&
+            pedido.op
+        ) {
+
+            numero.value =
+                pedido.op;
+        }
+
+
+        // OBSERVACIONES
+        const observaciones =
+            document.getElementById(
+                "observacionesCotizacion"
+            );
+
+
+        if (observaciones) {
+
+            let texto = "";
+
+
+            if (pedido.descripcion) {
+
+                texto +=
+                    pedido.descripcion;
+            }
+
+
+            if (pedido.fechaEntrega) {
+
+                if (texto) {
+                    texto += "\n";
+                }
+
+
+                texto +=
+                    "Fecha de entrega: " +
+                    pedido.fechaEntrega;
+            }
+
+
+            observaciones.value =
+                texto;
+        }
+
+
+        // LIMPIAR FILAS
+        document.getElementById(
+            "listaCotizacion"
+        ).innerHTML = "";
+
+
+        // CARGAR VIDRIOS
+        if (
+            Array.isArray(
+                pedido.vidrios
+            ) &&
+            pedido.vidrios.length > 0
+        ) {
+
+            pedido.vidrios.forEach(
+                vidrio => {
+
+                    agregarFilaCotizacion(
+                        vidrio
+                    );
+                }
+            );
+
+        } else {
+
+            agregarFilaCotizacion();
+        }
+
+
+        calcularCotizacion();
+
+
+        // BORRAR DATO TEMPORAL
+        localStorage.removeItem(
+            "pedidoParaCotizar"
+        );
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        agregarFilaCotizacion();
+    }
+}
 
 
 // ===============================
 // AGREGAR VIDRIO
 // ===============================
 
-function agregarFilaCotizacion() {
+function agregarFilaCotizacion(
+    datos = {}
+) {
 
     contadorFilasCotizacion++;
+
 
     const contenedor =
         document.getElementById(
@@ -108,14 +264,37 @@ function agregarFilaCotizacion() {
 
             <select class="cot-espesor">
 
-                <option value="4">4 mm</option>
-                <option value="5">5 mm</option>
-                <option value="6">6 mm</option>
-                <option value="8" selected>8 mm</option>
-                <option value="10">10 mm</option>
-                <option value="12">12 mm</option>
-                <option value="15">15 mm</option>
-                <option value="19">19 mm</option>
+                <option value="4">
+                    4 mm
+                </option>
+
+                <option value="5">
+                    5 mm
+                </option>
+
+                <option value="6">
+                    6 mm
+                </option>
+
+                <option value="8">
+                    8 mm
+                </option>
+
+                <option value="10">
+                    10 mm
+                </option>
+
+                <option value="12">
+                    12 mm
+                </option>
+
+                <option value="15">
+                    15 mm
+                </option>
+
+                <option value="19">
+                    19 mm
+                </option>
 
             </select>
 
@@ -183,10 +362,12 @@ function agregarFilaCotizacion() {
             </label>
 
             <input
-                type="text"
+                type="number"
                 class="cot-metros"
-                value="0.00"
-                readonly
+                min="0"
+                step="0.01"
+                value="0"
+                oninput="calcularCotizacion()"
             >
 
         </div>
@@ -244,6 +425,34 @@ function agregarFilaCotizacion() {
     contenedor.appendChild(
         fila
     );
+
+
+    fila.querySelector(
+        ".cot-tipo"
+    ).value =
+        datos.tipoVidrio ||
+        "INCOLORO";
+
+
+    fila.querySelector(
+        ".cot-espesor"
+    ).value =
+        String(
+            datos.espesor ||
+            "8"
+        );
+
+
+    fila.querySelector(
+        ".cot-cantidad"
+    ).value =
+        datos.cantidad ?? 1;
+
+
+    fila.querySelector(
+        ".cot-metros"
+    ).value =
+        datos.metros ?? 0;
 
 
     calcularCotizacion();
@@ -329,6 +538,12 @@ function calcularCotizacion() {
                 ) || 0;
 
 
+            const metrosInput =
+                fila.querySelector(
+                    ".cot-metros"
+                );
+
+
             const precio =
                 Number(
                     fila.querySelector(
@@ -337,21 +552,33 @@ function calcularCotizacion() {
                 ) || 0;
 
 
-            const metros =
-                ancho *
-                alto *
-                cantidad;
+            let metros =
+                Number(
+                    metrosInput.value
+                ) || 0;
+
+
+            // SI ESCRIBES ANCHO Y ALTO,
+            // RECALCULA LOS M²
+            if (
+                ancho > 0 &&
+                alto > 0
+            ) {
+
+                metros =
+                    ancho *
+                    alto *
+                    cantidad;
+
+
+                metrosInput.value =
+                    metros.toFixed(2);
+            }
 
 
             const subtotal =
                 metros *
                 precio;
-
-
-            fila.querySelector(
-                ".cot-metros"
-            ).value =
-                metros.toFixed(2);
 
 
             fila.querySelector(
@@ -439,6 +666,22 @@ function imprimirCotizacion() {
     }
 
 
+    const numero =
+        document.getElementById(
+            "numeroCotizacion"
+        ).value.trim();
+
+
+    if (!numero) {
+
+        alert(
+            "Ingresa el N° de cotización."
+        );
+
+        return;
+    }
+
+
     calcularCotizacion();
 
 
@@ -464,6 +707,11 @@ function nuevaCotizacion() {
 
 
     document.getElementById(
+        "numeroCotizacion"
+    ).value = "";
+
+
+    document.getElementById(
         "clienteCotizacion"
     ).value = "";
 
@@ -483,9 +731,8 @@ function nuevaCotizacion() {
     ).innerHTML = "";
 
 
-    
-
     colocarFechaHoy();
+
 
     agregarFilaCotizacion();
 }
