@@ -1,46 +1,29 @@
-```javascript
 let pedidos = [];
 
-
-// ===============================
-// API
-// ===============================
-
 async function api(url, options = {}) {
-
-    const response = await fetch(url, {
+    const respuesta = await fetch(url, {
         headers: {
             "Content-Type": "application/json"
         },
         ...options
     });
 
-    const data = await response.json();
+    const datos = await respuesta.json();
 
-    if (!response.ok) {
-        throw new Error(
-            data.error || "Error en el servidor"
-        );
+    if (!respuesta.ok) {
+        throw new Error(datos.error || "Error en la solicitud");
     }
 
-    return data;
+    return datos;
 }
 
-
-// ===============================
-// FORMATEAR FECHA Y HORA DE REGISTRO
-// ===============================
-
 function formatearCreadoEn(creadoEn) {
-
-    if (!creadoEn) {
-        return "NO DISPONIBLE";
-    }
+    if (!creadoEn) return "No disponible";
 
     const fecha = new Date(creadoEn);
 
     if (isNaN(fecha.getTime())) {
-        return creadoEn;
+        return "No disponible";
     }
 
     return fecha.toLocaleString("es-PE", {
@@ -54,572 +37,255 @@ function formatearCreadoEn(creadoEn) {
     });
 }
 
-
-// ===============================
-// GUARDAR PEDIDO
-// ===============================
-
 async function guardarPedido() {
 
-    const pedido = {
+    const op = document.getElementById("op").value.trim();
+    const cliente = document.getElementById("cliente").value.trim();
+    const fechaIngreso = document.getElementById("fechaIngreso").value;
+    const fechaEntrega = document.getElementById("fechaEntrega").value;
+    const horaEntrega = document.getElementById("horaEntrega").value;
+    const descripcion = document.getElementById("descripcion").value.trim();
+    const procesoEspecial = document.getElementById("procesoEspecial").value;
+    const cantidad = document.getElementById("cantidad").value;
+    const metros = document.getElementById("metros").value;
 
-        op: document
-            .getElementById("op")
-            .value
-            .trim(),
-
-        cliente: document
-            .getElementById("cliente")
-            .value
-            .trim(),
-
-        fechaIngreso:
-            document.getElementById("fechaIngreso").value,
-
-        fechaEntrega:
-            document.getElementById("fechaEntrega").value,
-
-        horaEntrega:
-            document.getElementById("horaEntrega").value,
-
-        descripcion:
-            document.getElementById("descripcion")
-                .value
-                .trim(),
-
-        procesoEspecial:
-            document.getElementById("procesoEspecial").value,
-
-        cantidad:
-            document.getElementById("cantidad").value,
-
-        metros:
-            document.getElementById("metros").value
-    };
-
-
-    if (!pedido.op || !pedido.cliente) {
-
-        alert(
-            "Ingrese la OP y el cliente."
-        );
-
+    if (!op || !cliente) {
+        alert("La OP y el cliente son obligatorios.");
         return;
     }
 
-
     try {
 
-        await api("/api/pedidos", {
-
+        const pedido = await api("/api/pedidos", {
             method: "POST",
-
-            body: JSON.stringify(pedido)
-
+            body: JSON.stringify({
+                op,
+                cliente,
+                fechaIngreso,
+                fechaEntrega,
+                horaEntrega,
+                descripcion,
+                procesoEspecial,
+                cantidad,
+                metros
+            })
         });
 
+        pedidos.push(pedido);
 
         limpiarFormulario();
 
         await cargarDatos();
 
-        alert(
-            "Pedido registrado correctamente."
-        );
+        alert("Pedido registrado correctamente.");
 
     } catch (error) {
 
-        alert(error.message);
+        console.error(error);
 
+        alert(error.message);
     }
 }
-
-
-// ===============================
-// CARGAR PEDIDOS
-// ===============================
 
 async function cargarDatos() {
 
     try {
 
-        pedidos =
-            await api("/api/pedidos");
-
+        pedidos = await api("/api/pedidos");
 
         mostrarProduccion();
-
         actualizarResumen();
 
+        const buscar = document.getElementById("buscar");
 
-        const texto =
-            document
-                .getElementById("buscar")
-                .value
-                .trim();
-
-
-        if (texto) {
-
+        if (buscar && buscar.value.trim() !== "") {
             buscarPedido();
-
         }
 
     } catch (error) {
 
         console.error(error);
 
-
-        document
-            .getElementById("produccion")
-            .innerHTML =
-                "<p>No se pudo conectar con la base de datos.</p>";
+        alert("No se pudieron cargar los pedidos.");
     }
 }
-
-
-// ===============================
-// LIMPIAR FORMULARIO
-// ===============================
 
 function limpiarFormulario() {
 
     document.getElementById("op").value = "";
-
     document.getElementById("cliente").value = "";
-
     document.getElementById("fechaIngreso").value = "";
-
     document.getElementById("fechaEntrega").value = "";
-
     document.getElementById("horaEntrega").value = "";
-
     document.getElementById("descripcion").value = "";
-
-    document.getElementById("procesoEspecial").value =
-        "NINGUNO";
-
+    document.getElementById("procesoEspecial").value = "NINGUNO";
     document.getElementById("cantidad").value = "";
-
     document.getElementById("metros").value = "";
 }
 
-
-// ===============================
-// MOSTRAR PRODUCCIÓN
-// ===============================
-
 function mostrarProduccion() {
 
-    const contenedor =
-        document.getElementById("produccion");
+    const contenedor = document.getElementById("produccion");
 
+    if (!contenedor) return;
 
     if (pedidos.length === 0) {
 
-        contenedor.innerHTML =
-            "<p>No hay pedidos registrados.</p>";
+        contenedor.innerHTML = `
+            <p>No hay pedidos registrados.</p>
+        `;
 
         return;
     }
 
+    contenedor.innerHTML = pedidos.map(pedido => {
 
-    const pedidosOrdenados =
-        [...pedidos].sort((a, b) => {
+        return `
+            <div class="pedido">
 
-            if (
-                a.fechaEntrega &&
-                b.fechaEntrega &&
-                a.fechaEntrega !== b.fechaEntrega
-            ) {
+                <h3>OP: ${pedido.op}</h3>
 
-                return a.fechaEntrega
-                    .localeCompare(
-                        b.fechaEntrega
-                    );
-            }
-
-
-            if (!a.fechaEntrega) return 1;
-
-            if (!b.fechaEntrega) return -1;
-
-
-            if (!a.horaEntrega) return 1;
-
-            if (!b.horaEntrega) return -1;
-
-
-            return a.horaEntrega
-                .localeCompare(
-                    b.horaEntrega
-                );
-        });
-
-
-    contenedor.innerHTML =
-        pedidosOrdenados.map(pedido => `
-
-        <div class="op-card">
-
-            <div class="op-cabecera">
-
-                <strong>
-                    OP ${pedido.op}
-                </strong>
-
-                <span>
+                <p>
+                    <strong>Cliente:</strong>
                     ${pedido.cliente}
-                </span>
+                </p>
 
-                <span>
-                    🕐 ${pedido.horaEntrega || "SIN HORA"}
-                </span>
+                <p>
+                    <strong>Fecha de ingreso:</strong>
+                    ${pedido.fechaIngreso || "-"}
+                </p>
 
-                <span>
-                    📅 ${pedido.fechaEntrega || "SIN FECHA"}
-                </span>
+                <p>
+                    <strong>Fecha de entrega:</strong>
+                    ${pedido.fechaEntrega || "-"}
+                </p>
 
-            </div>
+                <p>
+                    <strong>Hora de entrega:</strong>
+                    ${pedido.horaEntrega || "-"}
+                </p>
 
+                <p>
+                    <strong>Descripción:</strong>
+                    ${pedido.descripcion || "-"}
+                </p>
 
-            <div class="detalle-registro">
-
-                📝 Registrado:
-                <strong>
-                    ${formatearCreadoEn(pedido.creadoEn)}
-                </strong>
-
-            </div>
-
-
-            <div class="procesos">
-
-                ${crearProceso(
-                    "CORTE",
-                    pedido.corte,
-                    pedido.id,
-                    "corte"
-                )}
-
-                ${crearProceso(
-                    "ENTALLE",
-                    pedido.entalle,
-                    pedido.id,
-                    "entalle"
-                )}
-
-                ${crearProceso(
-                    "LIMPIOS",
-                    pedido.limpios,
-                    pedido.id,
-                    "limpios"
-                )}
-
-                ${crearProceso(
-                    "TEMPLADO",
-                    pedido.templado,
-                    pedido.id,
-                    "templado"
-                )}
-
-                ${crearProceso(
-                    "TERMINADO",
-                    pedido.terminado,
-                    pedido.id,
-                    "terminado"
-                )}
-
-                ${crearProceso(
-                    "DESPACHO",
-                    pedido.despacho,
-                    pedido.id,
-                    "despacho"
-                )}
-
-            </div>
-
-
-            <div class="detalle-op">
-
-                Especial:
-
-                <strong>
+                <p>
+                    <strong>Proceso especial:</strong>
                     ${pedido.procesoEspecial || "NINGUNO"}
-                </strong>
+                </p>
+
+                <p>
+                    <strong>Cantidad:</strong>
+                    ${pedido.cantidad || 0}
+                </p>
+
+                <p>
+                    <strong>Metros:</strong>
+                    ${pedido.metros || 0}
+                </p>
+
+                <div class="detalle-registro">
+                    📝 Registrado:
+                    <strong>
+                        ${formatearCreadoEn(pedido.creadoEn)}
+                    </strong>
+                </div>
+
+                <div class="proceso-botones">
+
+                    <button onclick="cambiarProceso(${pedido.id}, 'corte', ${!pedido.corte})">
+                        ${pedido.corte ? "✓ CORTE" : "CORTE"}
+                    </button>
+
+                    <button onclick="cambiarProceso(${pedido.id}, 'entalle', ${!pedido.entalle})">
+                        ${pedido.entalle ? "✓ ENTALLE" : "ENTALLE"}
+                    </button>
+
+                    <button onclick="cambiarProceso(${pedido.id}, 'limpios', ${!pedido.limpios})">
+                        ${pedido.limpios ? "✓ LIMPIO" : "LIMPIO"}
+                    </button>
+
+                    <button onclick="cambiarProceso(${pedido.id}, 'templado', ${!pedido.templado})">
+                        ${pedido.templado ? "✓ TEMPLADO" : "TEMPLADO"}
+                    </button>
+
+                    <button onclick="cambiarProceso(${pedido.id}, 'terminado', ${!pedido.terminado})">
+                        ${pedido.terminado ? "✓ TERMINADO" : "TERMINADO"}
+                    </button>
+
+                    <button onclick="cambiarProceso(${pedido.id}, 'despacho', ${!pedido.despacho})">
+                        ${pedido.despacho ? "✓ DESPACHO" : "DESPACHO"}
+                    </button>
+
+                    <button onclick="eliminarPedido(${pedido.id})">
+                        ELIMINAR
+                    </button>
+
+                </div>
 
             </div>
+        `;
 
-
-            <div class="acciones-pedido">
-
-                <button
-                    class="btn-eliminar"
-                    onclick="eliminarPedido(${pedido.id})"
-                >
-                    🗑️ Eliminar pedido
-                </button>
-
-            </div>
-
-        </div>
-
-    `).join("");
+    }).join("");
 }
 
-
-// ===============================
-// CREAR PROCESO
-// ===============================
-
-function crearProceso(
-    nombre,
-    terminado,
-    id,
-    proceso
-) {
-
-    return `
-
-        <div
-            class="${terminado
-                ? "proceso terminado"
-                : "proceso"}"
-
-            onclick="cambiarProceso(
-                ${id},
-                '${proceso}'
-            )"
-        >
-
-            ${terminado ? "✓ " : ""}
-            ${nombre}
-
-        </div>
-
-    `;
-}
-
-
-// ===============================
-// CAMBIAR PROCESO
-// ===============================
-
-async function cambiarProceso(
-    id,
-    proceso
-) {
-
-    const pedido =
-        pedidos.find(
-            p => p.id === id
-        );
-
-
-    if (!pedido) return;
-
-
-    const cambios = {};
-
-
-    if (proceso === "terminado") {
-
-        if (!pedido.terminado) {
-
-            cambios.terminado = true;
-
-            cambios.corte = true;
-
-            cambios.entalle = true;
-
-            cambios.limpios = true;
-
-            cambios.templado = true;
-
-        } else {
-
-            cambios.terminado = false;
-
-            cambios.templado = false;
-        }
-
-
-    } else if (proceso === "templado") {
-
-        cambios.templado =
-            !pedido.templado;
-
-
-        if (pedido.templado) {
-
-            cambios.terminado = false;
-        }
-
-
-    } else if (proceso === "limpios") {
-
-        cambios.limpios =
-            !pedido.limpios;
-
-
-        if (pedido.limpios) {
-
-            cambios.templado = false;
-
-            cambios.terminado = false;
-        }
-
-
-    } else if (proceso === "entalle") {
-
-        cambios.entalle =
-            !pedido.entalle;
-
-
-        if (pedido.entalle) {
-
-            cambios.limpios = false;
-
-            cambios.templado = false;
-
-            cambios.terminado = false;
-        }
-
-
-    } else if (proceso === "corte") {
-
-        cambios.corte =
-            !pedido.corte;
-
-
-        if (pedido.corte) {
-
-            cambios.entalle = false;
-
-            cambios.limpios = false;
-
-            cambios.templado = false;
-
-            cambios.terminado = false;
-        }
-
-
-    } else if (proceso === "despacho") {
-
-        cambios.despacho =
-            !pedido.despacho;
-    }
-
+async function cambiarProceso(id, campo, valor) {
 
     try {
 
-        await api(
-            `/api/pedidos/${id}`,
-            {
-                method: "PUT",
-
-                body:
-                    JSON.stringify(cambios)
-            }
-        );
-
+        await api(`/api/pedidos/${id}`, {
+            method: "PUT",
+            body: JSON.stringify({
+                [campo]: valor
+            })
+        });
 
         await cargarDatos();
 
-
     } catch (error) {
+
+        console.error(error);
 
         alert(error.message);
     }
 }
-
-
-// ===============================
-// ELIMINAR PEDIDO
-// ===============================
 
 async function eliminarPedido(id) {
 
-    const pedido =
-        pedidos.find(
-            p => p.id === id
-        );
+    const confirmar = confirm(
+        "¿Seguro que deseas eliminar este pedido?"
+    );
 
-
-    if (!pedido) {
-
-        alert(
-            "Pedido no encontrado."
-        );
-
-        return;
-    }
-
-
-    const confirmar =
-        confirm(
-
-            `¿Seguro que quieres eliminar la OP ${pedido.op}?\n\n` +
-
-            `Cliente: ${pedido.cliente}\n\n` +
-
-            `Esta acción no se puede deshacer.`
-        );
-
-
-    if (!confirmar) {
-
-        return;
-    }
-
+    if (!confirmar) return;
 
     try {
 
-        await api(
-            `/api/pedidos/${id}`,
-            {
-                method: "DELETE"
-            }
-        );
-
+        await api(`/api/pedidos/${id}`, {
+            method: "DELETE"
+        });
 
         await cargarDatos();
 
-
-        buscarPedido();
-
-
-        alert(
-            `La OP ${pedido.op} fue eliminada correctamente.`
-        );
-
-
     } catch (error) {
+
+        console.error(error);
 
         alert(error.message);
     }
 }
 
-
-// ===============================
-// BUSCAR PEDIDO
-// ===============================
-
 function buscarPedido() {
 
-    const texto =
-        document
-            .getElementById("buscar")
-            .value
-            .toLowerCase()
-            .trim();
+    const texto = document
+        .getElementById("buscar")
+        .value
+        .trim()
+        .toLowerCase();
 
+    const resultado = document.getElementById("resultado");
 
-    const resultado =
-        document.getElementById(
-            "resultado"
-        );
-
+    if (!resultado) return;
 
     if (!texto) {
 
@@ -628,350 +294,97 @@ function buscarPedido() {
         return;
     }
 
-
-    const encontrados =
-        pedidos.filter(pedido =>
-
-            String(pedido.op)
-                .toLowerCase()
-                .includes(texto)
-
-            ||
-
-            String(pedido.cliente)
-                .toLowerCase()
-                .includes(texto)
-        );
-
+    const encontrados = pedidos.filter(pedido =>
+        String(pedido.op).toLowerCase().includes(texto) ||
+        String(pedido.cliente).toLowerCase().includes(texto)
+    );
 
     if (encontrados.length === 0) {
 
-        resultado.innerHTML =
-            "<p>No se encontró ningún pedido.</p>";
+        resultado.innerHTML = `
+            <p>No se encontraron pedidos.</p>
+        `;
 
         return;
     }
 
-
-    resultado.innerHTML =
-        encontrados.map(pedido => {
-
-            let estadoActual =
-                "PENDIENTE";
-
-
-            if (pedido.terminado) {
-
-                estadoActual =
-                    "TERMINADO";
-
-            } else if (pedido.templado) {
-
-                estadoActual =
-                    "TEMPLADO";
-
-            } else if (pedido.limpios) {
-
-                estadoActual =
-                    "LIMPIOS";
-
-            } else if (pedido.entalle) {
-
-                estadoActual =
-                    "ENTALLE";
-
-            } else if (pedido.corte) {
-
-                estadoActual =
-                    "CORTE";
-            }
-
-
-            return `
-
-                <div class="resultado">
-
-                    <h3>
-                        OP: ${pedido.op}
-                    </h3>
-
-
-                    <p>
-
-                        <strong>
-                            Cliente:
-                        </strong>
-
-                        ${pedido.cliente}
-
-                    </p>
-
-
-                    <p>
-
-                        <strong>
-                            Registrado:
-                        </strong>
-
-                        ${formatearCreadoEn(
-                            pedido.creadoEn
-                        )}
-
-                    </p>
-
-
-                    <p>
-
-                        <strong>
-                            Entrega:
-                        </strong>
-
-                        ${pedido.fechaEntrega || "SIN FECHA"}
-
-                        ${pedido.horaEntrega || ""}
-
-                    </p>
-
-
-                    <div class="estado-pedido">
-
-                        <strong>
-                            ESTADO ACTUAL
-                        </strong>
-
-                        <div class="estado-grande">
-
-                            ${estadoActual}
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="procesos-busqueda">
-
-                        ${buscarProceso(
-                            "CORTE",
-                            pedido.corte,
-                            pedido.id,
-                            "corte"
-                        )}
-
-                        ${buscarProceso(
-                            "ENTALLE",
-                            pedido.entalle,
-                            pedido.id,
-                            "entalle"
-                        )}
-
-                        ${buscarProceso(
-                            "LIMPIOS",
-                            pedido.limpios,
-                            pedido.id,
-                            "limpios"
-                        )}
-
-                        ${buscarProceso(
-                            "TEMPLADO",
-                            pedido.templado,
-                            pedido.id,
-                            "templado"
-                        )}
-
-                        ${buscarProceso(
-                            "TERMINADO",
-                            pedido.terminado,
-                            pedido.id,
-                            "terminado"
-                        )}
-
-                        ${buscarProceso(
-                            "DESPACHO",
-                            pedido.despacho,
-                            pedido.id,
-                            "despacho"
-                        )}
-
-                    </div>
-
-
-                    <p>
-
-                        <strong>
-                            Descripción:
-                        </strong>
-
-                        ${pedido.descripcion || "-"}
-
-                    </p>
-
-
-                    <p>
-
-                        <strong>
-                            Proceso especial:
-                        </strong>
-
-                        ${pedido.procesoEspecial || "NINGUNO"}
-
-                    </p>
-
-
-                    <p>
-
-                        <strong>
-                            Cantidad:
-                        </strong>
-
-                        ${pedido.cantidad || "-"}
-
-                    </p>
-
-
-                    <p>
-
-                        <strong>
-                            Metros:
-                        </strong>
-
-                        ${pedido.metros || "-"}
-
-                    </p>
-
-
-                    <div class="acciones-pedido">
-
-                        <button
-                            class="btn-eliminar"
-                            onclick="eliminarPedido(${pedido.id})"
-                        >
-                            🗑️ Eliminar pedido
-                        </button>
-
-                    </div>
-
-                </div>
-
-            `;
-
-        }).join("");
+    resultado.innerHTML = encontrados.map(pedido => `
+
+        <div class="resultado-pedido">
+
+            <h3>OP: ${pedido.op}</h3>
+
+            <p>
+                <strong>Cliente:</strong>
+                ${pedido.cliente}
+            </p>
+
+            <p>
+                <strong>Fecha ingreso:</strong>
+                ${pedido.fechaIngreso || "-"}
+            </p>
+
+            <p>
+                <strong>Fecha entrega:</strong>
+                ${pedido.fechaEntrega || "-"}
+            </p>
+
+            <p>
+                <strong>Hora entrega:</strong>
+                ${pedido.horaEntrega || "-"}
+            </p>
+
+            <p>
+                <strong>Descripción:</strong>
+                ${pedido.descripcion || "-"}
+            </p>
+
+            <p>
+                <strong>Proceso especial:</strong>
+                ${pedido.procesoEspecial || "NINGUNO"}
+            </p>
+
+            <p>
+                <strong>Cantidad:</strong>
+                ${pedido.cantidad || 0}
+            </p>
+
+            <p>
+                <strong>Metros:</strong>
+                ${pedido.metros || 0}
+            </p>
+
+            <p>
+                <strong>Registrado:</strong>
+                ${formatearCreadoEn(pedido.creadoEn)}
+            </p>
+
+        </div>
+
+    `).join("");
 }
-
-
-// ===============================
-// PROCESOS DE BÚSQUEDA
-// ===============================
-
-function buscarProceso(
-    nombre,
-    estado,
-    id,
-    proceso
-) {
-
-    return `
-
-        <span
-            class="${estado
-                ? "proceso-busqueda terminado"
-                : "proceso-busqueda"}"
-
-            onclick="cambiarProceso(
-                ${id},
-                '${proceso}'
-            )"
-
-            style="cursor: pointer;"
-        >
-
-            ${estado ? "✓" : "○"}
-            ${nombre}
-
-        </span>
-
-    `;
-}
-
-
-// ===============================
-// RESUMEN
-// ===============================
 
 function actualizarResumen() {
 
-    const total =
-        pedidos.length;
+    const total = pedidos.length;
 
+    const pendientes = pedidos.filter(pedido =>
+        !pedido.corte
+    ).length;
 
-    let pendientes = 0;
+    const proceso = pedidos.filter(pedido =>
+        pedido.corte &&
+        !pedido.terminado
+    ).length;
 
-    let terminados = 0;
+    const terminados = pedidos.filter(pedido =>
+        pedido.terminado
+    ).length;
 
-    let proceso = 0;
-
-
-    pedidos.forEach(pedido => {
-
-        if (pedido.terminado) {
-
-            terminados++;
-
-            return;
-        }
-
-
-        const procesos = [
-
-            pedido.corte,
-
-            pedido.entalle,
-
-            pedido.limpios,
-
-            pedido.templado
-
-        ];
-
-
-        if (
-            procesos.filter(Boolean)
-                .length === 0
-        ) {
-
-            pendientes++;
-
-        } else {
-
-            proceso++;
-        }
-
-    });
-
-
-    document.getElementById(
-        "total"
-    ).textContent = total;
-
-
-    document.getElementById(
-        "pendientes"
-    ).textContent = pendientes;
-
-
-    document.getElementById(
-        "proceso"
-    ).textContent = proceso;
-
-
-    document.getElementById(
-        "terminados"
-    ).textContent = terminados;
+    document.getElementById("total").textContent = total;
+    document.getElementById("pendientes").textContent = pendientes;
+    document.getElementById("proceso").textContent = proceso;
+    document.getElementById("terminados").textContent = terminados;
 }
 
-
-// ===============================
-// INICIAR
-// ===============================
-
 cargarDatos();
-```
