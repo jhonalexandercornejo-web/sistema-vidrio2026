@@ -22,66 +22,7 @@ document.addEventListener(
 // NÚMERO DE COTIZACIÓN
 // ===============================
 
-function generarNumeroCotizacion() {
 
-    const fecha = new Date();
-
-    const anio =
-        fecha.getFullYear();
-
-    const mes =
-        String(
-            fecha.getMonth() + 1
-        ).padStart(2, "0");
-
-    const dia =
-        String(
-            fecha.getDate()
-        ).padStart(2, "0");
-
-    const hora =
-        String(
-            fecha.getHours()
-        ).padStart(2, "0");
-
-    const minuto =
-        String(
-            fecha.getMinutes()
-        ).padStart(2, "0");
-
-    document.getElementById(
-        "numeroCotizacion"
-    ).value =
-        `COT-${anio}${mes}${dia}-${hora}${minuto}`;
-}
-
-
-// ===============================
-// FECHA ACTUAL
-// ===============================
-
-function colocarFechaHoy() {
-
-    const fecha = new Date();
-
-    const anio =
-        fecha.getFullYear();
-
-    const mes =
-        String(
-            fecha.getMonth() + 1
-        ).padStart(2, "0");
-
-    const dia =
-        String(
-            fecha.getDate()
-        ).padStart(2, "0");
-
-    document.getElementById(
-        "fechaCotizacion"
-    ).value =
-        `${anio}-${mes}-${dia}`;
-}
 
 
 // ===============================
@@ -542,7 +483,7 @@ function nuevaCotizacion() {
     ).innerHTML = "";
 
 
-    generarNumeroCotizacion();
+    
 
     colocarFechaHoy();
 
