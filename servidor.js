@@ -1,54 +1,196 @@
 const express = require("express");
+
 const path = require("path");
+
 const { Pool } = require("pg");
 
+
 const app = express();
-const PORT = process.env.PORT || 3000;
+
+
+const PORT =
+    process.env.PORT || 3000;
+
+
 
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+
+    connectionString:
+        process.env.DATABASE_URL,
+
     ssl: {
         rejectUnauthorized: false
     }
+
 });
 
-app.use(express.json());
-app.use(express.static(path.join(__dirname)));
+
+
+app.use(
+    express.json()
+);
+
+
+app.use(
+    express.static(
+        path.join(__dirname)
+    )
+);
+
+
 
 // ===============================
-// CREAR / ASEGURAR TABLA
+// CREAR TABLAS
 // ===============================
 
-async function crearTabla() {
+async function crearTablas() {
 
     await pool.query(`
+
         CREATE TABLE IF NOT EXISTS pedidos (
+
             id SERIAL PRIMARY KEY,
+
             op TEXT NOT NULL UNIQUE,
+
             cliente TEXT NOT NULL,
+
             "fechaIngreso" TEXT,
+
             "fechaEntrega" TEXT,
+
             "horaEntrega" TEXT,
+
             descripcion TEXT,
-            "procesoEspecial" TEXT DEFAULT 'NINGUNO',
-            cantidad REAL DEFAULT 0,
-            metros REAL DEFAULT 0,
+
             corte INTEGER DEFAULT 0,
+
             entalle INTEGER DEFAULT 0,
+
             limpios INTEGER DEFAULT 0,
+
             templado INTEGER DEFAULT 0,
+
             terminado INTEGER DEFAULT 0,
+
             despacho INTEGER DEFAULT 0,
-            "creadoEn" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+
+            "creadoEn"
+            TIMESTAMP
+            NOT NULL
+            DEFAULT CURRENT_TIMESTAMP
+
         )
+
     `);
 
+
+
     await pool.query(`
+
         ALTER TABLE pedidos
-        ADD COLUMN IF NOT EXISTS "creadoEn"
-        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+
+        ADD COLUMN IF NOT EXISTS
+        "creadoEn"
+
+        TIMESTAMP
+        NOT NULL
+        DEFAULT CURRENT_TIMESTAMP
+
     `);
+
+
+
+    await pool.query(`
+
+        CREATE TABLE IF NOT EXISTS vidrios (
+
+            id SERIAL PRIMARY KEY,
+
+            "pedidoId"
+            INTEGER NOT NULL
+            REFERENCES pedidos(id)
+            ON DELETE CASCADE,
+
+            "tipoVidrio"
+            TEXT
+            DEFAULT 'INCOLORO',
+
+            espesor TEXT
+            DEFAULT '8',
+
+            cantidad REAL
+            DEFAULT 0,
+
+            metros REAL
+            DEFAULT 0,
+
+            "procesoEspecial"
+            TEXT
+            DEFAULT 'NINGUNO'
+
+        )
+
+    `);
+
+
+
+    // MIGRAR PEDIDOS ANTIGUOS
+    // SOLO SI TODAVÍA NO TIENEN VIDRIOS
+
+    await pool.query(`
+
+        INSERT INTO vidrios (
+
+            "pedidoId",
+            "tipoVidrio",
+            espesor,
+            cantidad,
+            metros,
+            "procesoEspecial"
+
+        )
+
+        SELECT
+
+            p.id,
+
+            'INCOLORO',
+
+            '8',
+
+            COALESCE(p.cantidad, 0),
+
+            COALESCE(p.metros, 0),
+
+            COALESCE(
+                p."procesoEspecial",
+                'NINGUNO'
+            )
+
+        FROM pedidos p
+
+        WHERE NOT EXISTS (
+
+            SELECT 1
+
+            FROM vidrios v
+
+            WHERE
+                v."pedidoId" = p.id
+
+        )
+
+    `).catch(() => {
+
+        console.log(
+            "Pedidos antiguos sin columnas cantidad/procesoEspecial. Se continúa normalmente."
+        );
+
+    });
 }
+
+
 
 // ===============================
 // CONVERTIR PEDIDO
@@ -56,289 +198,987 @@ async function crearTabla() {
 
 function convertirPedido(row) {
 
-    if (!row) return null;
-
     return {
-        ...row,
 
-        corte: Boolean(row.corte),
-        entalle: Boolean(row.entalle),
-        limpios: Boolean(row.limpios),
-        templado: Boolean(row.templado),
-        terminado: Boolean(row.terminado),
-        despacho: Boolean(row.despacho),
+        id:
+            row.id,
 
-        creadoEn: row.creadoEn
+        op:
+            row.op,
+
+        cliente:
+            row.cliente,
+
+        fechaIngreso:
+            row.fechaIngreso || "",
+
+        fechaEntrega:
+            row.fechaEntrega || "",
+
+        horaEntrega:
+            row.horaEntrega || "",
+
+        descripcion:
+            row.descripcion || "",
+
+        corte:
+            Boolean(row.corte),
+
+        entalle:
+            Boolean(row.entalle),
+
+        limpios:
+            Boolean(row.limpios),
+
+        templado:
+            Boolean(row.templado),
+
+        terminado:
+            Boolean(row.terminado),
+
+        despacho:
+            Boolean(row.despacho),
+
+        creadoEn:
+            row.creadoEn,
+
+        vidrios:
+            Array.isArray(row.vidrios)
+                ? row.vidrios
+                : []
+
     };
 }
 
+
+
 // ===============================
-// OBTENER TODOS LOS PEDIDOS
+// OBTENER PEDIDOS
 // ===============================
 
-app.get("/api/pedidos", async (req, res) => {
+app.get(
+    "/api/pedidos",
 
-    try {
+    async (req, res) => {
 
-        const resultado = await pool.query(`
-            SELECT *
-            FROM pedidos
-            ORDER BY
-                CASE
-                    WHEN "fechaEntrega" IS NULL
-                    OR "fechaEntrega" = ''
-                    THEN 1
-                    ELSE 0
-                END,
-                "fechaEntrega" ASC,
-                CASE
-                    WHEN "horaEntrega" IS NULL
-                    OR "horaEntrega" = ''
-                    THEN 1
-                    ELSE 0
-                END,
-                "horaEntrega" ASC
-        `);
+        try {
 
-        res.json(
-            resultado.rows.map(convertirPedido)
-        );
+            const resultado =
+                await pool.query(`
 
-    } catch (error) {
+                    SELECT
 
-        console.error(error);
+                        p.*,
 
-        res.status(500).json({
-            error: "No se pudieron cargar los pedidos."
-        });
+                        COALESCE(
+
+                            json_agg(
+
+                                json_build_object(
+
+                                    'id',
+                                    v.id,
+
+                                    'tipoVidrio',
+                                    v."tipoVidrio",
+
+                                    'espesor',
+                                    v.espesor,
+
+                                    'cantidad',
+                                    v.cantidad,
+
+                                    'metros',
+                                    v.metros,
+
+                                    'procesoEspecial',
+                                    v."procesoEspecial"
+
+                                )
+
+                                ORDER BY v.id
+
+                            )
+
+                            FILTER (
+                                WHERE v.id IS NOT NULL
+                            ),
+
+                            '[]'
+
+                        ) AS vidrios
+
+                    FROM pedidos p
+
+                    LEFT JOIN vidrios v
+
+                        ON
+                        v."pedidoId" = p.id
+
+
+                    GROUP BY p.id
+
+
+                    ORDER BY
+
+                        CASE
+
+                            WHEN
+                                p."fechaEntrega" IS NULL
+                                OR
+                                p."fechaEntrega" = ''
+
+                            THEN 1
+
+                            ELSE 0
+
+                        END,
+
+                        p."fechaEntrega" ASC,
+
+
+                        CASE
+
+                            WHEN
+                                p."horaEntrega" IS NULL
+                                OR
+                                p."horaEntrega" = ''
+
+                            THEN 1
+
+                            ELSE 0
+
+                        END,
+
+                        p."horaEntrega" ASC
+
+                `);
+
+
+            res.json(
+
+                resultado.rows.map(
+                    convertirPedido
+                )
+
+            );
+
+
+        } catch (error) {
+
+            console.error(error);
+
+
+            res.status(500).json({
+
+                error:
+                    "No se pudieron cargar los pedidos."
+
+            });
+        }
     }
-});
+);
+
+
 
 // ===============================
 // CREAR PEDIDO
 // ===============================
 
-app.post("/api/pedidos", async (req, res) => {
+app.post(
+    "/api/pedidos",
 
-    const {
-        op,
-        cliente,
-        fechaIngreso,
-        fechaEntrega,
-        horaEntrega,
-        descripcion,
-        procesoEspecial,
-        cantidad,
-        metros
-    } = req.body;
+    async (req, res) => {
 
-    if (!op || !cliente) {
+        const {
 
-        return res.status(400).json({
-            error: "La OP y el cliente son obligatorios."
-        });
-    }
-
-    try {
-
-        const resultado = await pool.query(`
-            INSERT INTO pedidos (
-                op,
-                cliente,
-                "fechaIngreso",
-                "fechaEntrega",
-                "horaEntrega",
-                descripcion,
-                "procesoEspecial",
-                cantidad,
-                metros
-            )
-            VALUES (
-                $1,
-                $2,
-                $3,
-                $4,
-                $5,
-                $6,
-                $7,
-                $8,
-                $9
-            )
-            RETURNING *
-        `, [
             op,
+
             cliente,
-            fechaIngreso || "",
-            fechaEntrega || "",
-            horaEntrega || "",
-            descripcion || "",
-            procesoEspecial || "NINGUNO",
-            Number(cantidad) || 0,
-            Number(metros) || 0
-        ]);
 
-        res.status(201).json(
-            convertirPedido(resultado.rows[0])
-        );
+            fechaIngreso,
 
-    } catch (error) {
+            fechaEntrega,
 
-        console.error(error);
+            horaEntrega,
 
-        if (error.code === "23505") {
+            descripcion,
 
-            return res.status(409).json({
-                error: "Esa OP ya existe."
-            });
+            vidrios
+
+        } = req.body;
+
+
+
+        if (!op || !cliente) {
+
+            return res
+                .status(400)
+                .json({
+
+                    error:
+                        "La OP y el nombre son obligatorios."
+
+                });
         }
 
-        res.status(500).json({
-            error: "No se pudo guardar el pedido."
-        });
+
+
+        if (
+            !Array.isArray(vidrios)
+            ||
+            vidrios.length === 0
+        ) {
+
+            return res
+                .status(400)
+                .json({
+
+                    error:
+                        "Debes agregar al menos un vidrio."
+
+                });
+        }
+
+
+
+        const clienteDB =
+            await pool.connect();
+
+
+        try {
+
+            await clienteDB.query(
+                "BEGIN"
+            );
+
+
+
+            const resultado =
+                await clienteDB.query(`
+
+                    INSERT INTO pedidos (
+
+                        op,
+
+                        cliente,
+
+                        "fechaIngreso",
+
+                        "fechaEntrega",
+
+                        "horaEntrega",
+
+                        descripcion
+
+                    )
+
+                    VALUES (
+
+                        $1,
+                        $2,
+                        $3,
+                        $4,
+                        $5,
+                        $6
+
+                    )
+
+                    RETURNING *
+
+                `, [
+
+                    op,
+
+                    cliente,
+
+                    fechaIngreso || "",
+
+                    fechaEntrega || "",
+
+                    horaEntrega || "",
+
+                    descripcion || ""
+
+                ]);
+
+
+
+            const pedido =
+                resultado.rows[0];
+
+
+
+            for (
+                const vidrio
+                of vidrios
+            ) {
+
+                await clienteDB.query(`
+
+                    INSERT INTO vidrios (
+
+                        "pedidoId",
+
+                        "tipoVidrio",
+
+                        espesor,
+
+                        cantidad,
+
+                        metros,
+
+                        "procesoEspecial"
+
+                    )
+
+                    VALUES (
+
+                        $1,
+                        $2,
+                        $3,
+                        $4,
+                        $5,
+                        $6
+
+                    )
+
+                `, [
+
+                    pedido.id,
+
+                    vidrio.tipoVidrio
+                        || "INCOLORO",
+
+                    String(
+                        vidrio.espesor
+                        || "8"
+                    ),
+
+                    Number(
+                        vidrio.cantidad
+                    ) || 0,
+
+                    Number(
+                        vidrio.metros
+                    ) || 0,
+
+                    vidrio.procesoEspecial
+                        || "NINGUNO"
+
+                ]);
+            }
+
+
+
+            await clienteDB.query(
+                "COMMIT"
+            );
+
+
+            res
+                .status(201)
+                .json({
+
+                    mensaje:
+                        "Pedido registrado correctamente.",
+
+                    id:
+                        pedido.id
+
+                });
+
+
+        } catch (error) {
+
+            await clienteDB.query(
+                "ROLLBACK"
+            );
+
+
+            console.error(error);
+
+
+            if (
+                error.code === "23505"
+            ) {
+
+                return res
+                    .status(409)
+                    .json({
+
+                        error:
+                            "Esa OP ya existe."
+
+                    });
+            }
+
+
+            res
+                .status(500)
+                .json({
+
+                    error:
+                        "No se pudo guardar el pedido."
+
+                });
+
+
+        } finally {
+
+            clienteDB.release();
+        }
     }
-});
+);
+
+
+
+// ===============================
+// ACTUALIZAR DATOS DEL PEDIDO
+// ===============================
+
+app.put(
+    "/api/pedidos/:id/datos",
+
+    async (req, res) => {
+
+        const id =
+            Number(req.params.id);
+
+
+        const {
+
+            op,
+
+            cliente,
+
+            fechaIngreso,
+
+            fechaEntrega,
+
+            horaEntrega,
+
+            descripcion,
+
+            vidrios
+
+        } = req.body;
+
+
+
+        if (
+            !Number.isInteger(id)
+        ) {
+
+            return res
+                .status(400)
+                .json({
+
+                    error:
+                        "ID inválido."
+
+                });
+        }
+
+
+
+        if (!op || !cliente) {
+
+            return res
+                .status(400)
+                .json({
+
+                    error:
+                        "La OP y el nombre son obligatorios."
+
+                });
+        }
+
+
+
+        if (
+            !Array.isArray(vidrios)
+            ||
+            vidrios.length === 0
+        ) {
+
+            return res
+                .status(400)
+                .json({
+
+                    error:
+                        "Debes agregar al menos un vidrio."
+
+                });
+        }
+
+
+
+        const clienteDB =
+            await pool.connect();
+
+
+        try {
+
+            await clienteDB.query(
+                "BEGIN"
+            );
+
+
+
+            const resultado =
+                await clienteDB.query(`
+
+                    UPDATE pedidos
+
+                    SET
+
+                        op = $1,
+
+                        cliente = $2,
+
+                        "fechaIngreso" = $3,
+
+                        "fechaEntrega" = $4,
+
+                        "horaEntrega" = $5,
+
+                        descripcion = $6
+
+                    WHERE id = $7
+
+                    RETURNING *
+
+                `, [
+
+                    op,
+
+                    cliente,
+
+                    fechaIngreso || "",
+
+                    fechaEntrega || "",
+
+                    horaEntrega || "",
+
+                    descripcion || "",
+
+                    id
+
+                ]);
+
+
+
+            if (
+                resultado.rowCount === 0
+            ) {
+
+                await clienteDB.query(
+                    "ROLLBACK"
+                );
+
+
+                return res
+                    .status(404)
+                    .json({
+
+                        error:
+                            "Pedido no encontrado."
+
+                    });
+            }
+
+
+
+            await clienteDB.query(`
+
+                DELETE FROM vidrios
+
+                WHERE "pedidoId" = $1
+
+            `, [id]);
+
+
+
+            for (
+                const vidrio
+                of vidrios
+            ) {
+
+                await clienteDB.query(`
+
+                    INSERT INTO vidrios (
+
+                        "pedidoId",
+
+                        "tipoVidrio",
+
+                        espesor,
+
+                        cantidad,
+
+                        metros,
+
+                        "procesoEspecial"
+
+                    )
+
+                    VALUES (
+
+                        $1,
+                        $2,
+                        $3,
+                        $4,
+                        $5,
+                        $6
+
+                    )
+
+                `, [
+
+                    id,
+
+                    vidrio.tipoVidrio
+                        || "INCOLORO",
+
+                    String(
+                        vidrio.espesor
+                        || "8"
+                    ),
+
+                    Number(
+                        vidrio.cantidad
+                    ) || 0,
+
+                    Number(
+                        vidrio.metros
+                    ) || 0,
+
+                    vidrio.procesoEspecial
+                        || "NINGUNO"
+
+                ]);
+            }
+
+
+
+            await clienteDB.query(
+                "COMMIT"
+            );
+
+
+            res.json({
+
+                mensaje:
+                    "Pedido actualizado correctamente."
+
+            });
+
+
+        } catch (error) {
+
+            await clienteDB.query(
+                "ROLLBACK"
+            );
+
+
+            console.error(error);
+
+
+            if (
+                error.code === "23505"
+            ) {
+
+                return res
+                    .status(409)
+                    .json({
+
+                        error:
+                            "Esa OP ya existe."
+
+                    });
+            }
+
+
+            res
+                .status(500)
+                .json({
+
+                    error:
+                        "No se pudo actualizar el pedido."
+
+                });
+
+
+        } finally {
+
+            clienteDB.release();
+        }
+    }
+);
+
+
 
 // ===============================
 // ACTUALIZAR PROCESO
 // ===============================
 
-app.put("/api/pedidos/:id", async (req, res) => {
+app.put(
+    "/api/pedidos/:id",
 
-    const id = Number(req.params.id);
+    async (req, res) => {
 
-    const camposPermitidos = [
-        "corte",
-        "entalle",
-        "limpios",
-        "templado",
-        "terminado",
-        "despacho"
-    ];
+        const id =
+            Number(req.params.id);
 
-    const cambios = Object.entries(req.body)
-        .filter(([campo]) =>
-            camposPermitidos.includes(campo)
-        );
 
-    if (cambios.length === 0) {
+        const camposPermitidos = [
 
-        return res.status(400).json({
-            error: "No hay cambios válidos."
-        });
-    }
+            "corte",
 
-    try {
+            "entalle",
 
-        const valores = [];
+            "limpios",
 
-        const sets = cambios.map(
-            ([campo, valor], indice) => {
+            "templado",
 
-                valores.push(valor ? 1 : 0);
+            "terminado",
 
-                return `"${campo}" = $${indice + 1}`;
+            "despacho"
+
+        ];
+
+
+
+        const cambios =
+            Object.entries(req.body)
+
+            .filter(
+                ([campo]) =>
+                    camposPermitidos.includes(
+                        campo
+                    )
+            );
+
+
+
+        if (
+            cambios.length === 0
+        ) {
+
+            return res
+                .status(400)
+                .json({
+
+                    error:
+                        "No hay cambios válidos."
+
+                });
+        }
+
+
+
+        try {
+
+            const valores = [];
+
+
+            const sets =
+                cambios.map(
+                    ([campo, valor], indice) => {
+
+                        valores.push(
+                            valor ? 1 : 0
+                        );
+
+
+                        return `"${campo}" = $${indice + 1}`;
+                    }
+                );
+
+
+            valores.push(id);
+
+
+
+            const resultado =
+                await pool.query(`
+
+                    UPDATE pedidos
+
+                    SET
+                        ${sets.join(", ")}
+
+                    WHERE
+                        id = $${valores.length}
+
+                    RETURNING *
+
+                `, valores);
+
+
+
+            if (
+                resultado.rowCount === 0
+            ) {
+
+                return res
+                    .status(404)
+                    .json({
+
+                        error:
+                            "Pedido no encontrado."
+
+                    });
             }
-        );
 
-        valores.push(id);
 
-        const resultado = await pool.query(`
-            UPDATE pedidos
-            SET ${sets.join(", ")}
-            WHERE id = $${valores.length}
-            RETURNING *
-        `, valores);
 
-        if (resultado.rowCount === 0) {
+            res.json({
 
-            return res.status(404).json({
-                error: "Pedido no encontrado."
+                mensaje:
+                    "Proceso actualizado correctamente."
+
             });
+
+
+        } catch (error) {
+
+            console.error(error);
+
+
+            res
+                .status(500)
+                .json({
+
+                    error:
+                        "No se pudo actualizar el proceso."
+
+                });
         }
-
-        res.json(
-            convertirPedido(resultado.rows[0])
-        );
-
-    } catch (error) {
-
-        console.error(error);
-
-        res.status(500).json({
-            error: "No se pudo actualizar el pedido."
-        });
     }
-});
+);
+
+
 
 // ===============================
-// ELIMINAR PEDIDO
+// ELIMINAR
 // ===============================
 
-app.delete("/api/pedidos/:id", async (req, res) => {
+app.delete(
+    "/api/pedidos/:id",
 
-    const id = Number(req.params.id);
+    async (req, res) => {
 
-    if (!Number.isInteger(id)) {
+        const id =
+            Number(req.params.id);
 
-        return res.status(400).json({
-            error: "ID de pedido inválido."
-        });
-    }
 
-    try {
 
-        const resultado = await pool.query(
-            `
-            DELETE FROM pedidos
-            WHERE id = $1
-            RETURNING *
-            `,
-            [id]
-        );
+        if (
+            !Number.isInteger(id)
+        ) {
 
-        if (resultado.rowCount === 0) {
+            return res
+                .status(400)
+                .json({
 
-            return res.status(404).json({
-                error: "Pedido no encontrado."
-            });
+                    error:
+                        "ID inválido."
+
+                });
         }
 
-        res.json({
-            mensaje: "Pedido eliminado correctamente."
-        });
 
-    } catch (error) {
 
-        console.error(error);
+        try {
 
-        res.status(500).json({
-            error: "No se pudo eliminar el pedido."
-        });
+            const resultado =
+                await pool.query(`
+
+                    DELETE FROM pedidos
+
+                    WHERE id = $1
+
+                    RETURNING id
+
+                `, [id]);
+
+
+
+            if (
+                resultado.rowCount === 0
+            ) {
+
+                return res
+                    .status(404)
+                    .json({
+
+                        error:
+                            "Pedido no encontrado."
+
+                    });
+            }
+
+
+
+            res.json({
+
+                mensaje:
+                    "Pedido eliminado correctamente."
+
+            });
+
+
+        } catch (error) {
+
+            console.error(error);
+
+
+            res
+                .status(500)
+                .json({
+
+                    error:
+                        "No se pudo eliminar el pedido."
+
+                });
+        }
     }
-});
+);
+
+
 
 // ===============================
 // INICIAR SERVIDOR
 // ===============================
 
-crearTabla()
+crearTablas()
+
     .then(() => {
 
-        app.listen(PORT, () => {
+        app.listen(
+            PORT,
 
-            console.log(
-                `Sistema funcionando en http://localhost:${PORT}`
-            );
+            () => {
 
-        });
+                console.log(
+
+                    `Sistema funcionando en http://localhost:${PORT}`
+
+                );
+            }
+        );
 
     })
-    .catch((error) => {
+
+    .catch(error => {
 
         console.error(
-            "Error conectando con Neon:",
+            "Error conectando con PostgreSQL:",
             error
         );
+
 
         process.exit(1);
     });
