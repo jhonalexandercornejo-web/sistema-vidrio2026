@@ -812,3 +812,163 @@ textarea:focus {
 #resultado {
     display: none !important;
 }
+/* =========================================
+   PÁGINA METROS POR FECHA DE ENTREGA
+========================================= */
+
+.cabecera-metros {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.cabecera-metros h1 {
+    margin: 0;
+    color: #172033;
+}
+
+.cabecera-metros p {
+    margin-top: 7px;
+    color: #64748b;
+}
+
+.btn-volver {
+    text-decoration: none;
+    background: #0b3d91;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 5px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.btn-volver:hover {
+    background: #082f75;
+}
+
+.resumen-metros {
+    margin-bottom: 20px;
+}
+
+.texto-fecha {
+    font-size: 19px !important;
+}
+
+.barra-metros {
+    display: flex;
+    align-items: end;
+    gap: 15px;
+}
+
+.barra-metros > div {
+    width: 260px;
+}
+
+.btn-limpiar-fecha {
+    height: 43px;
+    border: none;
+    background: #d71920;
+    color: white;
+    padding: 0 18px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-limpiar-fecha:hover {
+    background: #b9151b;
+}
+
+.tabla-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.tabla-metros {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 650px;
+}
+
+.tabla-metros th {
+    background: #0b3d91;
+    color: white;
+    padding: 13px;
+    text-align: left;
+    font-size: 13px;
+}
+
+.tabla-metros td {
+    border-bottom: 1px solid #e2e8f0;
+    padding: 14px 13px;
+}
+
+.tabla-metros tr:hover {
+    background: #f8fafc;
+}
+
+.metros-destacado {
+    font-size: 17px;
+    font-weight: bold;
+    color: #0b3d91;
+}
+
+.btn-ver-op {
+    border: none;
+    background: #dbeafe;
+    color: #0b3d91;
+    padding: 9px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-ver-op:hover {
+    background: #bfdbfe;
+}
+
+.sin-datos {
+    text-align: center;
+    color: #64748b;
+    padding: 30px !important;
+}
+
+.detalle-metros-op {
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.detalle-metros-op strong {
+    color: #0b3d91;
+    font-size: 18px;
+}
+
+
+/* CELULAR */
+
+@media (max-width: 650px) {
+
+    .cabecera-metros {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .btn-volver {
+        text-align: center;
+    }
+
+    .barra-metros {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .barra-metros > div {
+        width: 100%;
+    }
+
+    .btn-limpiar-fecha {
+        width: 100%;
+    }
+}
