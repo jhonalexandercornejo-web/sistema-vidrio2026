@@ -972,3 +972,311 @@ textarea:focus {
         width: 100%;
     }
 }
+/* =========================================
+   COTIZACIONES
+========================================= */
+
+.cabecera-cotizacion {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.cabecera-cotizacion h1 {
+    margin: 0;
+    color: #172033;
+}
+
+.cabecera-cotizacion p {
+    margin-top: 7px;
+    color: #64748b;
+}
+
+.datos-cotizacion {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.datos-cotizacion label,
+.fila-cotizacion label {
+    display: block;
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 6px;
+    color: #334155;
+}
+
+.datos-cotizacion input,
+.fila-cotizacion input,
+.fila-cotizacion select {
+    width: 100%;
+    height: 42px;
+    border: 1px solid #cbd5e1;
+    border-radius: 5px;
+    padding: 8px 10px;
+    background: white;
+}
+
+.datos-cotizacion input:focus,
+.fila-cotizacion input:focus,
+.fila-cotizacion select:focus {
+    outline: none;
+    border-color: #0b3d91;
+}
+
+.titulo-cotizacion {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.titulo-cotizacion h2 {
+    margin: 0;
+}
+
+.fila-cotizacion {
+    display: grid;
+    grid-template-columns:
+        1.3fr
+        0.8fr
+        0.8fr
+        0.8fr
+        0.7fr
+        0.8fr
+        0.9fr
+        1fr
+        auto;
+
+    gap: 10px;
+    align-items: end;
+
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+
+    padding: 15px;
+    margin-bottom: 12px;
+}
+
+.cot-metros,
+.cot-subtotal {
+    background: #eaf2ff !important;
+    font-weight: bold;
+}
+
+.contenedor-quitar {
+    display: flex;
+    align-items: end;
+}
+
+.btn-quitar-cotizacion {
+    height: 42px;
+    border: none;
+    background: #d71920;
+    color: white;
+    font-weight: bold;
+    border-radius: 5px;
+    padding: 0 12px;
+    cursor: pointer;
+}
+
+.btn-quitar-cotizacion:hover {
+    background: #b9151b;
+}
+
+.observaciones-cotizacion {
+    width: 100%;
+    min-height: 100px;
+    resize: vertical;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 12px;
+    font-family: Arial, sans-serif;
+}
+
+.resumen-cotizacion {
+    max-width: 500px;
+    margin-left: auto;
+}
+
+.linea-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 12px 0;
+
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.linea-total span {
+    font-weight: bold;
+}
+
+.linea-total strong {
+    font-size: 18px;
+}
+
+.igv-linea label {
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.total-final {
+    border-bottom: none;
+    margin-top: 5px;
+    padding: 15px;
+
+    background: #0b3d91;
+    color: white;
+
+    border-radius: 6px;
+}
+
+.total-final span {
+    font-size: 18px;
+}
+
+.total-final strong {
+    font-size: 25px;
+}
+
+.acciones-cotizacion {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-bottom: 40px;
+}
+
+.btn-nueva-cotizacion {
+    border: none;
+    background: #475569;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-nueva-cotizacion:hover {
+    background: #334155;
+}
+
+
+/* ===============================
+   IMPRESIÓN
+================================ */
+
+@media print {
+
+    header {
+        padding: 10px 20px;
+    }
+
+    .btn-volver,
+    .btn-agregar,
+    .btn-quitar-cotizacion,
+    .acciones-cotizacion {
+        display: none !important;
+    }
+
+    body {
+        background: white;
+    }
+
+    main {
+        width: 100%;
+        max-width: none;
+        margin: 10px auto;
+    }
+
+    .panel {
+        box-shadow: none;
+        border: 1px solid #ddd;
+        break-inside: avoid;
+    }
+
+    .fila-cotizacion {
+        break-inside: avoid;
+    }
+}
+
+
+/* ===============================
+   TABLET
+================================ */
+
+@media (max-width: 1100px) {
+
+    .fila-cotizacion {
+        grid-template-columns:
+            repeat(4, 1fr);
+    }
+
+    .contenedor-quitar {
+        align-items: stretch;
+    }
+
+    .btn-quitar-cotizacion {
+        width: 100%;
+    }
+}
+
+
+/* ===============================
+   CELULAR
+================================ */
+
+@media (max-width: 650px) {
+
+    .cabecera-cotizacion {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .cabecera-cotizacion .btn-volver {
+        text-align: center;
+    }
+
+    .datos-cotizacion {
+        grid-template-columns: 1fr;
+    }
+
+    .titulo-cotizacion {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .titulo-cotizacion .btn-agregar {
+        width: 100%;
+    }
+
+    .fila-cotizacion {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .resumen-cotizacion {
+        max-width: none;
+    }
+
+    .acciones-cotizacion {
+        flex-direction: column;
+    }
+
+    .acciones-cotizacion button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 420px) {
+
+    .fila-cotizacion {
+        grid-template-columns: 1fr;
+    }
+}
