@@ -2,6 +2,14 @@ let pedidos = [];
 
 let pedidoEditando = null;
 
+let paginaActual = 1;
+
+let totalPaginas = 1;
+
+let limitePorPagina = 50;
+
+let busquedaActual = "";
+
 
 // ===============================
 // API
@@ -32,7 +40,6 @@ async function api(url, options = {}) {
 
     return datos;
 }
-
 
 
 // ===============================
@@ -67,7 +74,6 @@ function formatearCreadoEn(fecha) {
         }
     );
 }
-
 
 
 // ===============================
@@ -275,7 +281,6 @@ function agregarVidrio(datos = {}) {
 }
 
 
-
 // ===============================
 // QUITAR VIDRIO
 // ===============================
@@ -302,7 +307,6 @@ function quitarVidrio(boton) {
 
     boton.closest(".fila-vidrio").remove();
 }
-
 
 
 // ===============================
@@ -341,7 +345,6 @@ function obtenerVidriosFormulario() {
 
     });
 }
-
 
 
 // ===============================
@@ -437,6 +440,21 @@ async function guardarPedido() {
 
         cancelarEdicion();
 
+
+        busquedaActual = "";
+
+        paginaActual = 1;
+
+
+        const buscar =
+            document.getElementById("buscar");
+
+
+        if (buscar) {
+            buscar.value = "";
+        }
+
+
         await cargarDatos();
 
 
@@ -447,7 +465,6 @@ async function guardarPedido() {
         alert(error.message);
     }
 }
-
 
 
 // ===============================
@@ -476,47 +493,66 @@ function limpiarFormulario() {
 }
 
 
-
 // ===============================
-// CARGAR DATOS
+// CARGAR DATOS PAGINADOS
 // ===============================
 
 async function cargarDatos() {
 
     try {
 
+        let url =
+            `/api/pedidos-paginados?page=${paginaActual}&limit=${limitePorPagina}`;
+
+
+        if (busquedaActual) {
+
+            url +=
+                `&buscar=${encodeURIComponent(
+                    busquedaActual
+                )}`;
+        }
+
+
+        const respuesta =
+            await api(url);
+
+
         pedidos =
-            await api("/api/pedidos");
+            Array.isArray(respuesta.pedidos)
+                ? respuesta.pedidos
+                : [];
+
+
+        paginaActual =
+            respuesta.pagina || 1;
+
+
+        totalPaginas =
+            respuesta.totalPaginas || 1;
 
 
         mostrarProduccion();
 
-        actualizarResumen();
+
+        mostrarPaginacion(
+            respuesta.total || 0
+        );
 
 
-        const buscar =
-            document.getElementById("buscar");
-
-
-        if (
-            buscar &&
-            buscar.value.trim() !== ""
-        ) {
-
-            buscarPedido();
-        }
+        await actualizarResumen();
 
 
     } catch (error) {
 
         console.error(error);
 
+
         alert(
             "No se pudieron cargar los pedidos."
         );
     }
 }
-
 
 
 // ===============================
@@ -579,7 +615,6 @@ function crearResumenVidrios(vidrios = []) {
 }
 
 
-
 // ===============================
 // MOSTRAR PRODUCCIÓN
 // ===============================
@@ -598,7 +633,7 @@ function mostrarProduccion() {
     if (pedidos.length === 0) {
 
         contenedor.innerHTML =
-            "<p>No hay pedidos registrados.</p>";
+            "<p>No hay pedidos encontrados.</p>";
 
         return;
     }
@@ -748,7 +783,6 @@ function mostrarProduccion() {
 }
 
 
-
 // ===============================
 // CREAR BOTÓN PROCESO
 // ===============================
@@ -785,7 +819,6 @@ function crearProceso(
 }
 
 
-
 // ===============================
 // CAMBIAR PROCESO
 // ===============================
@@ -820,7 +853,6 @@ async function cambiarProceso(
         alert(error.message);
     }
 }
-
 
 
 // ===============================
@@ -880,7 +912,6 @@ function cotizarPedido(id) {
         "_blank"
     );
 }
-
 
 
 // ===============================
@@ -980,7 +1011,6 @@ function editarPedido(id) {
 }
 
 
-
 // ===============================
 // CANCELAR EDICIÓN
 // ===============================
@@ -1007,7 +1037,6 @@ function cancelarEdicion() {
         "btnCancelarEdicion"
     ).classList.add("oculto");
 }
-
 
 
 // ===============================
@@ -1037,6 +1066,15 @@ async function eliminarPedido(id) {
         );
 
 
+        if (
+            pedidos.length === 1 &&
+            paginaActual > 1
+        ) {
+
+            paginaActual--;
+        }
+
+
         await cargarDatos();
 
 
@@ -1049,59 +1087,88 @@ async function eliminarPedido(id) {
 }
 
 
-
 // ===============================
 // BUSCAR
 // ===============================
 
-function buscarPedido() {
+async function buscarPedido() {
+
+    const input =
+        document.getElementById("buscar");
+
+
+    if (!input) {
+        return;
+    }
+
 
     const texto =
-        document
-            .getElementById("buscar")
-            .value
-            .trim()
-            .toLowerCase();
+        input.value.trim();
+
 
     const resultado =
         document.getElementById("resultado");
 
-    resultado.innerHTML = "";
+
+    if (resultado) {
+        resultado.innerHTML = "";
+    }
+
+
+    busquedaActual =
+        texto;
+
+
+    paginaActual = 1;
+
+
+    await cargarDatos();
+
 
     if (!texto) {
         return;
     }
 
 
-    const pedidoEncontrado =
+    const pedidoExacto =
         pedidos.find(pedido =>
             String(pedido.op)
-                .toLowerCase() === texto
+                .toLowerCase() ===
+            texto.toLowerCase()
         );
 
 
-    if (!pedidoEncontrado) {
-        return;
-    }
+    if (pedidoExacto) {
 
-
-    const tarjeta =
-        document.getElementById(
-            `pedido-${pedidoEncontrado.id}`
+        irAlPedido(
+            pedidoExacto.id
         );
-
-
-    if (!tarjeta) {
-        return;
     }
-
-
-    tarjeta.scrollIntoView({
-        behavior: "smooth",
-        block: "center"
-    });
 }
 
+
+// ===============================
+// LIMPIAR BÚSQUEDA
+// ===============================
+
+async function limpiarBusqueda() {
+
+    const buscar =
+        document.getElementById("buscar");
+
+
+    if (buscar) {
+        buscar.value = "";
+    }
+
+
+    busquedaActual = "";
+
+    paginaActual = 1;
+
+
+    await cargarDatos();
+}
 
 
 // ===============================
@@ -1128,72 +1195,267 @@ function irAlPedido(id) {
 }
 
 
-
 // ===============================
-// RESUMEN
+// RESUMEN GENERAL DESDE POSTGRESQL
 // ===============================
 
-function actualizarResumen() {
+async function actualizarResumen() {
 
-    const total =
-        pedidos.length;
+    try {
 
-
-    const pendientes =
-        pedidos.filter(
-            pedido =>
-                !pedido.corte &&
-                !pedido.entalle &&
-                !pedido.limpios &&
-                !pedido.templado &&
-                !pedido.terminado
-        ).length;
+        const resumen =
+            await api(
+                "/api/resumen"
+            );
 
 
-    const proceso =
-        pedidos.filter(
-            pedido =>
-
-                (
-                    pedido.corte ||
-                    pedido.entalle ||
-                    pedido.limpios ||
-                    pedido.templado
-                )
-
-                &&
-
-                !pedido.terminado
-
-        ).length;
+        document.getElementById("total")
+            .textContent =
+            resumen.total || 0;
 
 
-    const terminados =
-        pedidos.filter(
-            pedido => pedido.terminado
-        ).length;
+        document.getElementById("pendientes")
+            .textContent =
+            resumen.pendientes || 0;
 
 
-    document.getElementById("total")
-        .textContent =
-        total;
+        document.getElementById("proceso")
+            .textContent =
+            resumen.proceso || 0;
 
 
-    document.getElementById("pendientes")
-        .textContent =
-        pendientes;
+        document.getElementById("terminados")
+            .textContent =
+            resumen.terminados || 0;
 
 
-    document.getElementById("proceso")
-        .textContent =
-        proceso;
+    } catch (error) {
 
-
-    document.getElementById("terminados")
-        .textContent =
-        terminados;
+        console.error(
+            "Error cargando resumen:",
+            error
+        );
+    }
 }
 
+
+// ===============================
+// PAGINACIÓN
+// ===============================
+
+function mostrarPaginacion(totalPedidos) {
+
+    let contenedor =
+        document.getElementById(
+            "paginacionPedidos"
+        );
+
+
+    if (!contenedor) {
+
+        contenedor =
+            document.createElement(
+                "div"
+            );
+
+
+        contenedor.id =
+            "paginacionPedidos";
+
+
+        contenedor.style.display =
+            "flex";
+
+        contenedor.style.justifyContent =
+            "center";
+
+        contenedor.style.alignItems =
+            "center";
+
+        contenedor.style.gap =
+            "10px";
+
+        contenedor.style.flexWrap =
+            "wrap";
+
+        contenedor.style.margin =
+            "25px 0";
+
+
+        const produccion =
+            document.getElementById(
+                "produccion"
+            );
+
+
+        if (produccion) {
+
+            produccion.insertAdjacentElement(
+                "afterend",
+                contenedor
+            );
+        }
+    }
+
+
+    if (totalPedidos === 0) {
+
+        contenedor.innerHTML = "";
+
+        return;
+    }
+
+
+    contenedor.innerHTML = `
+
+        <button
+            type="button"
+            onclick="paginaAnterior()"
+            ${paginaActual <= 1 ? "disabled" : ""}
+        >
+            ← ANTERIOR
+        </button>
+
+
+        <strong>
+            Página ${paginaActual}
+            de ${totalPaginas}
+        </strong>
+
+
+        <span>
+            ${totalPedidos}
+            pedido${totalPedidos === 1 ? "" : "s"}
+        </span>
+
+
+        <button
+            type="button"
+            onclick="paginaSiguiente()"
+            ${paginaActual >= totalPaginas ? "disabled" : ""}
+        >
+            SIGUIENTE →
+        </button>
+
+    `;
+}
+
+
+// ===============================
+// PÁGINA ANTERIOR
+// ===============================
+
+async function paginaAnterior() {
+
+    if (paginaActual <= 1) {
+        return;
+    }
+
+
+    paginaActual--;
+
+
+    await cargarDatos();
+
+
+    irArribaPedidos();
+}
+
+
+// ===============================
+// PÁGINA SIGUIENTE
+// ===============================
+
+async function paginaSiguiente() {
+
+    if (
+        paginaActual >= totalPaginas
+    ) {
+        return;
+    }
+
+
+    paginaActual++;
+
+
+    await cargarDatos();
+
+
+    irArribaPedidos();
+}
+
+
+// ===============================
+// IR ARRIBA DE LOS PEDIDOS
+// ===============================
+
+function irArribaPedidos() {
+
+    const produccion =
+        document.getElementById(
+            "produccion"
+        );
+
+
+    if (!produccion) {
+        return;
+    }
+
+
+    produccion.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+}
+
+
+// ===============================
+// ENTER EN BUSCADOR
+// ===============================
+
+function prepararBuscador() {
+
+    const buscar =
+        document.getElementById(
+            "buscar"
+        );
+
+
+    if (!buscar) {
+        return;
+    }
+
+
+    buscar.addEventListener(
+        "keydown",
+        function (evento) {
+
+            if (
+                evento.key === "Enter"
+            ) {
+
+                evento.preventDefault();
+
+                buscarPedido();
+            }
+        }
+    );
+
+
+    buscar.addEventListener(
+        "input",
+        function () {
+
+            if (
+                buscar.value.trim() === "" &&
+                busquedaActual !== ""
+            ) {
+
+                limpiarBusqueda();
+            }
+        }
+    );
+}
 
 
 // ===============================
@@ -1201,5 +1463,7 @@ function actualizarResumen() {
 // ===============================
 
 agregarVidrio();
+
+prepararBuscador();
 
 cargarDatos();
