@@ -717,6 +717,14 @@ function mostrarProduccion() {
 
                         <button
                             class="btn-editar"
+                            onclick="cotizarPedido(${pedido.id})"
+                        >
+                            💰 Cotizar
+                        </button>
+
+
+                        <button
+                            class="btn-editar"
                             onclick="editarPedido(${pedido.id})"
                         >
                             ✎ Editar pedido
@@ -811,6 +819,66 @@ async function cambiarProceso(
 
         alert(error.message);
     }
+}
+
+
+
+// ===============================
+// COTIZAR PEDIDO
+// ===============================
+
+function cotizarPedido(id) {
+
+    const pedido =
+        pedidos.find(
+            p => Number(p.id) === Number(id)
+        );
+
+
+    if (!pedido) {
+
+        alert(
+            "Pedido no encontrado."
+        );
+
+        return;
+    }
+
+
+    const datosCotizacion = {
+
+        pedidoId:
+            pedido.id,
+
+        op:
+            pedido.op || "",
+
+        cliente:
+            pedido.cliente || "",
+
+        fechaEntrega:
+            pedido.fechaEntrega || "",
+
+        descripcion:
+            pedido.descripcion || "",
+
+        vidrios:
+            Array.isArray(pedido.vidrios)
+                ? pedido.vidrios
+                : []
+    };
+
+
+    localStorage.setItem(
+        "pedidoParaCotizar",
+        JSON.stringify(datosCotizacion)
+    );
+
+
+    window.open(
+        "cotizaciones.html",
+        "_blank"
+    );
 }
 
 
@@ -998,38 +1066,42 @@ function buscarPedido() {
     const resultado =
         document.getElementById("resultado");
 
-    // No mostrar pedidos dentro del buscador
     resultado.innerHTML = "";
 
     if (!texto) {
         return;
     }
 
-    // Buscar OP exacta
+
     const pedidoEncontrado =
         pedidos.find(pedido =>
             String(pedido.op)
                 .toLowerCase() === texto
         );
 
+
     if (!pedidoEncontrado) {
         return;
     }
+
 
     const tarjeta =
         document.getElementById(
             `pedido-${pedidoEncontrado.id}`
         );
 
+
     if (!tarjeta) {
         return;
     }
+
 
     tarjeta.scrollIntoView({
         behavior: "smooth",
         block: "center"
     });
 }
+
 
 
 // ===============================
@@ -1039,17 +1111,24 @@ function buscarPedido() {
 function irAlPedido(id) {
 
     const tarjeta =
-        document.getElementById(`pedido-${id}`);
+        document.getElementById(
+            `pedido-${id}`
+        );
+
 
     if (!tarjeta) {
         return;
     }
+
 
     tarjeta.scrollIntoView({
         behavior: "smooth",
         block: "center"
     });
 }
+
+
+
 // ===============================
 // RESUMEN
 // ===============================
