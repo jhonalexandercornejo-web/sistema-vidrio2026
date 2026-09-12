@@ -609,7 +609,7 @@ function mostrarProduccion() {
 
             return `
 
-                <div class="op-card">
+                <div class="op-card" id="pedido-${pedido.id}">
 
                     <div class="op-cabecera">
 
@@ -1028,7 +1028,7 @@ function buscarPedido() {
 
         resultado.innerHTML = `
 
-            <div class="resultado">
+            <div class="resultado" onclick="irAlPedido(${pedido.id})" style="cursor:pointer;">
 
                 No se encontraron pedidos.
 
@@ -1138,7 +1138,24 @@ function buscarPedido() {
 }
 
 
+// ===============================
+// IR DIRECTAMENTE AL PEDIDO
+// ===============================
 
+function irAlPedido(id) {
+
+    const tarjeta =
+        document.getElementById(`pedido-${id}`);
+
+    if (!tarjeta) {
+        return;
+    }
+
+    tarjeta.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+    });
+}
 // ===============================
 // RESUMEN
 // ===============================
