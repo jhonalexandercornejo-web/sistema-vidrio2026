@@ -1,3 +1,4 @@
+```javascript
 let pedidos = [];
 
 
@@ -23,6 +24,34 @@ async function api(url, options = {}) {
     }
 
     return data;
+}
+
+
+// ===============================
+// FORMATEAR FECHA Y HORA DE REGISTRO
+// ===============================
+
+function formatearCreadoEn(creadoEn) {
+
+    if (!creadoEn) {
+        return "NO DISPONIBLE";
+    }
+
+    const fecha = new Date(creadoEn);
+
+    if (isNaN(fecha.getTime())) {
+        return creadoEn;
+    }
+
+    return fecha.toLocaleString("es-PE", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false
+    });
 }
 
 
@@ -250,6 +279,16 @@ function mostrarProduccion() {
                 <span>
                     📅 ${pedido.fechaEntrega || "SIN FECHA"}
                 </span>
+
+            </div>
+
+
+            <div class="detalle-registro">
+
+                📝 Registrado:
+                <strong>
+                    ${formatearCreadoEn(pedido.creadoEn)}
+                </strong>
 
             </div>
 
@@ -671,6 +710,19 @@ function buscarPedido() {
                     <p>
 
                         <strong>
+                            Registrado:
+                        </strong>
+
+                        ${formatearCreadoEn(
+                            pedido.creadoEn
+                        )}
+
+                    </p>
+
+
+                    <p>
+
+                        <strong>
                             Entrega:
                         </strong>
 
@@ -922,3 +974,4 @@ function actualizarResumen() {
 // ===============================
 
 cargarDatos();
+```
