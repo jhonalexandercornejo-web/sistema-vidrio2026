@@ -15,7 +15,12 @@ const pool = new Pool({
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
+// ===============================
+// CREAR / ASEGURAR TABLA
+// ===============================
+
 async function crearTabla() {
+
     await pool.query(`
         CREATE TABLE IF NOT EXISTS pedidos (
             id SERIAL PRIMARY KEY,
@@ -34,44 +39,73 @@ async function crearTabla() {
             templado INTEGER DEFAULT 0,
             terminado INTEGER DEFAULT 0,
             despacho INTEGER DEFAULT 0,
-            "creadoEn" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            "creadoEn" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
         )
+    `);
+
+    await pool.query(`
+        ALTER TABLE pedidos
+        ADD COLUMN IF NOT EXISTS "creadoEn"
+        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
     `);
 }
 
+// ===============================
+// CONVERTIR PEDIDO
+// ===============================
+
 function convertirPedido(row) {
+
     if (!row) return null;
 
     return {
         ...row,
+
         corte: Boolean(row.corte),
         entalle: Boolean(row.entalle),
         limpios: Boolean(row.limpios),
         templado: Boolean(row.templado),
         terminado: Boolean(row.terminado),
-        despacho: Boolean(row.despacho)
+        despacho: Boolean(row.despacho),
+
+        creadoEn: row.creadoEn
     };
 }
-
 
 // ===============================
 // OBTENER TODOS LOS PEDIDOS
 // ===============================
 
 app.get("/api/pedidos", async (req, res) => {
+
     try {
+
         const resultado = await pool.query(`
-            SELECT * FROM pedidos
+            SELECT *
+            FROM pedidos
             ORDER BY
-                CASE WHEN "fechaEntrega" IS NULL OR "fechaEntrega" = '' THEN 1 ELSE 0 END,
+                CASE
+                    WHEN "fechaEntrega" IS NULL
+                    OR "fechaEntrega" = ''
+                    THEN 1
+                    ELSE 0
+                END,
                 "fechaEntrega" ASC,
-                CASE WHEN "horaEntrega" IS NULL OR "horaEntrega" = '' THEN 1 ELSE 0 END,
+                CASE
+                    WHEN "horaEntrega" IS NULL
+                    OR "horaEntrega" = ''
+                    THEN 1
+                    ELSE 0
+                END,
                 "horaEntrega" ASC
         `);
 
-        res.json(resultado.rows.map(convertirPedido));
+        res.json(
+            resultado.rows.map(convertirPedido)
+        );
 
     } catch (error) {
+
         console.error(error);
 
         res.status(500).json({
@@ -79,7 +113,6 @@ app.get("/api/pedidos", async (req, res) => {
         });
     }
 });
-
 
 // ===============================
 // CREAR PEDIDO
@@ -100,6 +133,7 @@ app.post("/api/pedidos", async (req, res) => {
     } = req.body;
 
     if (!op || !cliente) {
+
         return res.status(400).json({
             error: "La OP y el cliente son obligatorios."
         });
@@ -119,7 +153,17 @@ app.post("/api/pedidos", async (req, res) => {
                 cantidad,
                 metros
             )
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+            VALUES (
+                $1,
+                $2,
+                $3,
+                $4,
+                $5,
+                $6,
+                $7,
+                $8,
+                $9
+            )
             RETURNING *
         `, [
             op,
@@ -142,6 +186,7 @@ app.post("/api/pedidos", async (req, res) => {
         console.error(error);
 
         if (error.code === "23505") {
+
             return res.status(409).json({
                 error: "Esa OP ya existe."
             });
@@ -152,7 +197,6 @@ app.post("/api/pedidos", async (req, res) => {
         });
     }
 });
-
 
 // ===============================
 // ACTUALIZAR PROCESO
@@ -177,6 +221,7 @@ app.put("/api/pedidos/:id", async (req, res) => {
         );
 
     if (cambios.length === 0) {
+
         return res.status(400).json({
             error: "No hay cambios válidos."
         });
@@ -186,12 +231,14 @@ app.put("/api/pedidos/:id", async (req, res) => {
 
         const valores = [];
 
-        const sets = cambios.map(([campo, valor], indice) => {
+        const sets = cambios.map(
+            ([campo, valor], indice) => {
 
-            valores.push(valor ? 1 : 0);
+                valores.push(valor ? 1 : 0);
 
-            return `"${campo}" = $${indice + 1}`;
-        });
+                return `"${campo}" = $${indice + 1}`;
+            }
+        );
 
         valores.push(id);
 
@@ -203,6 +250,7 @@ app.put("/api/pedidos/:id", async (req, res) => {
         `, valores);
 
         if (resultado.rowCount === 0) {
+
             return res.status(404).json({
                 error: "Pedido no encontrado."
             });
@@ -222,7 +270,6 @@ app.put("/api/pedidos/:id", async (req, res) => {
     }
 });
 
-
 // ===============================
 // ELIMINAR PEDIDO
 // ===============================
@@ -232,6 +279,7 @@ app.delete("/api/pedidos/:id", async (req, res) => {
     const id = Number(req.params.id);
 
     if (!Number.isInteger(id)) {
+
         return res.status(400).json({
             error: "ID de pedido inválido."
         });
@@ -249,6 +297,7 @@ app.delete("/api/pedidos/:id", async (req, res) => {
         );
 
         if (resultado.rowCount === 0) {
+
             return res.status(404).json({
                 error: "Pedido no encontrado."
             });
@@ -267,7 +316,6 @@ app.delete("/api/pedidos/:id", async (req, res) => {
         });
     }
 });
-
 
 // ===============================
 // INICIAR SERVIDOR

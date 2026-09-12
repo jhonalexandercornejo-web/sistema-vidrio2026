@@ -1,4 +1,3 @@
-```css
 * {
     box-sizing: border-box;
 }
@@ -316,7 +315,7 @@ select:focus {
         font-size: 12px;
     }
 }
-```
+
 /* PROCESOS DEL BUSCADOR: CLICKEABLES */
 .procesos-busqueda {
     position: relative;
