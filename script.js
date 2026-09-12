@@ -995,146 +995,40 @@ function buscarPedido() {
             .trim()
             .toLowerCase();
 
-
     const resultado =
         document.getElementById("resultado");
 
+    // No mostrar pedidos dentro del buscador
+    resultado.innerHTML = "";
 
     if (!texto) {
-
-        resultado.innerHTML = "";
-
         return;
     }
 
-
-    const encontrados =
-        pedidos.filter(pedido =>
-
+    // Buscar OP exacta
+    const pedidoEncontrado =
+        pedidos.find(pedido =>
             String(pedido.op)
-                .toLowerCase()
-                .includes(texto)
-
-            ||
-
-            String(pedido.cliente)
-                .toLowerCase()
-                .includes(texto)
-
+                .toLowerCase() === texto
         );
 
-
-    if (!encontrados.length) {
-
-        resultado.innerHTML = `
-
-            <div class="resultado" onclick="irAlPedido(${pedido.id})" style="cursor:pointer;">
-
-                No se encontraron pedidos.
-
-            </div>
-
-        `;
-
+    if (!pedidoEncontrado) {
         return;
     }
 
+    const tarjeta =
+        document.getElementById(
+            `pedido-${pedidoEncontrado.id}`
+        );
 
-    resultado.innerHTML =
-        encontrados.map(pedido => {
+    if (!tarjeta) {
+        return;
+    }
 
-            return `
-
-                <div class="resultado">
-
-                    <div class="op-cabecera">
-
-                        <strong>
-                            OP ${pedido.op}
-                        </strong>
-
-                        <strong>
-                            ${pedido.cliente}
-                        </strong>
-
-                        <span>
-                            🕐 hora de entrega:
-                            ${pedido.horaEntrega || "-"}
-                        </span>
-
-                        <span>
-                            📅 fecha de entrega:
-                            ${pedido.fechaEntrega || "-"}
-                        </span>
-
-                    </div>
-
-
-                    <div class="resumen-vidrios">
-
-                        ${crearResumenVidrios(
-                            pedido.vidrios
-                        )}
-
-                    </div>
-
-
-                    <div class="procesos">
-
-                        ${crearProceso(
-                            pedido,
-                            "corte",
-                            "CORTE"
-                        )}
-
-                        ${crearProceso(
-                            pedido,
-                            "entalle",
-                            "ENTALLE"
-                        )}
-
-                        ${crearProceso(
-                            pedido,
-                            "limpios",
-                            "LIMPIOS"
-                        )}
-
-                        ${crearProceso(
-                            pedido,
-                            "templado",
-                            "TEMPLADO"
-                        )}
-
-                        ${crearProceso(
-                            pedido,
-                            "terminado",
-                            "TERMINADO"
-                        )}
-
-                        ${crearProceso(
-                            pedido,
-                            "despacho",
-                            "DESPACHO"
-                        )}
-
-                    </div>
-
-
-                    <div class="detalle-op">
-
-                        📝 Registrado:
-
-                        ${formatearCreadoEn(
-                            pedido.creadoEn
-                        )}
-
-                    </div>
-
-                </div>
-
-            `;
-
-        }).join("");
+    tarjeta.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+    });
 }
 
 
