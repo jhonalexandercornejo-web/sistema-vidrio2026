@@ -1058,12 +1058,12 @@ function buscarPedido() {
                         </strong>
 
                         <span>
-                            🕐
+                            🕐 hora de entrga
                             ${pedido.horaEntrega || "-"}
                         </span>
 
                         <span>
-                            📅
+                            📅 fecha de entrega:
                             ${pedido.fechaEntrega || "-"}
                         </span>
 
