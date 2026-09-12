@@ -809,3 +809,6 @@ textarea:focus {
         width: 100%;
     }
 }
+#resultado {
+    display: none !important;
+}
