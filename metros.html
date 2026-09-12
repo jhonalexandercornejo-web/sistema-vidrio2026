@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Metros por Fecha de Entrega</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+
+    <img
+        src="https://maqvid.com/wp-content/uploads/2024/05/Zakata.jpeg"
+        alt="ZAKATA GLASS"
+        class="logo"
+    >
+
+    <div>
+        <h1>VIDRIO TEMPLADO</h1>
+        <p>METROS POR FECHA DE ENTREGA</p>
+    </div>
+
+</header>
+
+
+<main>
+
+    <div class="cabecera-metros">
+
+        <div>
+            <h1>METROS POR FECHA DE ENTREGA</h1>
+
+            <p>
+                Resumen automático según la fecha de entrega de los pedidos.
+            </p>
+        </div>
+
+
+        <a
+            href="index.html"
+            class="btn-volver"
+        >
+            ← VOLVER A PEDIDOS
+        </a>
+
+    </div>
+
+
+    <section class="resumen resumen-metros">
+
+        <div class="card-resumen">
+
+            <span>FECHAS CON ENTREGA</span>
+
+            <strong id="totalFechas">
+                0
+            </strong>
+
+        </div>
+
+
+        <div class="card-resumen">
+
+            <span>TOTAL OP</span>
+
+            <strong id="totalOPMetros">
+                0
+            </strong>
+
+        </div>
+
+
+        <div class="card-resumen">
+
+            <span>TOTAL METROS</span>
+
+            <strong id="totalMetrosGeneral">
+                0.00
+            </strong>
+
+        </div>
+
+
+        <div class="card-resumen">
+
+            <span>PRÓXIMA ENTREGA</span>
+
+            <strong
+                id="proximaEntrega"
+                class="texto-fecha"
+            >
+                -
+            </strong>
+
+        </div>
+
+    </section>
+
+
+    <section class="panel">
+
+        <div class="barra-metros">
+
+            <div>
+
+                <label>
+                    BUSCAR FECHA
+                </label>
+
+                <input
+                    id="buscarFecha"
+                    type="date"
+                    onchange="mostrarMetros()"
+                >
+
+            </div>
+
+
+            <button
+                class="btn-limpiar-fecha"
+                onclick="limpiarFecha()"
+            >
+                MOSTRAR TODAS
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <section class="panel">
+
+        <h2>
+            RESUMEN DE ENTREGAS
+        </h2>
+
+
+        <div class="tabla-responsive">
+
+            <table class="tabla-metros">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            FECHA DE ENTREGA
+                        </th>
+
+                        <th>
+                            CANTIDAD DE OP
+                        </th>
+
+                        <th>
+                            TOTAL M²
+                        </th>
+
+                        <th>
+                            ACCIÓN
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="tablaMetros">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <section
+        class="panel"
+        id="detalleFecha"
+        style="display:none;"
+    >
+
+        <h2 id="tituloDetalle">
+            PEDIDOS
+        </h2>
+
+
+        <div id="listaDetalleFecha">
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<script src="metros.js"></script>
+
+</body>
+
+</html>
