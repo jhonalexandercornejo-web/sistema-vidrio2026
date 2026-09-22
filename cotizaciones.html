@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Cotizaciones - Zakata Glass
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+</head>
+
+
+<body>
+
+<header>
+
+    <img
+        src="https://maqvid.com/wp-content/uploads/2024/05/Zakata.jpeg"
+        alt="ZAKATA GLASS"
+        class="logo"
+    >
+
+    <div>
+
+        <h1>
+            VIDRIO TEMPLADO
+        </h1>
+
+        <p>
+            COTIZACIONES
+        </p>
+
+    </div>
+
+</header>
+
+
+<main>
+
+    <div class="cabecera-cotizacion">
+
+        <div>
+
+            <h1>
+                COTIZADOR DE VIDRIOS
+            </h1>
+
+            <p>
+                Calcula automáticamente metros cuadrados y precios.
+            </p>
+
+        </div>
+
+
+        <a
+            href="index.html"
+            class="btn-volver"
+        >
+            ← VOLVER A PEDIDOS
+        </a>
+
+    </div>
+
+
+    <!-- DATOS DE LA COTIZACIÓN -->
+
+    <section class="panel">
+
+        <h2>
+            DATOS DE LA COTIZACIÓN
+        </h2>
+
+
+        <div class="datos-cotizacion">
+
+            <div>
+
+                <label>
+                    N° COTIZACIÓN
+                </label>
+
+                <input
+                    id="numeroCotizacion"
+                    type="text"
+                     placeholder="Ejemplo: COT-001"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label>
+                    CLIENTE
+                </label>
+
+                <input
+                    id="clienteCotizacion"
+                    type="text"
+                    placeholder="Nombre del cliente"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label>
+                    FECHA
+                </label>
+
+                <input
+                    id="fechaCotizacion"
+                    type="date"
+                >
+
+            </div>
+
+        </div>
+
+        <div class="datos-cotizacion cot-datos-extra">
+          <div><label>RUC DEL CLIENTE</label><input id="rucCotizacion" inputmode="numeric" maxlength="11" placeholder="RUC"></div>
+          <div><label>DIRECCIÓN DEL CLIENTE</label><input id="direccionCotizacion" placeholder="Dirección"></div>
+          <div><label>VENDEDOR</label><input id="vendedorCotizacion" placeholder="Vendedor"></div>
+          <div><label>N° OP</label><input id="opCotizacion" placeholder="OP"></div>
+          <div><label>CPS</label><input id="cpsCotizacion" placeholder="CPS"></div>
+          <div><label>DESCUENTO (S/)</label><input id="descuentoCotizacion" type="number" min="0" step="0.01" value="0" oninput="calcularCotizacion()"></div>
+        </div>
+    </section>
+
+
+    <!-- VIDRIOS -->
+
+    <section class="panel">
+
+        <div class="titulo-cotizacion">
+
+            <h2>
+                VIDRIOS A COTIZAR
+            </h2>
+
+
+            <button
+                class="btn-agregar"
+                onclick="agregarFilaCotizacion()"
+            >
+                + AGREGAR VIDRIO
+            </button>
+
+        </div>
+
+
+        <div id="listaCotizacion"></div>
+
+    </section>
+
+
+    <!-- OBSERVACIONES -->
+
+    <section class="panel">
+
+        <h2>
+            OBSERVACIONES
+        </h2>
+
+
+        <textarea
+            id="observacionesCotizacion"
+            class="observaciones-cotizacion"
+            placeholder="Ejemplo: incluye instalación, entrega, perforaciones, etc."
+        ></textarea>
+
+    </section>
+
+
+    <!-- TOTALES -->
+
+    <section class="panel">
+
+        <div class="resumen-cotizacion">
+
+            <div class="linea-total">
+
+                <span>
+                    TOTAL M²
+                </span>
+
+                <strong id="totalMetrosCotizacion">
+                    0.00 m²
+                </strong>
+
+            </div>
+
+
+            <div class="linea-total">
+
+                <span>
+                    SUBTOTAL
+                </span>
+
+                <strong id="subtotalCotizacion">
+                    S/ 0.00
+                </strong>
+
+            </div>
+
+
+            <div class="linea-total igv-linea">
+
+                <label>
+
+                    <input
+                        type="checkbox"
+                        id="aplicarIgv"
+                        onchange="calcularCotizacion()"
+                    >
+
+                    APLICAR IGV 18%
+
+                </label>
+
+
+                <strong id="igvCotizacion">
+                    S/ 0.00
+                </strong>
+
+            </div>
+
+
+            <div class="linea-total total-final">
+
+                <span>
+                    TOTAL
+                </span>
+
+                <strong id="totalCotizacion">
+                    S/ 0.00
+                </strong>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- BOTONES -->
+
+    <section class="acciones-cotizacion">
+
+        <button
+            class="btn-principal"
+            onclick="imprimirCotizacion()"
+        >
+            🖨 IMPRIMIR COTIZACIÓN
+        </button>
+
+
+        <button
+            class="btn-nueva-cotizacion"
+            onclick="nuevaCotizacion()"
+        >
+            + NUEVA COTIZACIÓN
+        </button>
+
+    </section>
+
+</main>
+
+
+<section id="documentoCotizacion" aria-label="Cotización imprimible">
+  <div class="doc-top"><div class="doc-empresa"><img src="https://maqvid.com/wp-content/uploads/2024/05/Zakata.jpeg" alt="Zakata Glass"><div><b>CORPORATION ZAKATA GLASS SAC</b><br>JR. LOS MARTILLOS 5083 URB. INDUSTRIAL INFANTAS - LOS OLIVOS, LIMA<br>Teléfono: 903161015<br>corporation.zakataglass@gmail.com</div></div><div class="doc-ruc">R.U.C. N° 20610769404<br><strong>COTIZACIÓN</strong><br><span id="docNumero"></span></div></div>
+  <div class="doc-meta"><div><p><b>Señor(es):</b> <span id="docCliente"></span></p><p><b>RUC:</b> <span id="docRuc"></span></p><p><b>Dirección:</b> <span id="docDireccion"></span></p><p><b>Observ.:</b> <span id="docObservaciones"></span></p></div><div><p><b>Fecha:</b> <span id="docFecha"></span></p><p><b>Vendedor:</b> <span id="docVendedor"></span></p><p><b>OP:</b> <span id="docOp"></span></p><p><b>CPS:</b> <span id="docCps"></span></p></div></div>
+  <table class="doc-tabla"><thead><tr><th>CÓDIGO</th><th>DESCRIPCIÓN</th><th>UNI</th><th>CANT</th><th>VALOR</th><th>V. TOTAL</th></tr></thead><tbody id="docFilas"></tbody></table>
+  <div class="doc-bottom"><div><p><b>SON:</b> <span id="docLetras"></span></p><p>Total Peso Kg.: —</p><p class="doc-planta">( PLANTA )</p></div><div class="doc-totales"><p><span>Total Valor Venta - Op. Gravadas</span><b id="docSubtotal"></b></p><p><span>Dscto.</span><b id="docDescuento"></b></p><p><span>I.G.V.</span><b id="docIgv"></b></p><p class="doc-final"><span>Importe Total PEN</span><b id="docTotal"></b></p></div></div>
+  <div class="doc-bancos"><b>Sírvase abonar a nuestra cuenta corriente:</b><br>BCP SOLES: 191-9978634-0-80 // CCI: 002-191009978634080-54<br>BCP DÓLARES: 191-9986747-1-39 // CCI: 002-191-009986747139-55<br>BBVA - SOLES: 0011-0174-0201177909 // CCI: 01117400020117790903</div>
+</section>
+
+<script src="cotizaciones.js"></script>
+
+</body>
+
+</html>
