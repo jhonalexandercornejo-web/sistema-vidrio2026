@@ -903,7 +903,7 @@ function crearResumenVidrios(
 
                         -
 
-                        ${vidrio.metros || 0} m
+                      ${(Number(vidrio.metros) || 0).toFixed(2)} m²
 
                     </span>
 
