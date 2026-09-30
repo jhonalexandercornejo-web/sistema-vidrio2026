@@ -19,7 +19,6 @@
     >
 </head>
 
-
 <body>
 
 <header>
@@ -31,36 +30,23 @@
     >
 
     <div>
-
-        <h1>
-            VIDRIO TEMPLADO
-        </h1>
-
-        <p>
-            COTIZACIONES
-        </p>
-
+        <h1>VIDRIO TEMPLADO</h1>
+        <p>COTIZACIONES</p>
     </div>
 
 </header>
-
 
 <main>
 
     <div class="cabecera-cotizacion">
 
         <div>
-
-            <h1>
-                COTIZADOR DE VIDRIOS
-            </h1>
+            <h1>COTIZADOR DE VIDRIOS</h1>
 
             <p>
                 Calcula automáticamente metros cuadrados y precios.
             </p>
-
         </div>
-
 
         <a
             href="index.html"
@@ -76,60 +62,121 @@
 
     <section class="panel">
 
-        <h2>
-            DATOS DE LA COTIZACIÓN
-        </h2>
-
+        <h2>DATOS DE LA COTIZACIÓN</h2>
 
         <div class="datos-cotizacion">
-            <div><label>RUC DEL CLIENTE</label><input id="rucCotizacion" inputmode="numeric" maxlength="11" placeholder="RUC"></div>
-            <div><label>DIRECCIÓN DEL CLIENTE</label><input id="direccionCotizacion" placeholder="Dirección"></div>
-            <div><label>VENDEDOR</label><input id="vendedorCotizacion" placeholder="Vendedor"></div>
-            <div><label>N.º DOCUMENTO</label><input id="documentoCotizacion" placeholder="1"></div>
-            <div><label>OP</label><input id="opCotizacion" placeholder="Número de OP"></div>
-            <div><label>CPS</label><input id="cpsCotizacion" placeholder="CPS"></div>
 
             <div>
-
-                <label>
-                    N° COTIZACIÓN
-                </label>
+                <label>RUC DEL CLIENTE</label>
 
                 <input
-                    id="numeroCotizacion"
-                    type="text"
-                     placeholder="Ejemplo: COT-001"
+                    id="rucCotizacion"
+                    inputmode="numeric"
+                    maxlength="11"
+                    placeholder="RUC"
                 >
-
             </div>
 
 
             <div>
+                <label>DIRECCIÓN DEL CLIENTE</label>
 
-                <label>
-                    CLIENTE
-                </label>
+                <input
+                    id="direccionCotizacion"
+                    placeholder="Dirección"
+                >
+            </div>
+
+
+            <div>
+                <label>VENDEDOR</label>
+
+                <input
+                    id="vendedorCotizacion"
+                    placeholder="Vendedor"
+                >
+            </div>
+
+
+            <div>
+                <label>N.º DOCUMENTO</label>
+
+                <input
+                    id="documentoCotizacion"
+                    placeholder="1"
+                >
+            </div>
+
+
+            <div>
+                <label>OP</label>
+
+                <input
+                    id="opCotizacion"
+                    placeholder="Número de OP"
+                >
+            </div>
+
+
+            <div>
+                <label>CPS</label>
+
+                <input
+                    id="cpsCotizacion"
+                    placeholder="CPS"
+                >
+            </div>
+
+
+            <div>
+                <label>N° COTIZACIÓN</label>
+
+                <input
+                    id="numeroCotizacion"
+                    type="text"
+                    placeholder="Ejemplo: COT-001"
+                >
+            </div>
+
+
+            <div>
+                <label>CLIENTE</label>
 
                 <input
                     id="clienteCotizacion"
                     type="text"
                     placeholder="Nombre del cliente"
                 >
-
             </div>
 
 
             <div>
-
-                <label>
-                    FECHA
-                </label>
+                <label>FECHA</label>
 
                 <input
                     id="fechaCotizacion"
                     type="date"
                 >
+            </div>
 
+
+            <!-- MONEDA -->
+
+            <div>
+                <label>MONEDA</label>
+
+                <select
+                    id="monedaCotizacion"
+                    onchange="calcularCotizacion()"
+                >
+                    <option value="PEN">
+                        SOLES (S/)
+                    </option>
+
+                    <option value="USD">
+                        DÓLARES (US$)
+                    </option>
+                </select>
             </div>
 
         </div>
@@ -143,12 +190,10 @@
 
         <div class="titulo-cotizacion">
 
-            <h2>
-                VIDRIOS A COTIZAR
-            </h2>
-
+            <h2>VIDRIOS A COTIZAR</h2>
 
             <button
+                type="button"
                 class="btn-agregar"
                 onclick="agregarFilaCotizacion()"
             >
@@ -156,7 +201,6 @@
             </button>
 
         </div>
-
 
         <div id="listaCotizacion"></div>
 
@@ -167,10 +211,7 @@
 
     <section class="panel">
 
-        <h2>
-            OBSERVACIONES
-        </h2>
-
+        <h2>OBSERVACIONES</h2>
 
         <textarea
             id="observacionesCotizacion"
@@ -186,16 +227,30 @@
     <section class="panel">
 
         <div class="resumen-cotizacion">
-            <div class="linea-total"><span>DESCUENTO (S/)</span><input id="descuentoCotizacion" type="number" min="0" step="0.01" value="0" oninput="calcularCotizacion()" style="max-width:135px"></div>
 
             <div class="linea-total">
 
-                <span>
-                    TOTAL M²
-                </span>
+                <span>DESCUENTO</span>
+
+                <input
+                    id="descuentoCotizacion"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value="0"
+                    oninput="calcularCotizacion()"
+                    style="max-width:135px"
+                >
+
+            </div>
+
+
+            <div class="linea-total">
+
+                <span>TOTAL M²</span>
 
                 <strong id="totalMetrosCotizacion">
-                    0.00 m²
+                    0.000 m²
                 </strong>
 
             </div>
@@ -203,9 +258,7 @@
 
             <div class="linea-total">
 
-                <span>
-                    SUBTOTAL
-                </span>
+                <span>SUBTOTAL</span>
 
                 <strong id="subtotalCotizacion">
                     S/ 0.00
@@ -228,7 +281,6 @@
 
                 </label>
 
-
                 <strong id="igvCotizacion">
                     S/ 0.00
                 </strong>
@@ -238,9 +290,7 @@
 
             <div class="linea-total total-final">
 
-                <span>
-                    TOTAL
-                </span>
+                <span>TOTAL</span>
 
                 <strong id="totalCotizacion">
                     S/ 0.00
@@ -277,9 +327,14 @@
 </main>
 
 
-<div id="hojaImpresion" aria-hidden="true"></div>
+<div
+    id="hojaImpresion"
+    aria-hidden="true"
+></div>
+
+
 <script src="cotizaciones.js"></script>
 
 </body>
-    
+
 </html>
