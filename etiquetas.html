@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Etiquetas - Zakata Glass</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- ENCABEZADO -->
+    <header>
+
+        <img
+            src="https://maqvid.com/wp-content/uploads/2024/05/Zakata.jpeg"
+            alt="Zakata Glass"
+            class="logo"
+        >
+
+        <div>
+            <h1>VIDRIO TEMPLADO</h1>
+            <p>GENERADOR DE ETIQUETAS</p>
+        </div>
+
+    </header>
+
+
+    <main>
+
+        <!-- VOLVER -->
+        <div style="margin-bottom: 20px;">
+
+            <button
+                type="button"
+                class="btn-editar"
+                onclick="window.location.href='index.html'"
+            >
+                ← VOLVER A PRODUCCIÓN
+            </button>
+
+        </div>
+
+
+        <!-- BUSCAR OP -->
+        <section class="panel">
+
+            <h2>BUSCAR PEDIDO</h2>
+
+            <div class="form-grid">
+
+                <div>
+                    <label for="buscarOpEtiqueta">
+                        OP
+                    </label>
+
+                    <input
+                        type="text"
+                        id="buscarOpEtiqueta"
+                        placeholder="Ejemplo: V003"
+                    >
+                </div>
+
+                <div style="display:flex; align-items:end;">
+
+                    <button
+                        type="button"
+                        class="btn-guardar"
+                        onclick="buscarPedidoEtiqueta()"
+                    >
+                        BUSCAR OP
+                    </button>
+
+                </div>
+
+            </div>
+
+            <div
+                id="mensajeEtiqueta"
+                style="margin-top:15px;"
+            ></div>
+
+        </section>
+
+
+        <!-- DATOS -->
+        <section class="panel">
+
+            <h2>DATOS DE LA ETIQUETA</h2>
+
+            <div class="form-grid">
+
+                <div>
+                    <label>OP</label>
+                    <input
+                        type="text"
+                        id="opEtiqueta"
+                    >
+                </div>
+
+                <div>
+                    <label>CLIENTE</label>
+                    <input
+                        type="text"
+                        id="clienteEtiqueta"
+                    >
+                </div>
+
+                <div>
+                    <label>OBRA</label>
+                    <input
+                        type="text"
+                        id="obraEtiqueta"
+                        placeholder="Opcional"
+                    >
+                </div>
+
+                <div>
+                    <label>FECHA DE ENTREGA</label>
+                    <input
+                        type="date"
+                        id="fechaEtiqueta"
+                    >
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- VIDRIO -->
+        <section class="panel">
+
+            <h2>DATOS DEL VIDRIO</h2>
+
+            <div class="form-grid">
+
+                <div>
+                    <label>TIPO DE VIDRIO</label>
+
+                    <input
+                        type="text"
+                        id="tipoVidrioEtiqueta"
+                        placeholder="Ejemplo: INCOLORO"
+                    >
+                </div>
+
+
+                <div>
+                    <label>ESPESOR</label>
+
+                    <input
+                        type="number"
+                        id="espesorEtiqueta"
+                        min="1"
+                        placeholder="Ejemplo: 6"
+                    >
+                </div>
+
+
+                <div>
+                    <label>ANCHO (mm)</label>
+
+                    <input
+                        type="number"
+                        id="anchoEtiqueta"
+                        min="1"
+                        placeholder="723"
+                    >
+                </div>
+
+
+                <div>
+                    <label>ALTO (mm)</label>
+
+                    <input
+                        type="number"
+                        id="altoEtiqueta"
+                        min="1"
+                        placeholder="1005"
+                    >
+                </div>
+
+
+                <div>
+                    <label>CANTIDAD</label>
+
+                    <input
+                        type="number"
+                        id="cantidadEtiqueta"
+                        min="1"
+                        value="1"
+                    >
+                </div>
+
+
+                <div>
+                    <label>ENTALLE</label>
+
+                    <input
+                        type="number"
+                        id="entalleEtiqueta"
+                        min="0"
+                        value="0"
+                    >
+                </div>
+
+
+                <div>
+                    <label>LIMPIO</label>
+
+                    <input
+                        type="number"
+                        id="limpioEtiqueta"
+                        min="0"
+                        value="0"
+                    >
+                </div>
+
+            </div>
+
+
+            <div style="margin-top:20px;">
+
+                <button
+                    type="button"
+                    class="btn-guardar"
+                    onclick="generarEtiquetas()"
+                >
+                    🏷️ GENERAR ETIQUETAS
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- VISTA PREVIA -->
+        <section class="panel">
+
+            <h2>VISTA PREVIA</h2>
+
+            <div id="listaEtiquetas">
+
+                <p style="color:#64748b;">
+                    Aquí aparecerán las etiquetas.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- IMPRIMIR -->
+        <div
+            id="accionesEtiquetas"
+            style="margin:20px 0; display:none;"
+        >
+
+            <button
+                type="button"
+                class="btn-guardar"
+                onclick="imprimirEtiquetas()"
+            >
+                🖨️ IMPRIMIR ETIQUETAS
+            </button>
+
+        </div>
+
+    </main>
+
+
+    <script src="etiquetas.js"></script>
+
+</body>
+
+</html>
