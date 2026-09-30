@@ -1219,3 +1219,69 @@ textarea:focus {
     margin-top: 5px;
     width: 100%;
 }
+/* =========================================
+   PROCESOS INDIVIDUALES DEL VIDRIO
+========================================= */
+
+.vidrio-bloque {
+    width: 100%;
+    margin: 12px 0;
+    padding: 12px 14px;
+    background: #f8fafc;
+    border: 1px solid #dbe3ee;
+    border-radius: 6px;
+}
+
+.vidrio-resumen {
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.proceso-vidrio-detalle {
+    margin-top: 10px;
+}
+
+.proceso-vidrio-titulo {
+    font-size: 12px;
+    font-weight: bold;
+    color: #334155;
+    margin-bottom: 6px;
+}
+
+.unidades-proceso {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.unidad-proceso {
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #94a3b8;
+    border-radius: 5px;
+
+    background: white;
+    color: #334155;
+
+    font-size: 12px;
+    font-weight: bold;
+
+    cursor: pointer;
+    user-select: none;
+}
+
+.unidad-proceso:hover {
+    background: #dbeafe;
+    border-color: #0b3d91;
+}
+
+.unidad-proceso.marcada {
+    background: #16a34a;
+    border-color: #15803d;
+    color: white;
+}
