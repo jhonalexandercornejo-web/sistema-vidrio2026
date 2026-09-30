@@ -127,9 +127,81 @@ async function crearTablas() {
 
             "procesoEspecial"
             TEXT
-            DEFAULT 'NINGUNO'
+            DEFAULT 'NINGUNO',
+
+            "cantidadEntalle"
+            INTEGER
+            DEFAULT 0,
+
+            "cantidadLimpio"
+            INTEGER
+            DEFAULT 0,
+
+            "marcadosEntalle"
+            JSONB
+            NOT NULL
+            DEFAULT '[]'::jsonb,
+
+            "marcadosLimpio"
+            JSONB
+            NOT NULL
+            DEFAULT '[]'::jsonb
 
         )
+
+    `);
+
+
+    // =====================================
+    // AGREGAR COLUMNAS A BASE YA EXISTENTE
+    // =====================================
+
+    await pool.query(`
+
+        ALTER TABLE vidrios
+
+        ADD COLUMN IF NOT EXISTS
+        "cantidadEntalle"
+        INTEGER
+        DEFAULT 0
+
+    `);
+
+
+    await pool.query(`
+
+        ALTER TABLE vidrios
+
+        ADD COLUMN IF NOT EXISTS
+        "cantidadLimpio"
+        INTEGER
+        DEFAULT 0
+
+    `);
+
+
+    await pool.query(`
+
+        ALTER TABLE vidrios
+
+        ADD COLUMN IF NOT EXISTS
+        "marcadosEntalle"
+        JSONB
+        NOT NULL
+        DEFAULT '[]'::jsonb
+
+    `);
+
+
+    await pool.query(`
+
+        ALTER TABLE vidrios
+
+        ADD COLUMN IF NOT EXISTS
+        "marcadosLimpio"
+        JSONB
+        NOT NULL
+        DEFAULT '[]'::jsonb
 
     `);
 
@@ -297,8 +369,6 @@ function convertirPedido(row) {
 
     };
 }
-
-
 // ===============================
 // CONSTRUIR FILTROS
 // ===============================
@@ -308,16 +378,13 @@ function construirFiltros(query = {}) {
     const condiciones = [];
     const valores = [];
 
-
     const buscar =
         String(query.buscar || "")
             .trim();
 
-
     const fechaEntrega =
         String(query.fechaEntrega || "")
             .trim();
-
 
     const estado =
         String(query.estado || "")
@@ -330,7 +397,6 @@ function construirFiltros(query = {}) {
         valores.push(
             `%${buscar}%`
         );
-
 
         condiciones.push(`
 
@@ -349,7 +415,6 @@ function construirFiltros(query = {}) {
         valores.push(
             fechaEntrega
         );
-
 
         condiciones.push(`
 
@@ -577,7 +642,31 @@ app.get(
                                     v.metros,
 
                                     'procesoEspecial',
-                                    v."procesoEspecial"
+                                    v."procesoEspecial",
+
+                                    'cantidadEntalle',
+                                    COALESCE(
+                                        v."cantidadEntalle",
+                                        0
+                                    ),
+
+                                    'cantidadLimpio',
+                                    COALESCE(
+                                        v."cantidadLimpio",
+                                        0
+                                    ),
+
+                                    'marcadosEntalle',
+                                    COALESCE(
+                                        v."marcadosEntalle",
+                                        '[]'::jsonb
+                                    ),
+
+                                    'marcadosLimpio',
+                                    COALESCE(
+                                        v."marcadosLimpio",
+                                        '[]'::jsonb
+                                    )
 
                                 )
 
@@ -658,27 +747,21 @@ app.get(
                     ),
 
                 pagina:
-
                     pagina,
 
                 limite:
-
                     limite,
 
                 total:
-
                     total,
 
                 totalPaginas:
-
                     totalPaginas,
 
                 tieneAnterior:
-
                     pagina > 1,
 
                 tieneSiguiente:
-
                     pagina < totalPaginas
 
             });
@@ -796,8 +879,6 @@ app.get(
         }
     }
 );
-
-
 // ===============================
 // OBTENER UN PEDIDO
 // ===============================
@@ -855,7 +936,31 @@ app.get(
                                     v.metros,
 
                                     'procesoEspecial',
-                                    v."procesoEspecial"
+                                    v."procesoEspecial",
+
+                                    'cantidadEntalle',
+                                    COALESCE(
+                                        v."cantidadEntalle",
+                                        0
+                                    ),
+
+                                    'cantidadLimpio',
+                                    COALESCE(
+                                        v."cantidadLimpio",
+                                        0
+                                    ),
+
+                                    'marcadosEntalle',
+                                    COALESCE(
+                                        v."marcadosEntalle",
+                                        '[]'::jsonb
+                                    ),
+
+                                    'marcadosLimpio',
+                                    COALESCE(
+                                        v."marcadosLimpio",
+                                        '[]'::jsonb
+                                    )
 
                                 )
 
@@ -927,8 +1032,8 @@ app.get(
 // ===============================
 // API ANTIGUA
 // ===============================
-// Se mantiene por ahora para que
-// tu script.js actual siga funcionando.
+// Se mantiene para que las demás
+// funciones actuales sigan funcionando.
 // ===============================
 
 app.get(
@@ -967,7 +1072,31 @@ app.get(
                                     v.metros,
 
                                     'procesoEspecial',
-                                    v."procesoEspecial"
+                                    v."procesoEspecial",
+
+                                    'cantidadEntalle',
+                                    COALESCE(
+                                        v."cantidadEntalle",
+                                        0
+                                    ),
+
+                                    'cantidadLimpio',
+                                    COALESCE(
+                                        v."cantidadLimpio",
+                                        0
+                                    ),
+
+                                    'marcadosEntalle',
+                                    COALESCE(
+                                        v."marcadosEntalle",
+                                        '[]'::jsonb
+                                    ),
+
+                                    'marcadosLimpio',
+                                    COALESCE(
+                                        v."marcadosLimpio",
+                                        '[]'::jsonb
+                                    )
 
                                 )
 
@@ -1113,6 +1242,89 @@ app.post(
         }
 
 
+        // ===============================
+        // VALIDAR CANTIDADES
+        // ===============================
+
+        for (const vidrio of vidrios) {
+
+            const cantidad =
+                Math.max(
+                    0,
+                    Math.floor(
+                        Number(
+                            vidrio.cantidad
+                        ) || 0
+                    )
+                );
+
+            const cantidadEntalle =
+                Math.max(
+                    0,
+                    Math.floor(
+                        Number(
+                            vidrio.cantidadEntalle
+                        ) || 0
+                    )
+                );
+
+            const cantidadLimpio =
+                Math.max(
+                    0,
+                    Math.floor(
+                        Number(
+                            vidrio.cantidadLimpio
+                        ) || 0
+                    )
+                );
+
+
+            if (cantidadEntalle > 30) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        error:
+                            "La cantidad de ENTALLE no puede superar 30."
+
+                    });
+            }
+
+
+            if (cantidadLimpio > 30) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        error:
+                            "La cantidad de LIMPIO no puede superar 30."
+
+                    });
+            }
+
+
+            if (
+                cantidadEntalle
+                +
+                cantidadLimpio
+                >
+                cantidad
+            ) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        error:
+                            "ENTALLE + LIMPIO no puede superar la cantidad total del vidrio."
+
+                    });
+            }
+        }
+
+
         const clienteDB =
             await pool.connect();
 
@@ -1182,6 +1394,37 @@ app.post(
                 of vidrios
             ) {
 
+                const cantidad =
+                    Math.max(
+                        0,
+                        Math.floor(
+                            Number(
+                                vidrio.cantidad
+                            ) || 0
+                        )
+                    );
+
+                const cantidadEntalle =
+                    Math.max(
+                        0,
+                        Math.floor(
+                            Number(
+                                vidrio.cantidadEntalle
+                            ) || 0
+                        )
+                    );
+
+                const cantidadLimpio =
+                    Math.max(
+                        0,
+                        Math.floor(
+                            Number(
+                                vidrio.cantidadLimpio
+                            ) || 0
+                        )
+                    );
+
+
                 await clienteDB.query(`
 
                     INSERT INTO vidrios (
@@ -1196,7 +1439,15 @@ app.post(
 
                         metros,
 
-                        "procesoEspecial"
+                        "procesoEspecial",
+
+                        "cantidadEntalle",
+
+                        "cantidadLimpio",
+
+                        "marcadosEntalle",
+
+                        "marcadosLimpio"
 
                     )
 
@@ -1207,7 +1458,11 @@ app.post(
                         $3,
                         $4,
                         $5,
-                        $6
+                        $6,
+                        $7,
+                        $8,
+                        $9::jsonb,
+                        $10::jsonb
 
                     )
 
@@ -1223,16 +1478,21 @@ app.post(
                         || "8"
                     ),
 
-                    Number(
-                        vidrio.cantidad
-                    ) || 0,
+                    cantidad,
 
                     Number(
                         vidrio.metros
                     ) || 0,
 
-                    vidrio.procesoEspecial
-                        || "NINGUNO"
+                    "NINGUNO",
+
+                    cantidadEntalle,
+
+                    cantidadLimpio,
+
+                    JSON.stringify([]),
+
+                    JSON.stringify([])
 
                 ]);
             }
@@ -1297,8 +1557,6 @@ app.post(
         }
     }
 );
-
-
 // ===============================
 // ACTUALIZAR DATOS DEL PEDIDO
 // ===============================
@@ -1310,7 +1568,6 @@ app.put(
 
         const id =
             Number(req.params.id);
-
 
         const {
 
@@ -1331,9 +1588,7 @@ app.put(
         } = req.body;
 
 
-        if (
-            !Number.isInteger(id)
-        ) {
+        if (!Number.isInteger(id)) {
 
             return res
                 .status(400)
@@ -1373,6 +1628,89 @@ app.put(
                         "Debes agregar al menos un vidrio."
 
                 });
+        }
+
+
+        // ===============================
+        // VALIDAR CANTIDADES
+        // ===============================
+
+        for (const vidrio of vidrios) {
+
+            const cantidad =
+                Math.max(
+                    0,
+                    Math.floor(
+                        Number(
+                            vidrio.cantidad
+                        ) || 0
+                    )
+                );
+
+            const cantidadEntalle =
+                Math.max(
+                    0,
+                    Math.floor(
+                        Number(
+                            vidrio.cantidadEntalle
+                        ) || 0
+                    )
+                );
+
+            const cantidadLimpio =
+                Math.max(
+                    0,
+                    Math.floor(
+                        Number(
+                            vidrio.cantidadLimpio
+                        ) || 0
+                    )
+                );
+
+
+            if (cantidadEntalle > 30) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        error:
+                            "La cantidad de ENTALLE no puede superar 30."
+
+                    });
+            }
+
+
+            if (cantidadLimpio > 30) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        error:
+                            "La cantidad de LIMPIO no puede superar 30."
+
+                    });
+            }
+
+
+            if (
+                cantidadEntalle
+                +
+                cantidadLimpio
+                >
+                cantidad
+            ) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        error:
+                            "ENTALLE + LIMPIO no puede superar la cantidad total del vidrio."
+
+                    });
+            }
         }
 
 
@@ -1449,71 +1787,335 @@ app.put(
             }
 
 
-            await clienteDB.query(`
+            // ===============================
+            // VIDRIOS QUE YA EXISTEN
+            // ===============================
 
-                DELETE FROM vidrios
-
-                WHERE "pedidoId" = $1
-
-            `, [id]);
-
-
-            for (
-                const vidrio
-                of vidrios
-            ) {
-
+            const vidriosActuales =
                 await clienteDB.query(`
 
-                    INSERT INTO vidrios (
+                    SELECT *
 
-                        "pedidoId",
+                    FROM vidrios
 
-                        "tipoVidrio",
+                    WHERE
+                        "pedidoId" = $1
 
-                        espesor,
+                `, [id]);
+
+
+            const idsRecibidos = [];
+
+
+            // ===============================
+            // ACTUALIZAR / CREAR VIDRIOS
+            // ===============================
+
+            for (const vidrio of vidrios) {
+
+                const vidrioId =
+                    Number(
+                        vidrio.id
+                    );
+
+
+                const cantidad =
+                    Math.max(
+                        0,
+                        Math.floor(
+                            Number(
+                                vidrio.cantidad
+                            ) || 0
+                        )
+                    );
+
+
+                const cantidadEntalle =
+                    Math.max(
+                        0,
+                        Math.floor(
+                            Number(
+                                vidrio.cantidadEntalle
+                            ) || 0
+                        )
+                    );
+
+
+                const cantidadLimpio =
+                    Math.max(
+                        0,
+                        Math.floor(
+                            Number(
+                                vidrio.cantidadLimpio
+                            ) || 0
+                        )
+                    );
+
+
+                const existente =
+                    vidriosActuales.rows.find(
+                        item =>
+                            Number(item.id)
+                            ===
+                            vidrioId
+                    );
+
+
+                // ===============================
+                // SI EL VIDRIO YA EXISTE
+                // ===============================
+
+                if (existente) {
+
+                    idsRecibidos.push(
+                        vidrioId
+                    );
+
+
+                    let marcadosEntalle =
+                        Array.isArray(
+                            existente.marcadosEntalle
+                        )
+                            ? existente.marcadosEntalle
+                            : [];
+
+
+                    let marcadosLimpio =
+                        Array.isArray(
+                            existente.marcadosLimpio
+                        )
+                            ? existente.marcadosLimpio
+                            : [];
+
+
+                    // Si bajamos la cantidad,
+                    // quitar números que ya no existen.
+
+                    marcadosEntalle =
+                        marcadosEntalle
+                            .map(Number)
+                            .filter(
+                                numero =>
+                                    Number.isInteger(numero)
+                                    &&
+                                    numero >= 1
+                                    &&
+                                    numero <= cantidadEntalle
+                                    &&
+                                    numero <= 30
+                            );
+
+
+                    marcadosLimpio =
+                        marcadosLimpio
+                            .map(Number)
+                            .filter(
+                                numero =>
+                                    Number.isInteger(numero)
+                                    &&
+                                    numero >= 1
+                                    &&
+                                    numero <= cantidadLimpio
+                                    &&
+                                    numero <= 30
+                            );
+
+
+                    await clienteDB.query(`
+
+                        UPDATE vidrios
+
+                        SET
+
+                            "tipoVidrio" = $1,
+
+                            espesor = $2,
+
+                            cantidad = $3,
+
+                            metros = $4,
+
+                            "procesoEspecial" = $5,
+
+                            "cantidadEntalle" = $6,
+
+                            "cantidadLimpio" = $7,
+
+                            "marcadosEntalle" = $8::jsonb,
+
+                            "marcadosLimpio" = $9::jsonb
+
+                        WHERE
+
+                            id = $10
+
+                            AND
+
+                            "pedidoId" = $11
+
+                    `, [
+
+                        vidrio.tipoVidrio
+                            || "INCOLORO",
+
+                        String(
+                            vidrio.espesor
+                            || "8"
+                        ),
 
                         cantidad,
 
-                        metros,
+                        Number(
+                            vidrio.metros
+                        ) || 0,
 
-                        "procesoEspecial"
+                        "NINGUNO",
 
-                    )
+                        cantidadEntalle,
 
-                    VALUES (
+                        cantidadLimpio,
 
-                        $1,
-                        $2,
-                        $3,
-                        $4,
-                        $5,
-                        $6
+                        JSON.stringify(
+                            marcadosEntalle
+                        ),
 
-                    )
+                        JSON.stringify(
+                            marcadosLimpio
+                        ),
+
+                        vidrioId,
+
+                        id
+
+                    ]);
+
+                } else {
+
+                    // ===============================
+                    // VIDRIO NUEVO
+                    // ===============================
+
+                    const nuevoVidrio =
+                        await clienteDB.query(`
+
+                            INSERT INTO vidrios (
+
+                                "pedidoId",
+
+                                "tipoVidrio",
+
+                                espesor,
+
+                                cantidad,
+
+                                metros,
+
+                                "procesoEspecial",
+
+                                "cantidadEntalle",
+
+                                "cantidadLimpio",
+
+                                "marcadosEntalle",
+
+                                "marcadosLimpio"
+
+                            )
+
+                            VALUES (
+
+                                $1,
+                                $2,
+                                $3,
+                                $4,
+                                $5,
+                                $6,
+                                $7,
+                                $8,
+                                $9::jsonb,
+                                $10::jsonb
+
+                            )
+
+                            RETURNING id
+
+                        `, [
+
+                            id,
+
+                            vidrio.tipoVidrio
+                                || "INCOLORO",
+
+                            String(
+                                vidrio.espesor
+                                || "8"
+                            ),
+
+                            cantidad,
+
+                            Number(
+                                vidrio.metros
+                            ) || 0,
+
+                            "NINGUNO",
+
+                            cantidadEntalle,
+
+                            cantidadLimpio,
+
+                            JSON.stringify([]),
+
+                            JSON.stringify([])
+
+                        ]);
+
+
+                    idsRecibidos.push(
+                        Number(
+                            nuevoVidrio.rows[0].id
+                        )
+                    );
+                }
+            }
+
+
+            // ===============================
+            // ELIMINAR VIDRIOS QUITADOS
+            // ===============================
+
+            const idsActuales =
+                vidriosActuales.rows.map(
+                    vidrio =>
+                        Number(vidrio.id)
+                );
+
+
+            const idsEliminar =
+                idsActuales.filter(
+                    vidrioId =>
+                        !idsRecibidos.includes(
+                            vidrioId
+                        )
+                );
+
+
+            if (idsEliminar.length > 0) {
+
+                await clienteDB.query(`
+
+                    DELETE FROM vidrios
+
+                    WHERE
+                        "pedidoId" = $1
+
+                    AND
+                        id = ANY($2::int[])
 
                 `, [
 
                     id,
 
-                    vidrio.tipoVidrio
-                        || "INCOLORO",
-
-                    String(
-                        vidrio.espesor
-                        || "8"
-                    ),
-
-                    Number(
-                        vidrio.cantidad
-                    ) || 0,
-
-                    Number(
-                        vidrio.metros
-                    ) || 0,
-
-                    vidrio.procesoEspecial
-                        || "NINGUNO"
+                    idsEliminar
 
                 ]);
             }
@@ -1575,8 +2177,284 @@ app.put(
 );
 
 
+// ==========================================
+// MARCAR / DESMARCAR UNIDAD DE VIDRIO
+// ==========================================
+
+app.put(
+    "/api/vidrios/:id/marcado",
+
+    async (req, res) => {
+
+        const id =
+            Number(
+                req.params.id
+            );
+
+
+        const proceso =
+            String(
+                req.body.proceso || ""
+            )
+                .trim()
+                .toLowerCase();
+
+
+        const numero =
+            Number(
+                req.body.numero
+            );
+
+
+        const marcado =
+            Boolean(
+                req.body.marcado
+            );
+
+
+        if (!Number.isInteger(id)) {
+
+            return res
+                .status(400)
+                .json({
+
+                    error:
+                        "ID de vidrio inválido."
+
+                });
+        }
+
+
+        if (
+            proceso !== "entalle"
+            &&
+            proceso !== "limpio"
+        ) {
+
+            return res
+                .status(400)
+                .json({
+
+                    error:
+                        "Proceso inválido."
+
+                });
+        }
+
+
+        if (
+            !Number.isInteger(numero)
+            ||
+            numero < 1
+            ||
+            numero > 30
+        ) {
+
+            return res
+                .status(400)
+                .json({
+
+                    error:
+                        "El número debe estar entre 1 y 30."
+
+                });
+        }
+
+
+        try {
+
+            const resultadoVidrio =
+                await pool.query(`
+
+                    SELECT
+
+                        id,
+
+                        "cantidadEntalle",
+
+                        "cantidadLimpio",
+
+                        "marcadosEntalle",
+
+                        "marcadosLimpio"
+
+                    FROM vidrios
+
+                    WHERE
+                        id = $1
+
+                `, [id]);
+
+
+            if (
+                resultadoVidrio.rowCount === 0
+            ) {
+
+                return res
+                    .status(404)
+                    .json({
+
+                        error:
+                            "Vidrio no encontrado."
+
+                    });
+            }
+
+
+            const vidrio =
+                resultadoVidrio.rows[0];
+
+
+            const cantidadProceso =
+                proceso === "entalle"
+
+                    ? Number(
+                        vidrio.cantidadEntalle
+                    ) || 0
+
+                    : Number(
+                        vidrio.cantidadLimpio
+                    ) || 0;
+
+
+            if (
+                numero > cantidadProceso
+            ) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        error:
+                            "Ese número no pertenece a la cantidad de este proceso."
+
+                    });
+            }
+
+
+            const campoMarcados =
+                proceso === "entalle"
+
+                    ? "marcadosEntalle"
+
+                    : "marcadosLimpio";
+
+
+            const marcadosActuales =
+                Array.isArray(
+                    vidrio[campoMarcados]
+                )
+
+                    ? vidrio[campoMarcados]
+                        .map(Number)
+                        .filter(
+                            valor =>
+                                Number.isInteger(valor)
+                        )
+
+                    : [];
+
+
+            let nuevosMarcados =
+                [...marcadosActuales];
+
+
+            if (marcado) {
+
+                if (
+                    !nuevosMarcados.includes(
+                        numero
+                    )
+                ) {
+
+                    nuevosMarcados.push(
+                        numero
+                    );
+                }
+
+            } else {
+
+                nuevosMarcados =
+                    nuevosMarcados.filter(
+                        valor =>
+                            valor !== numero
+                    );
+            }
+
+
+            nuevosMarcados =
+                [...new Set(
+                    nuevosMarcados
+                )]
+                    .filter(
+                        valor =>
+                            valor >= 1
+                            &&
+                            valor <= cantidadProceso
+                            &&
+                            valor <= 30
+                    )
+                    .sort(
+                        (a, b) =>
+                            a - b
+                    );
+
+
+            await pool.query(`
+
+                UPDATE vidrios
+
+                SET
+                    "${campoMarcados}" = $1::jsonb
+
+                WHERE
+                    id = $2
+
+            `, [
+
+                JSON.stringify(
+                    nuevosMarcados
+                ),
+
+                id
+
+            ]);
+
+
+            res.json({
+
+                mensaje:
+                    marcado
+                        ? "Unidad marcada."
+                        : "Unidad desmarcada.",
+
+                marcados:
+                    nuevosMarcados
+
+            });
+
+
+        } catch (error) {
+
+            console.error(
+                "ERROR MARCANDO VIDRIO:",
+                error
+            );
+
+
+            res
+                .status(500)
+                .json({
+
+                    error:
+                        "No se pudo actualizar la unidad."
+
+                });
+        }
+    }
+);
 // ===============================
-// ACTUALIZAR PROCESO
+// ACTUALIZAR PROCESO GENERAL
 // ===============================
 
 app.put(
@@ -1608,12 +2486,12 @@ app.put(
         const cambios =
             Object.entries(req.body)
 
-            .filter(
-                ([campo]) =>
-                    camposPermitidos.includes(
-                        campo
-                    )
-            );
+                .filter(
+                    ([campo]) =>
+                        camposPermitidos.includes(
+                            campo
+                        )
+                );
 
 
         if (
@@ -1711,7 +2589,7 @@ app.put(
 
 
 // ===============================
-// ELIMINAR
+// ELIMINAR PEDIDO
 // ===============================
 
 app.delete(
