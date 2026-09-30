@@ -75,33 +75,78 @@ function obtenerMoneda() {
 // CARGAR PEDIDO DESDE CONTROL
 // ===============================
 
-function cargarPedidoParaCotizar() {
-
-    const guardado =
-        localStorage.getItem(
-            "pedidoParaCotizar"
-        );
-
-    if (!guardado) {
-
-        agregarFilaCotizacion();
-        calcularCotizacion();
-
-        return;
-    }
+async function cargarPedidoParaCotizar() {
 
     try {
 
-        const pedido =
-            JSON.parse(guardado);
+        const parametros =
+            new URLSearchParams(window.location.search);
+
+        const idPedido =
+            parametros.get("pedido");
+
+        let pedido = null;
 
 
-        document.getElementById(
-            "clienteCotizacion"
-        ).value =
-            pedido.cliente || "";
+        // SI VIENE DESDE PROCESO DEL VIDRIO
+        if (idPedido) {
+
+            const response =
+                await fetch(`/api/pedidos/${idPedido}`);
+
+            if (!response.ok) {
+                throw new Error(
+                    "No se pudo cargar el pedido."
+                );
+            }
+
+            pedido =
+                await response.json();
+
+        } else {
+
+            // COMPATIBILIDAD CON EL SISTEMA ANTERIOR
+            const guardado =
+                localStorage.getItem(
+                    "pedidoParaCotizar"
+                );
+
+            if (guardado) {
+
+                pedido =
+                    JSON.parse(guardado);
+
+                localStorage.removeItem(
+                    "pedidoParaCotizar"
+                );
+            }
+        }
 
 
+        // SI NO HAY PEDIDO
+        if (!pedido) {
+
+            agregarFilaCotizacion();
+            calcularCotizacion();
+
+            return;
+        }
+
+
+        // CLIENTE
+        const cliente =
+            document.getElementById(
+                "clienteCotizacion"
+            );
+
+        if (cliente) {
+
+            cliente.value =
+                pedido.cliente || "";
+        }
+
+
+        // OP
         const op =
             document.getElementById(
                 "opCotizacion"
@@ -114,6 +159,7 @@ function cargarPedidoParaCotizar() {
         }
 
 
+        // N° COTIZACIÓN
         const numero =
             document.getElementById(
                 "numeroCotizacion"
@@ -129,6 +175,7 @@ function cargarPedidoParaCotizar() {
         }
 
 
+        // OBSERVACIONES
         const observaciones =
             document.getElementById(
                 "observacionesCotizacion"
@@ -147,7 +194,6 @@ function cargarPedidoParaCotizar() {
             if (pedido.fechaEntrega) {
 
                 if (texto) {
-
                     texto += "\n";
                 }
 
@@ -161,15 +207,20 @@ function cargarPedidoParaCotizar() {
         }
 
 
-        document.getElementById(
-            "listaCotizacion"
-        ).innerHTML = "";
+        // VIDRIOS
+        const lista =
+            document.getElementById(
+                "listaCotizacion"
+            );
+
+        if (lista) {
+
+            lista.innerHTML = "";
+        }
 
 
         if (
-            Array.isArray(
-                pedido.vidrios
-            ) &&
+            Array.isArray(pedido.vidrios) &&
             pedido.vidrios.length > 0
         ) {
 
@@ -191,20 +242,21 @@ function cargarPedidoParaCotizar() {
         calcularCotizacion();
 
 
-        localStorage.removeItem(
-            "pedidoParaCotizar"
-        );
-
-
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "ERROR CARGANDO PEDIDO PARA COTIZAR:",
+            error
+        );
+
+        alert(
+            "No se pudo cargar el pedido para cotizar."
+        );
 
         agregarFilaCotizacion();
+        calcularCotizacion();
     }
 }
-
-
 // ===============================
 // AGREGAR VIDRIO
 // ===============================
