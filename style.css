@@ -1653,3 +1653,43 @@ textarea:focus {
         page-break-inside: avoid !important;
     }
 }
+/* LETRA UN POCO MÁS GRANDE EN LA COTIZACIÓN */
+@media print {
+
+    .documento-zakata {
+        font-size: 10px !important;
+    }
+
+    .z-empresa {
+        font-size: 9px !important;
+    }
+
+    .z-empresa b {
+        font-size: 13px !important;
+    }
+
+    .z-renglon span {
+        font-size: 9px !important;
+    }
+
+    .z-tabla th {
+        font-size: 9px !important;
+    }
+
+    .z-tabla td {
+        font-size: 9px !important;
+    }
+
+    .z-bancos {
+        font-size: 9px !important;
+    }
+
+    .z-bancos b {
+        font-size: 13px !important;
+    }
+
+    .z-letras,
+    .z-totales {
+        font-size: 9px !important;
+    }
+}
