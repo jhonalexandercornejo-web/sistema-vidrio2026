@@ -12,156 +12,278 @@ let busquedaActual = "";
 
 
 // ===============================
-// TIPOS DE VIDRIO Y ESPESORES
-// ===============================
-
-const tiposVidrio = {
-
-    "INCOLORO": [
-        "3",
-        "4",
-        "5",
-        "6",
-        "8",
-        "10",
-        "12"
-    ],
-
-    "INCOLORO AL ACIDO": [
-        "6",
-        "8"
-    ],
-
-    "GRIS": [
-        "4",
-        "5",
-        "6",
-        "8",
-        "10"
-    ],
-
-    "VERDE": [
-        "4"
-    ],
-
-    "BRONCE": [
-        "6",
-        "8",
-        "10"
-    ],
-
-    "REFLEJANTE AZUL": [
-        "4"
-    ],
-
-    "GRIS REFLEJANTE": [
-        "5.5"
-    ],
-
-    "BRONCE REFLEJANTE": [
-        "6",
-        "8",
-        "10"
-    ],
-
-    "INC REFLEJANTE": [
-        "6",
-        "8"
-    ],
-
-    "REFL LIGHT BLUE": [
-        "6",
-        "8"
-    ],
-
-    "DARCK BLUE": [
-        "6"
-    ],
-
-    "ARTIC BLUE": [
-        "6"
-    ]
-};
-
-
-// ===============================
 // API
 // ===============================
 
-async function api(url, options = {}) {
+async function api(
+    url,
+    options = {}
+) {
 
-    const respuesta = await fetch(url, {
-
+    const configuracion = {
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type":
+                "application/json"
         },
-
         ...options
-    });
+    };
 
 
-    const datos = await respuesta.json();
+    const response =
+        await fetch(
+            url,
+            configuracion
+        );
 
 
-    if (!respuesta.ok) {
+    let data = {};
+
+    try {
+
+        data =
+            await response.json();
+
+    } catch (error) {
+
+        data = {};
+    }
+
+
+    if (!response.ok) {
 
         throw new Error(
-            datos.error || "Error en el servidor"
+            data.error
+            ||
+            "Error en el servidor"
         );
     }
 
 
-    return datos;
+    return data;
 }
 
 
 // ===============================
-// FORMATEAR FECHA REGISTRO
+// TIPOS DE VIDRIO
 // ===============================
 
-function formatearCreadoEn(fecha) {
+const tiposVidrio = [
 
-    if (!fecha) {
-        return "No disponible";
+    {
+        nombre: "INCOLORO",
+        espesores: [
+            "3",
+            "4",
+            "5",
+            "6",
+            "8",
+            "10",
+            "12"
+        ]
+    },
+
+    {
+        nombre: "INCOLORO AL ACIDO",
+        espesores: [
+            "6",
+            "8"
+        ]
+    },
+
+    {
+        nombre: "GRIS",
+        espesores: [
+            "4",
+            "5",
+            "6",
+            "8",
+            "10"
+        ]
+    },
+
+    {
+        nombre: "VERDE",
+        espesores: [
+            "4"
+        ]
+    },
+
+    {
+        nombre: "BRONCE",
+        espesores: [
+            "6",
+            "8",
+            "10"
+        ]
+    },
+
+    {
+        nombre: "REFLEJANTE AZUL",
+        espesores: [
+            "4"
+        ]
+    },
+
+    {
+        nombre: "GRIS REFLEJANTE",
+        espesores: [
+            "5.5"
+        ]
+    },
+
+    {
+        nombre: "BRONCE REFLEJANTE",
+        espesores: [
+            "6",
+            "8"
+        ]
+    },
+
+    {
+        nombre: "INC REFLEJANTE",
+        espesores: [
+            "6",
+            "8"
+        ]
+    },
+
+    {
+        nombre: "REFL LIGHT BLUE",
+        espesores: [
+            "6",
+            "8"
+        ]
+    },
+
+    {
+        nombre: "DARCK BLUE",
+        espesores: [
+            "6"
+        ]
+    },
+
+    {
+        nombre: "ARTIC BLUE",
+        espesores: [
+            "6"
+        ]
     }
 
-
-    const objetoFecha =
-        new Date(fecha);
+];
 
 
-    if (
-        isNaN(
-            objetoFecha.getTime()
-        )
-    ) {
+// ===============================
+// CREAR OPCIONES TIPO VIDRIO
+// ===============================
 
-        return fecha;
-    }
+function crearOpcionesTipoVidrio(
+    seleccionado = "INCOLORO"
+) {
 
+    return tiposVidrio
+        .map(tipo => {
 
-    return objetoFecha.toLocaleString(
-        "es-PE",
-        {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-            hour12: false
-        }
-    );
+            return `
+
+                <option
+                    value="${tipo.nombre}"
+                    ${
+                        tipo.nombre
+                        === seleccionado
+                            ? "selected"
+                            : ""
+                    }
+                >
+                    ${tipo.nombre}
+                </option>
+
+            `;
+
+        })
+        .join("");
 }
 
 
 // ===============================
-// ACTUALIZAR ESPESORES
+// OBTENER ESPESORES
 // ===============================
 
-function actualizarEspesores(
-    selectTipo,
-    espesorSeleccionado = null
+function obtenerEspesores(
+    tipoVidrio
+) {
+
+    const encontrado =
+        tiposVidrio.find(
+            tipo =>
+                tipo.nombre
+                === tipoVidrio
+        );
+
+
+    if (!encontrado) {
+
+        return [
+            "3",
+            "4",
+            "5",
+            "6",
+            "8",
+            "10",
+            "12"
+        ];
+    }
+
+
+    return encontrado.espesores;
+}
+
+
+// ===============================
+// CREAR OPCIONES ESPESOR
+// ===============================
+
+function crearOpcionesEspesor(
+    tipoVidrio,
+    seleccionado = ""
+) {
+
+    const espesores =
+        obtenerEspesores(
+            tipoVidrio
+        );
+
+
+    return espesores
+        .map(espesor => {
+
+            return `
+
+                <option
+                    value="${espesor}"
+                    ${
+                        String(espesor)
+                        ===
+                        String(seleccionado)
+                            ? "selected"
+                            : ""
+                    }
+                >
+                    ${espesor} mm
+                </option>
+
+            `;
+
+        })
+        .join("");
+}
+
+
+// ===============================
+// CAMBIAR ESPESORES
+// ===============================
+
+function cambiarEspesores(
+    selectTipo
 ) {
 
     const fila =
@@ -170,70 +292,36 @@ function actualizarEspesores(
         );
 
 
+    if (!fila) {
+        return;
+    }
+
+
     const selectEspesor =
         fila.querySelector(
             ".espesor"
         );
 
 
-    const tipo =
-        selectTipo.value;
-
-
-    const espesores =
-        tiposVidrio[tipo] || [];
-
-
-    selectEspesor.innerHTML = "";
-
-
-    espesores.forEach(
-        espesor => {
-
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-
-            option.value =
-                espesor;
-
-
-            option.textContent =
-                `${espesor} mm`;
-
-
-            selectEspesor.appendChild(
-                option
-            );
-        }
-    );
-
-
-    if (
-        espesorSeleccionado !== null
-        &&
-        espesores.includes(
-            String(
-                espesorSeleccionado
-            )
-        )
-    ) {
-
-        selectEspesor.value =
-            String(
-                espesorSeleccionado
-            );
+    if (!selectEspesor) {
+        return;
     }
+
+
+    selectEspesor.innerHTML =
+        crearOpcionesEspesor(
+            selectTipo.value
+        );
 }
 
 
 // ===============================
-// CREAR FILA VIDRIO
+// AGREGAR VIDRIO
 // ===============================
 
-function agregarVidrio(datos = {}) {
+function agregarVidrio(
+    datos = {}
+) {
 
     const lista =
         document.getElementById(
@@ -246,6 +334,26 @@ function agregarVidrio(datos = {}) {
     }
 
 
+    const tipoInicial =
+        datos.tipoVidrio
+        ||
+        "INCOLORO";
+
+
+    const espesores =
+        obtenerEspesores(
+            tipoInicial
+        );
+
+
+    const espesorInicial =
+        datos.espesor
+        ||
+        espesores[0]
+        ||
+        "8";
+
+
     const fila =
         document.createElement(
             "div"
@@ -254,6 +362,36 @@ function agregarVidrio(datos = {}) {
 
     fila.className =
         "fila-vidrio";
+
+
+    // Guardamos el ID del vidrio.
+    // Esto permite conservar las marcas
+    // cuando se edita un pedido.
+
+    fila.dataset.vidrioId =
+        datos.id
+            ? String(datos.id)
+            : "";
+
+
+    fila.dataset.marcadosEntalle =
+        JSON.stringify(
+            Array.isArray(
+                datos.marcadosEntalle
+            )
+                ? datos.marcadosEntalle
+                : []
+        );
+
+
+    fila.dataset.marcadosLimpio =
+        JSON.stringify(
+            Array.isArray(
+                datos.marcadosLimpio
+            )
+                ? datos.marcadosLimpio
+                : []
+        );
 
 
     fila.innerHTML = `
@@ -266,56 +404,12 @@ function agregarVidrio(datos = {}) {
 
             <select
                 class="tipoVidrio"
-                onchange="actualizarEspesores(this)"
+                onchange="cambiarEspesores(this)"
             >
 
-                <option value="INCOLORO">
-                    INCOLORO
-                </option>
-
-                <option value="INCOLORO AL ACIDO">
-                    INCOLORO AL ACIDO
-                </option>
-
-                <option value="GRIS">
-                    GRIS
-                </option>
-
-                <option value="VERDE">
-                    VERDE
-                </option>
-
-                <option value="BRONCE">
-                    BRONCE
-                </option>
-
-                <option value="REFLEJANTE AZUL">
-                    REFLEJANTE AZUL
-                </option>
-
-                <option value="GRIS REFLEJANTE">
-                    GRIS REFLEJANTE
-                </option>
-
-                <option value="BRONCE REFLEJANTE">
-                    BRONCE REFLEJANTE
-                </option>
-
-                <option value="INC REFLEJANTE">
-                    INC REFLEJANTE
-                </option>
-
-                <option value="REFL LIGHT BLUE">
-                    REFL LIGHT BLUE (AZUL CLARO)
-                </option>
-
-                <option value="DARCK BLUE">
-                    DARCK BLUE (AZUL CHILLON)
-                </option>
-
-                <option value="ARTIC BLUE">
-                    ARTIC BLUE (VERDOSO)
-                </option>
+                ${crearOpcionesTipoVidrio(
+                    tipoInicial
+                )}
 
             </select>
 
@@ -331,6 +425,12 @@ function agregarVidrio(datos = {}) {
             <select
                 class="espesor"
             >
+
+                ${crearOpcionesEspesor(
+                    tipoInicial,
+                    espesorInicial
+                )}
+
             </select>
 
         </div>
@@ -339,14 +439,19 @@ function agregarVidrio(datos = {}) {
         <div>
 
             <label>
-                CANTIDAD
+                CANTIDAD TOTAL
             </label>
 
             <input
-                class="cantidadVidrio"
                 type="number"
+                class="cantidadVidrio"
                 min="0"
                 step="1"
+                value="${
+                    datos.cantidad
+                    ?? ""
+                }"
+                placeholder="0"
             >
 
         </div>
@@ -355,15 +460,75 @@ function agregarVidrio(datos = {}) {
         <div>
 
             <label>
-                METROS
+                METROS (m²)
             </label>
 
             <input
-                class="metrosVidrio"
                 type="number"
+                class="metrosVidrio"
                 min="0"
                 step="0.01"
+                value="${
+                    datos.metros
+                    ?? ""
+                }"
+                placeholder="0.00"
             >
+
+        </div>
+
+
+        <div class="cantidades-proceso">
+
+            <label class="titulo-cantidad-proceso">
+                CANTIDAD POR PROCESO
+            </label>
+
+
+            <div class="campos-proceso-especial">
+
+                <div>
+
+                    <label>
+                        ENTALLE
+                    </label>
+
+                    <input
+                        type="number"
+                        class="cantidadEntalle"
+                        min="0"
+                        max="30"
+                        step="1"
+                        value="${
+                            datos.cantidadEntalle
+                            ?? 0
+                        }"
+                    >
+
+                </div>
+
+
+                <div>
+
+                    <label>
+                        LIMPIO
+                    </label>
+
+                    <input
+                        type="number"
+                        class="cantidadLimpio"
+                        min="0"
+                        max="30"
+                        step="1"
+                        value="${
+                            datos.cantidadLimpio
+                            ?? 0
+                        }"
+                    >
+
+                </div>
+
+            </div>
 
         </div>
 
@@ -371,41 +536,18 @@ function agregarVidrio(datos = {}) {
         <div>
 
             <label>
-                PROCESO ESPECIAL
+                ACCIÓN
             </label>
 
-            <select
-                class="procesoEspecialVidrio"
+            <button
+                type="button"
+                class="btn-quitar"
+                onclick="quitarVidrio(this)"
             >
-
-                <option value="NINGUNO">
-                    NINGUNO
-                </option>
-
-                <option value="ENTALLE">
-                    ENTALLE
-                </option>
-
-                <option value="LIMPIO">
-                    LIMPIO
-                </option>
-
-                <option value="ENTALLE Y LIMPIO">
-                    ENTALLE Y LIMPIO
-                </option>
-
-            </select>
+                ✕ Quitar
+            </button>
 
         </div>
-
-
-        <button
-            type="button"
-            class="btn-quitar"
-            onclick="quitarVidrio(this)"
-        >
-            Quitar
-        </button>
 
     `;
 
@@ -413,73 +555,33 @@ function agregarVidrio(datos = {}) {
     lista.appendChild(
         fila
     );
-
-
-    const selectTipo =
-        fila.querySelector(
-            ".tipoVidrio"
-        );
-
-
-    const tipoGuardado =
-        datos.tipoVidrio || "INCOLORO";
-
-
-    if (
-        tiposVidrio[
-            tipoGuardado
-        ]
-    ) {
-
-        selectTipo.value =
-            tipoGuardado;
-
-    } else {
-
-        selectTipo.value =
-            "INCOLORO";
-    }
-
-
-    actualizarEspesores(
-        selectTipo,
-        datos.espesor || null
-    );
-
-
-    fila.querySelector(
-        ".cantidadVidrio"
-    ).value =
-        datos.cantidad ?? "";
-
-
-    fila.querySelector(
-        ".metrosVidrio"
-    ).value =
-        datos.metros ?? "";
-
-
-    fila.querySelector(
-        ".procesoEspecialVidrio"
-    ).value =
-        datos.procesoEspecial
-        || "NINGUNO";
 }
+
+
 // ===============================
 // QUITAR VIDRIO
 // ===============================
 
-function quitarVidrio(boton) {
+function quitarVidrio(
+    boton
+) {
 
     const lista =
         document.getElementById(
             "listaVidrios"
         );
 
+
+    if (!lista) {
+        return;
+    }
+
+
     const filas =
         lista.querySelectorAll(
             ".fila-vidrio"
         );
+
 
     if (filas.length <= 1) {
 
@@ -490,38 +592,81 @@ function quitarVidrio(boton) {
         return;
     }
 
-    boton.closest(
-        ".fila-vidrio"
-    ).remove();
+
+    const fila =
+        boton.closest(
+            ".fila-vidrio"
+        );
+
+
+    if (fila) {
+
+        fila.remove();
+    }
 }
 
 
 // ===============================
-// OBTENER VIDRIOS
+// LEER ARRAY GUARDADO
+// ===============================
+
+function leerArrayDataset(
+    valor
+) {
+
+    try {
+
+        const datos =
+            JSON.parse(
+                valor || "[]"
+            );
+
+
+        return Array.isArray(datos)
+            ? datos
+            : [];
+
+    } catch (error) {
+
+        return [];
+    }
+}
+
+
+// ===============================
+// OBTENER VIDRIOS DEL FORMULARIO
 // ===============================
 
 function obtenerVidriosFormulario() {
 
     const filas =
         document.querySelectorAll(
-            ".fila-vidrio"
+            "#listaVidrios .fila-vidrio"
         );
 
-    return Array
-        .from(filas)
+
+    return Array.from(filas)
         .map(fila => {
 
             return {
+
+                id:
+                    Number(
+                        fila.dataset.vidrioId
+                    ) || null,
+
 
                 tipoVidrio:
                     fila.querySelector(
                         ".tipoVidrio"
                     ).value,
 
+
                 espesor:
                     fila.querySelector(
                         ".espesor"
                     ).value,
+
 
                 cantidad:
                     Number(
@@ -530,6 +675,7 @@ function obtenerVidriosFormulario() {
                         ).value
                     ) || 0,
 
+
                 metros:
                     Number(
                         fila.querySelector(
@@ -537,10 +683,36 @@ function obtenerVidriosFormulario() {
                         ).value
                     ) || 0,
 
-                procesoEspecial:
-                    fila.querySelector(
-                        ".procesoEspecialVidrio"
-                    ).value
+
+                cantidadEntalle:
+                    Number(
+                        fila.querySelector(
+                            ".cantidadEntalle"
+                        ).value
+                    ) || 0,
+
+
+                cantidadLimpio:
+                    Number(
+                        fila.querySelector(
+                            ".cantidadLimpio"
+                        ).value
+                    ) || 0,
+
+
+                marcadosEntalle:
+                    leerArrayDataset(
+                        fila.dataset
+                            .marcadosEntalle
+                    ),
+
+
+                marcadosLimpio:
+                    leerArrayDataset(
+                        fila.dataset
+                            .marcadosLimpio
+                    )
+
             };
 
         });
@@ -548,93 +720,205 @@ function obtenerVidriosFormulario() {
 
 
 // ===============================
-// GUARDAR / EDITAR PEDIDO
+// VALIDAR VIDRIOS
 // ===============================
 
-async function guardarPedido() {
-
-    const pedido = {
-
-        op:
-            document
-                .getElementById("op")
-                .value
-                .trim(),
-
-        cliente:
-            document
-                .getElementById("cliente")
-                .value
-                .trim(),
-
-        fechaIngreso:
-            document
-                .getElementById(
-                    "fechaIngreso"
-                )
-                .value,
-
-        horaEntrega:
-            document
-                .getElementById(
-                    "horaEntrega"
-                )
-                .value,
-
-        fechaEntrega:
-            document
-                .getElementById(
-                    "fechaEntrega"
-                )
-                .value,
-
-        descripcion:
-            document
-                .getElementById(
-                    "descripcion"
-                )
-                .value
-                .trim(),
-
-        vidrios:
-            obtenerVidriosFormulario()
-    };
-
+function validarVidrios(
+    vidrios
+) {
 
     if (
-        !pedido.op
+        !Array.isArray(vidrios)
         ||
-        !pedido.cliente
-    ) {
-
-        alert(
-            "La OP y el nombre son obligatorios."
-        );
-
-        return;
-    }
-
-
-    if (
-        pedido.vidrios.length === 0
+        vidrios.length === 0
     ) {
 
         alert(
             "Debes agregar al menos un vidrio."
         );
 
+        return false;
+    }
+
+
+    for (
+        let i = 0;
+        i < vidrios.length;
+        i++
+    ) {
+
+        const vidrio =
+            vidrios[i];
+
+
+        if (
+            vidrio.cantidadEntalle < 0
+            ||
+            vidrio.cantidadLimpio < 0
+        ) {
+
+            alert(
+                `Vidrio ${i + 1}: las cantidades no pueden ser negativas.`
+            );
+
+            return false;
+        }
+
+
+        if (
+            vidrio.cantidadEntalle > 30
+            ||
+            vidrio.cantidadLimpio > 30
+        ) {
+
+            alert(
+                `Vidrio ${i + 1}: ENTALLE y LIMPIO permiten máximo 30 unidades.`
+            );
+
+            return false;
+        }
+
+
+        if (
+            vidrio.cantidadEntalle
+            +
+            vidrio.cantidadLimpio
+            >
+            vidrio.cantidad
+        ) {
+
+            alert(
+                `Vidrio ${i + 1}: ENTALLE + LIMPIO no puede superar la CANTIDAD TOTAL.`
+            );
+
+            return false;
+        }
+    }
+
+
+    return true;
+}
+// ===============================
+// GUARDAR PEDIDO
+// ===============================
+
+async function guardarPedido() {
+
+    const op =
+        document.getElementById("op")
+            ?.value
+            .trim()
+        || "";
+
+
+    const cliente =
+        document.getElementById("cliente")
+            ?.value
+            .trim()
+        || "";
+
+
+    const fechaIngreso =
+        document.getElementById("fechaIngreso")
+            ?.value
+        || "";
+
+
+    const fechaEntrega =
+        document.getElementById("fechaEntrega")
+            ?.value
+        || "";
+
+
+    const horaEntrega =
+        document.getElementById("horaEntrega")
+            ?.value
+        || "";
+
+
+    const descripcion =
+        document.getElementById("descripcion")
+            ?.value
+            .trim()
+        || "";
+
+
+    // ===============================
+    // VALIDACIONES
+    // ===============================
+
+    if (!op) {
+
+        alert(
+            "Debes ingresar la OP."
+        );
+
+        document.getElementById("op")
+            ?.focus();
+
         return;
     }
 
 
+    if (!cliente) {
+
+        alert(
+            "Debes ingresar el cliente."
+        );
+
+        document.getElementById("cliente")
+            ?.focus();
+
+        return;
+    }
+
+
+    const vidrios =
+        obtenerVidriosFormulario();
+
+
+    if (
+        !validarVidrios(
+            vidrios
+        )
+    ) {
+
+        return;
+    }
+
+
+    const pedido = {
+
+        op,
+
+        cliente,
+
+        fechaIngreso,
+
+        fechaEntrega,
+
+        horaEntrega,
+
+        descripcion,
+
+        vidrios
+
+    };
+
+
     try {
+
+        // ===============================
+        // EDITANDO
+        // ===============================
 
         if (pedidoEditando) {
 
             await api(
                 `/api/pedidos/${pedidoEditando}/datos`,
                 {
-                    method: "PUT",
+                    method:
+                        "PUT",
 
                     body:
                         JSON.stringify(
@@ -642,17 +926,24 @@ async function guardarPedido() {
                         )
                 }
             );
+
 
             alert(
                 "Pedido actualizado correctamente."
             );
 
+
         } else {
+
+            // ===============================
+            // NUEVO PEDIDO
+            // ===============================
 
             await api(
                 "/api/pedidos",
                 {
-                    method: "POST",
+                    method:
+                        "POST",
 
                     body:
                         JSON.stringify(
@@ -660,6 +951,7 @@ async function guardarPedido() {
                         )
                 }
             );
+
 
             alert(
                 "Pedido registrado correctamente."
@@ -667,22 +959,14 @@ async function guardarPedido() {
         }
 
 
-        cancelarEdicion();
+        // ===============================
+        // LIMPIAR Y RECARGAR
+        // ===============================
 
-        busquedaActual = "";
+        limpiarFormulario();
+
 
         paginaActual = 1;
-
-
-        const buscar =
-            document.getElementById(
-                "buscar"
-            );
-
-
-        if (buscar) {
-            buscar.value = "";
-        }
 
 
         await cargarDatos();
@@ -691,13 +975,256 @@ async function guardarPedido() {
     } catch (error) {
 
         console.error(
+            "ERROR GUARDANDO PEDIDO:",
             error
         );
 
+
         alert(
             error.message
+            ||
+            "No se pudo guardar el pedido."
         );
     }
+}
+
+
+// ===============================
+// EDITAR PEDIDO
+// ===============================
+
+async function editarPedido(
+    id
+) {
+
+    try {
+
+        const pedido =
+            await api(
+                `/api/pedidos/${id}`
+            );
+
+
+        pedidoEditando =
+            Number(id);
+
+
+        // ===============================
+        // DATOS PRINCIPALES
+        // ===============================
+
+        const inputOp =
+            document.getElementById(
+                "op"
+            );
+
+
+        const inputCliente =
+            document.getElementById(
+                "cliente"
+            );
+
+
+        const inputFechaIngreso =
+            document.getElementById(
+                "fechaIngreso"
+            );
+
+
+        const inputFechaEntrega =
+            document.getElementById(
+                "fechaEntrega"
+            );
+
+
+        const inputHoraEntrega =
+            document.getElementById(
+                "horaEntrega"
+            );
+
+
+        const inputDescripcion =
+            document.getElementById(
+                "descripcion"
+            );
+
+
+        if (inputOp) {
+
+            inputOp.value =
+                pedido.op || "";
+        }
+
+
+        if (inputCliente) {
+
+            inputCliente.value =
+                pedido.cliente || "";
+        }
+
+
+        if (inputFechaIngreso) {
+
+            inputFechaIngreso.value =
+                pedido.fechaIngreso || "";
+        }
+
+
+        if (inputFechaEntrega) {
+
+            inputFechaEntrega.value =
+                pedido.fechaEntrega || "";
+        }
+
+
+        if (inputHoraEntrega) {
+
+            inputHoraEntrega.value =
+                pedido.horaEntrega || "";
+        }
+
+
+        if (inputDescripcion) {
+
+            inputDescripcion.value =
+                pedido.descripcion || "";
+        }
+
+
+        // ===============================
+        // CARGAR VIDRIOS
+        // ===============================
+
+        const lista =
+            document.getElementById(
+                "listaVidrios"
+            );
+
+
+        if (lista) {
+
+            lista.innerHTML = "";
+
+
+            if (
+                Array.isArray(
+                    pedido.vidrios
+                )
+                &&
+                pedido.vidrios.length > 0
+            ) {
+
+                pedido.vidrios.forEach(
+                    vidrio => {
+
+                        agregarVidrio(
+                            vidrio
+                        );
+
+                    }
+                );
+
+
+            } else {
+
+                agregarVidrio();
+            }
+        }
+
+
+        // ===============================
+        // CAMBIAR TEXTO DEL BOTÓN
+        // ===============================
+
+        const botonGuardar =
+            document.getElementById(
+                "btnGuardar"
+            );
+
+
+        if (botonGuardar) {
+
+            botonGuardar.textContent =
+                "💾 ACTUALIZAR PEDIDO";
+        }
+
+
+        // ===============================
+        // MOSTRAR BOTÓN CANCELAR
+        // ===============================
+
+        const botonCancelar =
+            document.getElementById(
+                "btnCancelarEdicion"
+            );
+
+
+        if (botonCancelar) {
+
+            botonCancelar.style.display =
+                "inline-block";
+        }
+
+
+        // ===============================
+        // IR AL FORMULARIO
+        // ===============================
+
+        const formulario =
+            document.getElementById(
+                "panelIngreso"
+            );
+
+
+        if (formulario) {
+
+            formulario.scrollIntoView({
+
+                behavior:
+                    "smooth",
+
+                block:
+                    "start"
+
+            });
+
+        } else {
+
+            window.scrollTo({
+
+                top: 0,
+
+                behavior:
+                    "smooth"
+
+            });
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "ERROR EDITANDO PEDIDO:",
+            error
+        );
+
+
+        alert(
+            error.message
+            ||
+            "No se pudo cargar el pedido."
+        );
+    }
+}
+
+
+// ===============================
+// CANCELAR EDICIÓN
+// ===============================
+
+function cancelarEdicion() {
+
+    limpiarFormulario();
 }
 
 
@@ -707,373 +1234,162 @@ async function guardarPedido() {
 
 function limpiarFormulario() {
 
-    document
-        .getElementById("op")
-        .value = "";
+    pedidoEditando = null;
 
-    document
-        .getElementById("cliente")
-        .value = "";
 
-    document
-        .getElementById("fechaIngreso")
-        .value = "";
+    const campos = [
 
-    document
-        .getElementById("horaEntrega")
-        .value = "";
+        "op",
 
-    document
-        .getElementById("fechaEntrega")
-        .value = "";
+        "cliente",
 
-    document
-        .getElementById("descripcion")
-        .value = "";
+        "fechaIngreso",
 
-    document
-        .getElementById(
+        "fechaEntrega",
+
+        "horaEntrega",
+
+        "descripcion"
+
+    ];
+
+
+    campos.forEach(
+        id => {
+
+            const elemento =
+                document.getElementById(
+                    id
+                );
+
+
+            if (elemento) {
+
+                elemento.value = "";
+            }
+        }
+    );
+
+
+    // ===============================
+    // LIMPIAR VIDRIOS
+    // ===============================
+
+    const lista =
+        document.getElementById(
             "listaVidrios"
-        )
-        .innerHTML = "";
+        );
 
-    agregarVidrio();
+
+    if (lista) {
+
+        lista.innerHTML = "";
+
+        agregarVidrio();
+    }
+
+
+    // ===============================
+    // RESTAURAR BOTÓN GUARDAR
+    // ===============================
+
+    const botonGuardar =
+        document.getElementById(
+            "btnGuardar"
+        );
+
+
+    if (botonGuardar) {
+
+        botonGuardar.textContent =
+            "💾 GUARDAR PEDIDO";
+    }
+
+
+    // ===============================
+    // OCULTAR CANCELAR
+    // ===============================
+
+    const botonCancelar =
+        document.getElementById(
+            "btnCancelarEdicion"
+        );
+
+
+    if (botonCancelar) {
+
+        botonCancelar.style.display =
+            "none";
+    }
 }
 
 
 // ===============================
-// CARGAR DATOS PAGINADOS
+// ELIMINAR PEDIDO
 // ===============================
 
-async function cargarDatos() {
+async function eliminarPedido(
+    id
+) {
+
+    const confirmar =
+        confirm(
+            "¿Seguro que deseas eliminar este pedido?"
+        );
+
+
+    if (!confirmar) {
+
+        return;
+    }
+
 
     try {
 
-        let url =
-            `/api/pedidos-paginados?page=${paginaActual}&limit=${limitePorPagina}`;
+        await api(
+            `/api/pedidos/${id}`,
+            {
+                method:
+                    "DELETE"
+            }
+        );
 
 
-        if (busquedaActual) {
+        // Si estamos editando
+        // justamente ese pedido.
 
-            url +=
-                `&buscar=${encodeURIComponent(
-                    busquedaActual
-                )}`;
+        if (
+            Number(pedidoEditando)
+            ===
+            Number(id)
+        ) {
+
+            limpiarFormulario();
         }
 
 
-        const respuesta =
-            await api(url);
-
-
-        pedidos =
-            Array.isArray(
-                respuesta.pedidos
-            )
-                ? respuesta.pedidos
-                : [];
-
-
-        paginaActual =
-            respuesta.pagina || 1;
-
-        totalPaginas =
-            respuesta.totalPaginas || 1;
-
-
-        mostrarProduccion();
-
-        mostrarPaginacion(
-            respuesta.total || 0
-        );
-
-        await actualizarResumen();
+        await cargarDatos();
 
 
     } catch (error) {
 
         console.error(
+            "ERROR ELIMINANDO PEDIDO:",
             error
         );
 
+
         alert(
-            "No se pudieron cargar los pedidos."
+            error.message
+            ||
+            "No se pudo eliminar el pedido."
         );
     }
 }
 
 
 // ===============================
-// MOSTRAR VIDRIOS
-// ===============================
-
-function crearResumenVidrios(
-    vidrios = []
-) {
-
-    if (!vidrios.length) {
-
-        return `
-            <div class="vidrio-resumen">
-                Sin información de vidrio
-            </div>
-        `;
-    }
-
-
-    return vidrios
-        .map(vidrio => {
-
-            const especial =
-                vidrio.procesoEspecial
-                &&
-                vidrio.procesoEspecial !== "NINGUNO"
-
-                    ? `
-                        <span class="etiqueta-especial">
-                            ${vidrio.procesoEspecial}
-                        </span>
-                    `
-
-                    : "";
-
-
-            return `
-                <div class="vidrio-resumen">
-
-                    <strong>
-                        ${vidrio.tipoVidrio || "INCOLORO"}
-                        ${vidrio.espesor || "-"} mm
-                    </strong>
-
-                    <span>
-                        -
-                        ${vidrio.cantidad || 0} und
-                    </span>
-
-                    <span>
-                        -
-                        ${(Number(vidrio.metros) || 0).toFixed(2)} m²
-                    </span>
-
-                    ${especial}
-
-                </div>
-            `;
-
-        })
-        .join("");
-}
-// ===============================
-// MOSTRAR PRODUCCIÓN
-// ===============================
-
-function mostrarProduccion() {
-
-    const contenedor =
-        document.getElementById(
-            "produccion"
-        );
-
-    if (!contenedor) {
-        return;
-    }
-
-    if (pedidos.length === 0) {
-
-        contenedor.innerHTML =
-            "<p>No hay pedidos encontrados.</p>";
-
-        return;
-    }
-
-    contenedor.innerHTML =
-        pedidos
-            .map(pedido => {
-
-                return `
-
-                    <div
-                        class="op-card"
-                        id="pedido-${pedido.id}"
-                    >
-
-                        <div class="op-cabecera">
-
-                            <strong>
-                                OP ${pedido.op}
-                            </strong>
-
-                            <strong>
-                                ${pedido.cliente}
-                            </strong>
-
-                            <span>
-                                Ingreso:
-                                ${pedido.fechaIngreso || "-"}
-                            </span>
-
-                            <span>
-                                🕐 hora de entrega:
-                                ${pedido.horaEntrega || "SIN HORA"}
-                            </span>
-
-                            <span>
-                                📅 fecha de entrega:
-                                ${pedido.fechaEntrega || "SIN FECHA"}
-                            </span>
-
-                        </div>
-
-                        ${
-                            pedido.descripcion
-
-                                ? `
-                                    <div class="descripcion-card">
-                                        ${pedido.descripcion}
-                                    </div>
-                                  `
-
-                                : ""
-                        }
-
-                        <div class="resumen-vidrios">
-
-                            ${crearResumenVidrios(
-                                pedido.vidrios
-                            )}
-
-                        </div>
-
-                        <div class="procesos">
-
-                            ${crearProceso(
-                                pedido,
-                                "corte",
-                                "CORTE"
-                            )}
-
-                            ${crearProceso(
-                                pedido,
-                                "entalle",
-                                "ENTALLE"
-                            )}
-
-                            ${crearProceso(
-                                pedido,
-                                "limpios",
-                                "HORNO"
-                            )}
-
-                            ${crearProceso(
-                                pedido,
-                                "templado",
-                                "TEMPLADO"
-                            )}
-
-                            ${crearProceso(
-                                pedido,
-                                "terminado",
-                                "ENCAJONADO"
-                            )}
-
-                            ${crearProceso(
-                                pedido,
-                                "despacho",
-                                "ENTREGADO"
-                            )}
-
-                        </div>
-
-                        <div class="detalle-op">
-
-                            📝 Registrado:
-
-                            <strong>
-                                ${formatearCreadoEn(
-                                    pedido.creadoEn
-                                )}
-                            </strong>
-
-                        </div>
-
-                        <div class="acciones-pedido">
-
-                            <button
-                                class="btn-editar"
-                                onclick="cotizarPedido(${pedido.id})"
-                            >
-                                💰 Cotizar
-                            </button>
-
-                            <button
-                                class="btn-editar"
-                                onclick="editarPedido(${pedido.id})"
-                            >
-                                ✎ Editar pedido
-                            </button>
-
-                            <button
-                                class="btn-eliminar"
-                                onclick="eliminarPedido(${pedido.id})"
-                            >
-                                🗑 Eliminar
-                            </button>
-
-                        </div>
-
-                    </div>
-                `;
-
-            })
-            .join("");
-}
-
-// ===============================
-// CREAR BOTÓN PROCESO
-// ===============================
-
-function crearProceso(
-    pedido,
-    campo,
-    texto
-) {
-
-    const activo =
-        Boolean(
-            pedido[campo]
-        );
-
-    return `
-
-        <div
-
-            class="proceso ${
-                activo
-                    ? "terminado"
-                    : ""
-            }"
-
-            onclick="cambiarProceso(
-                ${pedido.id},
-                '${campo}',
-                ${!activo}
-            )"
-
-        >
-
-            ${activo ? "✓ " : ""}
-
-            ${texto}
-
-        </div>
-
-    `;
-}
-
-
-// ===============================
-// CAMBIAR PROCESO
+// CAMBIAR PROCESO GENERAL
 // ===============================
 
 async function cambiarProceso(
@@ -1087,7 +1403,8 @@ async function cambiarProceso(
         await api(
             `/api/pedidos/${id}`,
             {
-                method: "PUT",
+                method:
+                    "PUT",
 
                 body:
                     JSON.stringify({
@@ -1099,400 +1416,875 @@ async function cambiarProceso(
             }
         );
 
+
         await cargarDatos();
+
 
     } catch (error) {
 
         console.error(
+            "ERROR CAMBIANDO PROCESO:",
             error
         );
 
+
         alert(
             error.message
+            ||
+            "No se pudo cambiar el proceso."
         );
     }
 }
 
 
 // ===============================
-// COTIZAR PEDIDO
+// CREAR BOTÓN PROCESO GENERAL
 // ===============================
 
-function cotizarPedido(id) {
+function crearProceso(
+    pedido,
+    campo,
+    texto
+) {
 
-    const pedido =
-        pedidos.find(
-            p =>
-                Number(p.id)
-                ===
-                Number(id)
+    const activo =
+        Boolean(
+            pedido[campo]
         );
 
-    if (!pedido) {
 
-        alert(
-            "Pedido no encontrado."
-        );
+    return `
 
-        return;
+        <div
+
+            class="
+                proceso
+                ${
+                    activo
+                        ? "terminado"
+                        : ""
+                }
+            "
+
+            onclick="
+                cambiarProceso(
+                    ${pedido.id},
+                    '${campo}',
+                    ${!activo}
+                )
+            "
+
+        >
+
+            ${
+                activo
+                    ? "✓ "
+                    : ""
+            }
+
+            ${texto}
+
+        </div>
+
+    `;
+}
+// ===============================
+// NORMALIZAR NÚMEROS MARCADOS
+// ===============================
+
+function normalizarMarcados(
+    valores,
+    cantidad
+) {
+
+    if (!Array.isArray(valores)) {
+        return [];
     }
 
-    const datosCotizacion = {
 
-        pedidoId:
-            pedido.id,
-
-        op:
-            pedido.op || "",
-
-        cliente:
-            pedido.cliente || "",
-
-        fechaEntrega:
-            pedido.fechaEntrega || "",
-
-        descripcion:
-            pedido.descripcion || "",
-
-        vidrios:
-            Array.isArray(
-                pedido.vidrios
+    const maximo =
+        Math.min(
+            30,
+            Math.max(
+                0,
+                Number(cantidad) || 0
             )
-                ? pedido.vidrios
-                : []
-    };
+        );
 
-    localStorage.setItem(
-        "pedidoParaCotizar",
 
-        JSON.stringify(
-            datosCotizacion
+    return [
+        ...new Set(
+            valores
+                .map(Number)
+                .filter(
+                    numero =>
+                        Number.isInteger(numero)
+                        &&
+                        numero >= 1
+                        &&
+                        numero <= maximo
+                )
         )
-    );
-
-    window.open(
-        "cotizaciones.html",
-        "_blank"
+    ].sort(
+        (a, b) => a - b
     );
 }
 
 
 // ===============================
-// EDITAR PEDIDO
+// CREAR NÚMEROS POR PROCESO
 // ===============================
 
-function editarPedido(id) {
+function crearMarcadoresVidrio(
+    vidrio,
+    proceso,
+    texto
+) {
 
-    const pedido =
-        pedidos.find(
-            p =>
-                Number(p.id)
-                ===
-                Number(id)
+    const esEntalle =
+        proceso === "entalle";
+
+
+    const cantidad =
+        Math.min(
+            30,
+            Math.max(
+                0,
+                Number(
+                    esEntalle
+                        ? vidrio.cantidadEntalle
+                        : vidrio.cantidadLimpio
+                ) || 0
+            )
         );
 
-    if (!pedido) {
 
-        alert(
-            "Pedido no encontrado."
-        );
+    // Si este vidrio no tiene
+    // unidades en ese proceso,
+    // no mostramos nada.
 
-        return;
+    if (cantidad <= 0) {
+        return "";
     }
 
-    pedidoEditando =
-        pedido.id;
 
-    document
-        .getElementById("op")
-        .value =
-        pedido.op || "";
+    const marcados =
+        normalizarMarcados(
 
-    document
-        .getElementById("cliente")
-        .value =
-        pedido.cliente || "";
+            esEntalle
+                ? vidrio.marcadosEntalle
+                : vidrio.marcadosLimpio,
 
-    document
-        .getElementById(
-            "fechaIngreso"
-        )
-        .value =
-        pedido.fechaIngreso || "";
+            cantidad
 
-    document
-        .getElementById(
-            "horaEntrega"
-        )
-        .value =
-        pedido.horaEntrega || "";
-
-    document
-        .getElementById(
-            "fechaEntrega"
-        )
-        .value =
-        pedido.fechaEntrega || "";
-
-    document
-        .getElementById(
-            "descripcion"
-        )
-        .value =
-        pedido.descripcion || "";
-
-    const lista =
-        document.getElementById(
-            "listaVidrios"
         );
 
-    lista.innerHTML = "";
+
+    const botones =
+        Array.from(
+            {
+                length:
+                    cantidad
+            },
+
+            (_, indice) => {
+
+                const numero =
+                    indice + 1;
+
+
+                const activo =
+                    marcados.includes(
+                        numero
+                    );
+
+
+                return `
+
+                    <button
+
+                        type="button"
+
+                        class="
+                            unidad-proceso
+                            ${
+                                activo
+                                    ? "marcada"
+                                    : ""
+                            }
+                        "
+
+                        onclick="
+                            cambiarMarcaVidrio(
+                                ${vidrio.id},
+                                '${proceso}',
+                                ${numero},
+                                ${!activo}
+                            )
+                        "
+
+                        title="
+                            ${texto}
+                            - unidad ${numero}
+                        "
+
+                    >
+
+                        ${
+                            activo
+                                ? "✓ "
+                                : ""
+                        }
+
+                        ${numero}
+
+                    </button>
+
+                `;
+
+            }
+        )
+        .join("");
+
+
+    return `
+
+        <div class="proceso-vidrio-detalle">
+
+            <div class="proceso-vidrio-titulo">
+
+                <strong>
+                    ${texto} (${cantidad})
+                </strong>
+
+
+                <span>
+
+                    ${marcados.length}
+                    /
+                    ${cantidad}
+                    realizados
+
+                </span>
+
+            </div>
+
+
+            <div class="unidades-proceso">
+
+                ${botones}
+
+            </div>
+
+        </div>
+
+    `;
+}
+
+
+// ===============================
+// RESUMEN DE VIDRIOS
+// ===============================
+
+function crearResumenVidrios(
+    vidrios = []
+) {
 
     if (
-        pedido.vidrios
-        &&
-        pedido.vidrios.length
+        !Array.isArray(vidrios)
+        ||
+        vidrios.length === 0
     ) {
 
-        pedido.vidrios.forEach(
-            vidrio => {
+        return `
 
-                agregarVidrio(
-                    vidrio
-                );
-            }
-        );
+            <div class="vidrio-resumen">
 
-    } else {
+                Sin información de vidrio
 
-        agregarVidrio();
+            </div>
+
+        `;
     }
 
-    document
-        .getElementById(
-            "tituloFormulario"
-        )
-        .textContent =
-        `EDITANDO OP ${pedido.op}`;
 
-    document
-        .getElementById(
-            "btnGuardar"
-        )
-        .textContent =
-        "GUARDAR CAMBIOS";
+    return vidrios
+        .map(vidrio => {
 
-    document
-        .getElementById(
-            "btnCancelarEdicion"
-        )
-        .classList
-        .remove(
-            "oculto"
-        );
+            const cantidadEntalle =
+                Number(
+                    vidrio.cantidadEntalle
+                ) || 0;
 
-    document
-        .getElementById(
-            "panelRegistro"
-        )
-        .scrollIntoView({
 
-            behavior: "smooth"
+            const cantidadLimpio =
+                Number(
+                    vidrio.cantidadLimpio
+                ) || 0;
 
-        });
+
+            // ===============================
+            // PEDIDOS ANTIGUOS
+            // ===============================
+            // Si es un pedido antiguo que
+            // todavía tiene procesoEspecial,
+            // lo mostramos para no perder
+            // esa información.
+
+            let procesoAntiguo = "";
+
+
+            if (
+                cantidadEntalle === 0
+                &&
+                cantidadLimpio === 0
+                &&
+                vidrio.procesoEspecial
+                &&
+                vidrio.procesoEspecial
+                    !== "NINGUNO"
+            ) {
+
+                procesoAntiguo = `
+
+                    <span class="etiqueta-especial">
+
+                        ${vidrio.procesoEspecial}
+
+                    </span>
+
+                `;
+            }
+
+
+            const entalle =
+                crearMarcadoresVidrio(
+                    vidrio,
+                    "entalle",
+                    "ENTALLE"
+                );
+
+
+            const limpio =
+                crearMarcadoresVidrio(
+                    vidrio,
+                    "limpio",
+                    "LIMPIO"
+                );
+
+
+            return `
+
+                <div class="vidrio-bloque">
+
+
+                    <div class="vidrio-resumen">
+
+                        <strong>
+
+                            ${
+                                vidrio.tipoVidrio
+                                ||
+                                "INCOLORO"
+                            }
+
+                            ${
+                                vidrio.espesor
+                                ||
+                                "-"
+                            } mm
+
+                        </strong>
+
+
+                        <span>
+
+                            -
+
+                            ${
+                                Number(
+                                    vidrio.cantidad
+                                ) || 0
+                            }
+
+                            und
+
+                        </span>
+
+
+                        <span>
+
+                            -
+
+                            ${
+                                (
+                                    Number(
+                                        vidrio.metros
+                                    ) || 0
+                                ).toFixed(2)
+                            }
+
+                            m²
+
+                        </span>
+
+
+                        ${procesoAntiguo}
+
+                    </div>
+
+
+                    ${entalle}
+
+
+                    ${limpio}
+
+
+                </div>
+
+            `;
+
+        })
+        .join("");
 }
-// ===============================
-// CANCELAR EDICIÓN
-// ===============================
-
-function cancelarEdicion() {
-
-    pedidoEditando = null;
-
-    limpiarFormulario();
-
-    document
-        .getElementById(
-            "tituloFormulario"
-        )
-        .textContent =
-        "REGISTRO DE PEDIDOS";
-
-    document
-        .getElementById(
-            "btnGuardar"
-        )
-        .textContent =
-        "REGISTRAR PEDIDO";
-
-    document
-        .getElementById(
-            "btnCancelarEdicion"
-        )
-        .classList
-        .add(
-            "oculto"
-        );
-}
 
 
 // ===============================
-// ELIMINAR
+// MARCAR / DESMARCAR NÚMERO
 // ===============================
 
-async function eliminarPedido(id) {
+async function cambiarMarcaVidrio(
+    idVidrio,
+    proceso,
+    numero,
+    marcado
+) {
 
-    const confirmar =
-        confirm(
-            "¿Seguro que deseas eliminar este pedido?"
+    if (!idVidrio) {
+
+        alert(
+            "No se encontró el vidrio."
         );
 
-    if (!confirmar) {
         return;
     }
+
 
     try {
 
         await api(
-            `/api/pedidos/${id}`,
+            `/api/vidrios/${idVidrio}/marcado`,
             {
                 method:
-                    "DELETE"
+                    "PUT",
+
+                body:
+                    JSON.stringify({
+
+                        proceso,
+
+                        numero,
+
+                        marcado
+
+                    })
             }
         );
 
-        if (
-            pedidos.length === 1
-            &&
-            paginaActual > 1
-        ) {
-            paginaActual--;
-        }
+
+        // Volvemos a cargar para que
+        // el número quede actualizado.
 
         await cargarDatos();
+
 
     } catch (error) {
 
         console.error(
+            "ERROR MARCANDO VIDRIO:",
             error
         );
 
+
         alert(
             error.message
+            ||
+            "No se pudo marcar la unidad."
         );
     }
 }
 
 
 // ===============================
-// BUSCAR PEDIDO
+// FORMATEAR FECHA REGISTRO
 // ===============================
 
-async function buscarPedido() {
+function formatearFechaRegistro(
+    fecha
+) {
 
-    const input =
+    if (!fecha) {
+        return "";
+    }
+
+
+    const fechaObjeto =
+        new Date(fecha);
+
+
+    if (
+        Number.isNaN(
+            fechaObjeto.getTime()
+        )
+    ) {
+
+        return fecha;
+    }
+
+
+    return fechaObjeto
+        .toLocaleString(
+            "es-PE"
+        );
+}
+
+
+// ===============================
+// MOSTRAR PRODUCCIÓN
+// ===============================
+
+function mostrarProduccion(
+    lista = pedidos
+) {
+
+    const contenedor =
         document.getElementById(
-            "buscar"
+            "listaPedidos"
         );
 
-    if (!input) {
+
+    if (!contenedor) {
         return;
     }
 
-    const texto =
-        input.value.trim();
 
-    const resultado =
-        document.getElementById(
-            "resultado"
-        );
+    if (
+        !Array.isArray(lista)
+        ||
+        lista.length === 0
+    ) {
 
-    if (resultado) {
-        resultado.innerHTML = "";
-    }
+        contenedor.innerHTML = `
 
-    busquedaActual =
-        texto;
+            <div class="sin-resultados">
 
-    paginaActual = 1;
+                No hay pedidos para mostrar.
 
-    await cargarDatos();
+            </div>
 
-    if (!texto) {
+        `;
+
         return;
     }
 
-    const pedidoExacto =
-        pedidos.find(
-            pedido =>
 
-                String(
-                    pedido.op
-                )
-                .toLowerCase()
-                ===
-                texto.toLowerCase()
+    contenedor.innerHTML =
+        lista
+            .map(pedido => {
+
+                return `
+
+                    <div class="op-card">
+
+
+                        <div class="op-cabecera">
+
+                            <strong>
+                                OP ${pedido.op}
+                            </strong>
+
+
+                            <span>
+                                ${pedido.cliente}
+                            </span>
+
+
+                            <span>
+
+                                🕐
+
+                                ${
+                                    pedido.horaEntrega
+                                    ||
+                                    "SIN HORA"
+                                }
+
+                            </span>
+
+
+                            <span>
+
+                                📅
+
+                                ${
+                                    pedido.fechaEntrega
+                                    ||
+                                    "SIN FECHA"
+                                }
+
+                            </span>
+
+                        </div>
+
+
+                        ${
+                            pedido.creadoEn
+
+                                ? `
+
+                                    <div class="registro-automatico">
+
+                                        🕒 Registrado:
+
+                                        ${formatearFechaRegistro(
+                                            pedido.creadoEn
+                                        )}
+
+                                    </div>
+
+                                `
+
+                                : ""
+                        }
+
+
+                        ${
+                            pedido.descripcion
+
+                                ? `
+
+                                    <div class="descripcion-pedido">
+
+                                        <strong>
+                                            DESCRIPCIÓN:
+                                        </strong>
+
+                                        ${pedido.descripcion}
+
+                                    </div>
+
+                                `
+
+                                : ""
+                        }
+
+
+                        <!-- =====================
+                             VIDRIOS + NÚMEROS
+                             ===================== -->
+
+                        <div class="resumen-vidrios">
+
+                            ${crearResumenVidrios(
+                                pedido.vidrios
+                            )}
+
+                        </div>
+
+
+                        <!-- =====================
+                             PROCESOS PRINCIPALES
+                             NO LOS CAMBIAMOS
+                             ===================== -->
+
+                        <div class="procesos">
+
+                            ${crearProceso(
+                                pedido,
+                                "corte",
+                                "CORTE"
+                            )}
+
+
+                            ${crearProceso(
+                                pedido,
+                                "entalle",
+                                "ENTALLE"
+                            )}
+
+
+                            ${crearProceso(
+                                pedido,
+                                "limpios",
+                                "HORNO"
+                            )}
+
+
+                            ${crearProceso(
+                                pedido,
+                                "templado",
+                                "TEMPLADO"
+                            )}
+
+
+                            ${crearProceso(
+                                pedido,
+                                "terminado",
+                                "ENCAJONADO"
+                            )}
+
+
+                            ${crearProceso(
+                                pedido,
+                                "despacho",
+                                "ENTREGADO"
+                            )}
+
+                        </div>
+
+
+                        <div class="acciones-pedido">
+
+                            <button
+                                type="button"
+                                class="btn-editar"
+                                onclick="
+                                    editarPedido(
+                                        ${pedido.id}
+                                    )
+                                "
+                            >
+
+                                ✏️ EDITAR
+
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="btn-eliminar"
+                                onclick="
+                                    eliminarPedido(
+                                        ${pedido.id}
+                                    )
+                                "
+                            >
+
+                                🗑️ ELIMINAR
+
+                            </button>
+
+                        </div>
+
+
+                    </div>
+
+                `;
+
+            })
+            .join("");
+}
+// ===============================
+// CARGAR DATOS
+// ===============================
+
+async function cargarDatos() {
+
+    try {
+
+        const parametros =
+            new URLSearchParams();
+
+
+        parametros.set(
+            "page",
+            paginaActual
         );
 
-    if (pedidoExacto) {
 
-        irAlPedido(
-            pedidoExacto.id
+        parametros.set(
+            "limit",
+            limitePorPagina
         );
+
+
+        if (busquedaActual) {
+
+            parametros.set(
+                "buscar",
+                busquedaActual
+            );
+        }
+
+
+        const data =
+            await api(
+                `/api/pedidos-paginados?${parametros.toString()}`
+            );
+
+
+        pedidos =
+            Array.isArray(data.pedidos)
+                ? data.pedidos
+                : [];
+
+
+        paginaActual =
+            Number(data.pagina)
+            || 1;
+
+
+        totalPaginas =
+            Number(data.totalPaginas)
+            || 1;
+
+
+        mostrarProduccion(
+            pedidos
+        );
+
+
+        actualizarPaginacion(
+            data
+        );
+
+
+        await actualizarResumen();
+
+
+    } catch (error) {
+
+        console.error(
+            "ERROR CARGANDO PEDIDOS:",
+            error
+        );
+
+
+        const contenedor =
+            document.getElementById(
+                "listaPedidos"
+            );
+
+
+        if (contenedor) {
+
+            contenedor.innerHTML = `
+
+                <div class="sin-resultados">
+
+                    No se pudieron cargar
+                    los pedidos.
+
+                </div>
+
+            `;
+        }
     }
 }
 
 
 // ===============================
-// LIMPIAR BÚSQUEDA
-// ===============================
-
-async function limpiarBusqueda() {
-
-    const buscar =
-        document.getElementById(
-            "buscar"
-        );
-
-    if (buscar) {
-        buscar.value = "";
-    }
-
-    busquedaActual = "";
-
-    paginaActual = 1;
-
-    await cargarDatos();
-}
-
-
-// ===============================
-// IR AL PEDIDO
-// ===============================
-
-function irAlPedido(id) {
-
-    const tarjeta =
-        document.getElementById(
-            `pedido-${id}`
-        );
-
-    if (!tarjeta) {
-        return;
-    }
-
-    tarjeta.scrollIntoView({
-
-        behavior: "smooth",
-
-        block: "center"
-
-    });
-}
-
-
-// ===============================
-// RESUMEN GENERAL
+// ACTUALIZAR RESUMEN
 // ===============================
 
 async function actualizarResumen() {
@@ -1504,38 +2296,63 @@ async function actualizarResumen() {
                 "/api/resumen"
             );
 
-        document
-            .getElementById(
-                "total"
-            )
-            .textContent =
-            resumen.total || 0;
 
-        document
-            .getElementById(
-                "pendientes"
-            )
-            .textContent =
-            resumen.pendientes || 0;
+        const total =
+            document.getElementById(
+                "totalPedidos"
+            );
 
-        document
-            .getElementById(
-                "proceso"
-            )
-            .textContent =
-            resumen.proceso || 0;
 
-        document
-            .getElementById(
-                "terminados"
-            )
-            .textContent =
-            resumen.terminados || 0;
+        const pendientes =
+            document.getElementById(
+                "totalPendientes"
+            );
+
+
+        const proceso =
+            document.getElementById(
+                "totalProceso"
+            );
+
+
+        const terminados =
+            document.getElementById(
+                "totalTerminados"
+            );
+
+
+        if (total) {
+
+            total.textContent =
+                resumen.total ?? 0;
+        }
+
+
+        if (pendientes) {
+
+            pendientes.textContent =
+                resumen.pendientes ?? 0;
+        }
+
+
+        if (proceso) {
+
+            proceso.textContent =
+                resumen.proceso ?? 0;
+        }
+
+
+        if (terminados) {
+
+            terminados.textContent =
+                resumen.terminados ?? 0;
+        }
+
 
     } catch (error) {
 
         console.error(
-            "Error cargando resumen:",
+            "ERROR CARGANDO RESUMEN:",
             error
         );
     }
@@ -1543,62 +2360,120 @@ async function actualizarResumen() {
 
 
 // ===============================
+// BUSCAR PEDIDOS
+// ===============================
+
+function buscarPedidos() {
+
+    const input =
+        document.getElementById(
+            "buscarPedido"
+        );
+
+
+    busquedaActual =
+        input
+            ?.value
+            .trim()
+        || "";
+
+
+    paginaActual = 1;
+
+
+    cargarDatos();
+}
+
+
+// ===============================
+// LIMPIAR BÚSQUEDA
+// ===============================
+
+function limpiarBusqueda() {
+
+    const input =
+        document.getElementById(
+            "buscarPedido"
+        );
+
+
+    if (input) {
+
+        input.value = "";
+    }
+
+
+    busquedaActual = "";
+
+    paginaActual = 1;
+
+
+    cargarDatos();
+}
+
+
+// ===============================
+// BUSCAR AL PRESIONAR ENTER
+// ===============================
+
+function prepararBuscador() {
+
+    const input =
+        document.getElementById(
+            "buscarPedido"
+        );
+
+
+    if (!input) {
+        return;
+    }
+
+
+    input.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (
+                event.key === "Enter"
+            ) {
+
+                event.preventDefault();
+
+                buscarPedidos();
+            }
+        }
+    );
+}
+
+
+// ===============================
 // PAGINACIÓN
 // ===============================
 
-function mostrarPaginacion(
-    totalPedidos
+function actualizarPaginacion(
+    data
 ) {
 
-    let contenedor =
+    const contenedor =
         document.getElementById(
-            "paginacionPedidos"
+            "paginacion"
         );
 
+
     if (!contenedor) {
-
-        contenedor =
-            document.createElement(
-                "div"
-            );
-
-        contenedor.id =
-            "paginacionPedidos";
-
-        contenedor.style.display =
-            "flex";
-
-        contenedor.style.justifyContent =
-            "center";
-
-        contenedor.style.alignItems =
-            "center";
-
-        contenedor.style.gap =
-            "10px";
-
-        contenedor.style.flexWrap =
-            "wrap";
-
-        contenedor.style.margin =
-            "25px 0";
-
-        const produccion =
-            document.getElementById(
-                "produccion"
-            );
-
-        if (produccion) {
-
-            produccion.insertAdjacentElement(
-                "afterend",
-                contenedor
-            );
-        }
+        return;
     }
 
+
+    const total =
+        Number(data.total)
+        || 0;
+
+
     if (
-        totalPedidos === 0
+        total === 0
+        ||
+        totalPaginas <= 1
     ) {
 
         contenedor.innerHTML = "";
@@ -1606,10 +2481,12 @@ function mostrarPaginacion(
         return;
     }
 
+
     contenedor.innerHTML = `
 
         <button
             type="button"
+            class="btn-pagina"
             onclick="paginaAnterior()"
             ${
                 paginaActual <= 1
@@ -1617,38 +2494,43 @@ function mostrarPaginacion(
                     : ""
             }
         >
+
             ← ANTERIOR
+
         </button>
 
-        <strong>
 
-            Página ${paginaActual}
-            de ${totalPaginas}
+        <span class="info-pagina">
 
-        </strong>
+            Página
 
-        <span>
+            <strong>
+                ${paginaActual}
+            </strong>
 
-            ${totalPedidos}
+            de
 
-            pedido${
-                totalPedidos === 1
-                    ? ""
-                    : "s"
-            }
+            <strong>
+                ${totalPaginas}
+            </strong>
 
         </span>
 
+
         <button
             type="button"
+            class="btn-pagina"
             onclick="paginaSiguiente()"
             ${
-                paginaActual >= totalPaginas
+                paginaActual
+                >= totalPaginas
                     ? "disabled"
                     : ""
             }
         >
+
             SIGUIENTE →
+
         </button>
 
     `;
@@ -1659,19 +2541,23 @@ function mostrarPaginacion(
 // PÁGINA ANTERIOR
 // ===============================
 
-async function paginaAnterior() {
+function paginaAnterior() {
 
     if (
         paginaActual <= 1
     ) {
+
         return;
     }
 
+
     paginaActual--;
 
-    await cargarDatos();
 
-    irArribaPedidos();
+    cargarDatos();
+
+
+    subirAProduccion();
 }
 
 
@@ -1679,102 +2565,255 @@ async function paginaAnterior() {
 // PÁGINA SIGUIENTE
 // ===============================
 
-async function paginaSiguiente() {
+function paginaSiguiente() {
 
     if (
-        paginaActual >= totalPaginas
+        paginaActual
+        >= totalPaginas
     ) {
+
         return;
     }
+
 
     paginaActual++;
 
-    await cargarDatos();
 
-    irArribaPedidos();
+    cargarDatos();
+
+
+    subirAProduccion();
 }
 
 
 // ===============================
-// IR ARRIBA DE LOS PEDIDOS
+// SUBIR A PRODUCCIÓN
 // ===============================
 
-function irArribaPedidos() {
+function subirAProduccion() {
 
-    const produccion =
+    const contenedor =
         document.getElementById(
-            "produccion"
+            "listaPedidos"
         );
 
-    if (!produccion) {
+
+    if (!contenedor) {
         return;
     }
 
-    produccion.scrollIntoView({
 
-        behavior: "smooth",
+    setTimeout(
+        () => {
 
-        block: "start"
+            contenedor.scrollIntoView({
 
-    });
-}
+                behavior:
+                    "smooth",
 
+                block:
+                    "start"
 
-// ===============================
-// PREPARAR BUSCADOR
-// ===============================
+            });
 
-function prepararBuscador() {
-
-    const buscar =
-        document.getElementById(
-            "buscar"
-        );
-
-    if (!buscar) {
-        return;
-    }
-
-    buscar.addEventListener(
-        "keydown",
-
-        function (evento) {
-
-            if (
-                evento.key === "Enter"
-            ) {
-
-                evento.preventDefault();
-
-                buscarPedido();
-            }
-        }
-    );
-
-    buscar.addEventListener(
-        "input",
-
-        function () {
-
-            if (
-                buscar.value.trim() === ""
-                &&
-                busquedaActual !== ""
-            ) {
-
-                limpiarBusqueda();
-            }
-        }
+        },
+        100
     );
 }
 
 
 // ===============================
-// INICIAR
+// FILTRAR POR PROCESO
 // ===============================
 
-agregarVidrio();
+function filtrarProceso(
+    proceso
+) {
 
-prepararBuscador();
+    if (!proceso) {
 
-cargarDatos();
+        mostrarProduccion(
+            pedidos
+        );
+
+        return;
+    }
+
+
+    const procesoNormalizado =
+        String(proceso)
+            .toLowerCase();
+
+
+    const filtrados =
+        pedidos.filter(
+            pedido => {
+
+                if (
+                    procesoNormalizado
+                    === "pendiente"
+                ) {
+
+                    return (
+                        !pedido.corte
+                        &&
+                        !pedido.entalle
+                        &&
+                        !pedido.limpios
+                        &&
+                        !pedido.templado
+                        &&
+                        !pedido.terminado
+                    );
+                }
+
+
+                if (
+                    procesoNormalizado
+                    === "proceso"
+                    ||
+                    procesoNormalizado
+                    === "enproceso"
+                ) {
+
+                    return (
+
+                        (
+                            pedido.corte
+                            ||
+                            pedido.entalle
+                            ||
+                            pedido.limpios
+                            ||
+                            pedido.templado
+                        )
+
+                        &&
+
+                        !pedido.terminado
+
+                    );
+                }
+
+
+                if (
+                    procesoNormalizado
+                    === "corte"
+                ) {
+
+                    return Boolean(
+                        pedido.corte
+                    );
+                }
+
+
+                if (
+                    procesoNormalizado
+                    === "entalle"
+                ) {
+
+                    return Boolean(
+                        pedido.entalle
+                    );
+                }
+
+
+                if (
+                    procesoNormalizado
+                    === "horno"
+                    ||
+                    procesoNormalizado
+                    === "limpios"
+                ) {
+
+                    return Boolean(
+                        pedido.limpios
+                    );
+                }
+
+
+                if (
+                    procesoNormalizado
+                    === "templado"
+                ) {
+
+                    return Boolean(
+                        pedido.templado
+                    );
+                }
+
+
+                if (
+                    procesoNormalizado
+                    === "terminado"
+                    ||
+                    procesoNormalizado
+                    === "encajonado"
+                ) {
+
+                    return Boolean(
+                        pedido.terminado
+                    );
+                }
+
+
+                if (
+                    procesoNormalizado
+                    === "despacho"
+                    ||
+                    procesoNormalizado
+                    === "entregado"
+                ) {
+
+                    return Boolean(
+                        pedido.despacho
+                    );
+                }
+
+
+                return true;
+            }
+        );
+
+
+    mostrarProduccion(
+        filtrados
+    );
+}
+
+
+// ===============================
+// INICIAR PÁGINA
+// ===============================
+
+document.addEventListener(
+    "DOMContentLoaded",
+    async function () {
+
+        prepararBuscador();
+
+
+        const listaVidrios =
+            document.getElementById(
+                "listaVidrios"
+            );
+
+
+        // Crear el primer vidrio
+        // solamente si todavía no existe.
+
+        if (
+            listaVidrios
+            &&
+            listaVidrios.children.length
+            === 0
+        ) {
+
+            agregarVidrio();
+        }
+
+
+        await cargarDatos();
+
+    }
+);
