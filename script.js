@@ -2022,7 +2022,7 @@ function mostrarProduccion(lista = pedidos) {
                 }
 
 
-                ${crearResumenVidrios(pedido)}
+                ${crearResumenVidrios(pedido.vidrios)}
 
 
                 <div class="procesos">
