@@ -17,10 +17,12 @@ body {
 header {
     background: #0b3d91;
     color: white;
+
     padding: 16px 30px;
 
     display: flex;
     align-items: center;
+
     gap: 18px;
 
     border-bottom: 5px solid #d71920;
@@ -33,6 +35,7 @@ header {
     object-fit: contain;
 
     background: white;
+
     padding: 5px;
 
     border-radius: 8px;
@@ -40,12 +43,15 @@ header {
 
 header h1 {
     margin: 0;
+
     font-size: 27px;
 }
 
 header p {
     margin: 5px 0 0;
+
     font-size: 13px;
+
     color: #dbeafe;
 }
 
@@ -57,12 +63,15 @@ header p {
 main {
     width: 95%;
     max-width: 1450px;
+
     margin: 25px auto;
 }
 
 .titulo-principal {
     color: #172033;
+
     margin-bottom: 25px;
+
     font-size: 27px;
 }
 
@@ -73,14 +82,19 @@ main {
 
 .resumen {
     display: grid;
+
     grid-template-columns: repeat(4, 1fr);
+
     gap: 14px;
+
     margin-bottom: 20px;
 }
 
 .card-resumen {
     background: white;
+
     border-radius: 9px;
+
     padding: 18px;
 
     border-top: 4px solid #0b3d91;
@@ -95,15 +109,21 @@ main {
 
 .card-resumen span {
     display: block;
+
     font-size: 12px;
+
     color: #666;
+
     font-weight: bold;
 }
 
 .card-resumen strong {
     display: block;
+
     margin-top: 7px;
+
     font-size: 29px;
+
     color: #0b3d91;
 }
 
@@ -114,8 +134,11 @@ main {
 
 .panel {
     background: white;
+
     border-radius: 9px;
+
     margin-bottom: 20px;
+
     padding: 25px;
 
     box-shadow: 0 2px 8px rgba(0,0,0,.08);
@@ -125,7 +148,9 @@ main {
 
 .panel h2 {
     color: #172033;
+
     margin-top: 0;
+
     margin-bottom: 25px;
 }
 
@@ -136,15 +161,19 @@ main {
 
 .datos-pedido {
     display: grid;
+
     grid-template-columns: repeat(3, 1fr);
+
     gap: 18px;
 }
 
 label {
     display: block;
+
     margin-bottom: 7px;
 
     font-size: 12px;
+
     font-weight: bold;
 
     color: #333;
@@ -156,82 +185,106 @@ textarea {
     width: 100%;
 
     border: 1px solid #cbd5e1;
+
     border-radius: 4px;
 
     background: white;
 
     font-family: Arial, sans-serif;
+
     font-size: 14px;
 }
 
 input,
 select {
     height: 43px;
-    padding: 0 11px;
+
+    padding: 0 12px;
 }
 
 textarea {
-    min-height: 90px;
-    padding: 11px;
+    min-height: 95px;
+
     resize: vertical;
+
+    padding: 12px;
 }
 
 input:focus,
 select:focus,
 textarea:focus {
     outline: none;
-    border-color: #0b3d91;
-}
-/* =========================
-   BOTONES DEL FORMULARIO
-========================= */
 
-.acciones-formulario {
-    display: flex;
-    gap: 10px;
+    border-color: #0b3d91;
+
+    box-shadow: 0 0 0 2px rgba(11,61,145,.12);
+}
+
+.descripcion {
     margin-top: 20px;
 }
 
-.btn-principal {
-    border: none;
-    background: #0b3d91;
-    color: white;
-    padding: 12px 20px;
-    border-radius: 5px;
-    font-weight: bold;
-    cursor: pointer;
+.aviso-registro {
+    display: flex;
+
+    align-items: center;
+
+    line-height: 1.5;
+
+    color: #555;
+
+    font-size: 13px;
 }
-
-.btn-principal:hover {
-    background: #082f75;
-}
-
-.btn-cancelar {
-    border: none;
-    background: #64748b;
-    color: white;
-    padding: 12px 20px;
-    border-radius: 5px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.btn-cancelar:hover {
-    background: #475569;
-}
-
-
 /* =========================
-   VIDRIOS DEL PEDIDO
+   VIDRIOS
 ========================= */
+
+.contenedor-vidrios {
+    margin-top: 20px;
+
+    padding: 20px;
+
+    border: 1px solid #d8dee8;
+
+    background: #fafafa;
+
+    border-radius: 6px;
+}
 
 .titulo-vidrios {
     display: flex;
+
     justify-content: space-between;
+
     align-items: center;
+
     gap: 15px;
-    margin-top: 25px;
-    margin-bottom: 15px;
+
+    margin-bottom: 18px;
+}
+
+.titulo-vidrios h3 {
+    margin: 0;
+
+    font-size: 14px;
+}
+
+.btn-agregar {
+    border: 1px solid #cbd5e1;
+
+    background: white;
+
+    padding: 10px 14px;
+
+    border-radius: 4px;
+
+    cursor: pointer;
+
+    font-weight: bold;
+}
+
+.btn-agregar:hover {
+    background: #eef4ff;
 }
 
 .fila-vidrio {
@@ -246,11 +299,13 @@ textarea:focus {
         auto;
 
     gap: 12px;
+
     align-items: end;
 
     padding: 12px;
 
     border: 1px solid #d8dee8;
+
     border-radius: 5px;
 
     margin-bottom: 10px;
@@ -259,55 +314,128 @@ textarea:focus {
 }
 
 .btn-quitar {
-    height: 43px;
+    height: 42px;
+
+    padding: 0 12px;
 
     border: none;
-    border-radius: 5px;
 
-    background: #dc2626;
-    color: white;
+    background: transparent;
 
-    padding: 0 14px;
+    color: #777;
 
-    font-weight: bold;
     cursor: pointer;
 }
 
 .btn-quitar:hover {
-    background: #b91c1c;
+    color: #d71920;
 }
 
 
 /* =========================
-   CANTIDAD POR PROCESO
+   BOTONES FORMULARIO
 ========================= */
 
-.cantidades-proceso {
+.acciones-formulario {
+    margin-top: 18px;
+
     display: flex;
-    flex-direction: column;
-    gap: 7px;
+
+    gap: 10px;
 }
 
-.titulo-cantidad-proceso {
-    font-size: 12px;
+.btn-principal {
+    border: none;
+
+    background: #a9001b;
+
+    color: white;
+
+    padding: 13px 22px;
+
+    border-radius: 4px;
+
     font-weight: bold;
-    color: #333;
+
+    cursor: pointer;
 }
 
-.campos-proceso-especial {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 7px;
+.btn-principal:hover {
+    background: #870016;
 }
 
-.campos-proceso-especial label {
-    margin: 0;
-    font-size: 11px;
-    color: #475569;
+.btn-cancelar {
+    border: none;
+
+    background: #64748b;
+
+    color: white;
+
+    padding: 13px 22px;
+
+    border-radius: 4px;
+
+    cursor: pointer;
+
+    font-weight: bold;
 }
 
-.campos-proceso-especial input {
-    margin-top: 4px;
+.oculto {
+    display: none;
+}
+
+
+/* =========================
+   BUSCADOR
+========================= */
+
+.buscador {
+    max-width: 100%;
+
+    margin-bottom: 15px;
+}
+/* =========================
+   TARJETA PEDIDO
+========================= */
+
+.op-card {
+    position: relative;
+
+    border: 1px solid #d5dbe3;
+
+    border-left: 4px solid #0b3d91;
+
+    border-radius: 7px;
+
+    padding: 16px;
+
+    margin-bottom: 14px;
+
+    background: #fafafa;
+}
+
+.op-cabecera {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    align-items: center;
+
+    gap: 18px;
+
+    margin-bottom: 12px;
+}
+
+.op-cabecera strong {
+    color: #172033;
+
+    font-size: 16px;
+}
+
+.descripcion-card {
+    margin-bottom: 12px;
+
+    color: #444;
 }
 
 
@@ -316,143 +444,75 @@ textarea:focus {
 ========================= */
 
 .resumen-vidrios {
-    margin-top: 15px;
     display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
 
-.vidrio-bloque {
-    border: 1px solid #d8dee8;
-    border-radius: 7px;
-    padding: 12px;
-    background: #f8fafc;
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 6px;
+
+    margin: 10px 0 12px;
 }
 
 .vidrio-resumen {
-    font-size: 14px;
-    font-weight: bold;
-    color: #172033;
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 7px;
+
+    align-items: center;
+
+    font-size: 13px;
 }
 
 .etiqueta-especial {
-    display: inline-block;
+    background: #a9001b;
 
-    margin-top: 7px;
+    color: white;
 
     padding: 4px 8px;
 
-    border-radius: 4px;
+    border-radius: 3px;
 
-    background: #dbeafe;
-    color: #0b3d91;
+    font-size: 11px;
 
-    font-size: 12px;
     font-weight: bold;
 }
 
 
 /* =========================
-   ENTALLE Y LIMPIO POR UNIDAD
-========================= */
-
-.proceso-vidrio-detalle {
-    margin-top: 10px;
-}
-
-.proceso-vidrio-titulo {
-    margin-bottom: 7px;
-
-    font-size: 12px;
-    font-weight: bold;
-
-    color: #334155;
-}
-
-.unidades-proceso {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-}
-
-.unidad-proceso {
-    min-width: 34px;
-    height: 34px;
-
-    border: 1px solid #94a3b8;
-    border-radius: 5px;
-
-    background: white;
-    color: #334155;
-
-    font-weight: bold;
-
-    cursor: pointer;
-
-    transition: .15s;
-}
-
-.unidad-proceso:hover {
-    background: #e2e8f0;
-}
-
-.unidad-proceso.marcada {
-    background: #16a34a;
-    border-color: #16a34a;
-    color: white;
-}
-/* =========================
-   CABECERA DEL PEDIDO
-========================= */
-
-.op-cabecera {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
-
-    padding-bottom: 12px;
-    margin-bottom: 12px;
-
-    border-bottom: 1px solid #e2e8f0;
-}
-
-.op-cabecera strong {
-    color: #0b3d91;
-    font-size: 17px;
-}
-
-.op-cabecera span {
-    font-size: 13px;
-    color: #475569;
-}
-
-
-/* =========================
-   PROCESOS PRINCIPALES
+   PROCESOS
 ========================= */
 
 .procesos {
     display: flex;
+
     flex-wrap: wrap;
+
     gap: 8px;
 
-    margin-top: 15px;
+    margin-top: 10px;
 }
 
 .proceso {
-    border: 1px solid #93c5fd;
-    border-radius: 5px;
-
     background: #dbeafe;
-    color: #0b3d91;
 
-    padding: 9px 12px;
+    border: 1px solid #bfdbfe;
 
-    font-size: 12px;
-    font-weight: bold;
+    color: #172033;
+
+    border-radius: 4px;
+
+    padding: 10px 14px;
 
     cursor: pointer;
+
+    font-size: 12px;
+
+    font-weight: bold;
+
     user-select: none;
 }
 
@@ -462,7 +522,9 @@ textarea:focus {
 
 .proceso.terminado {
     background: #a9001b;
+
     border-color: #a9001b;
+
     color: white;
 }
 
@@ -475,6 +537,7 @@ textarea:focus {
     margin-top: 13px;
 
     font-size: 13px;
+
     color: #555;
 
     line-height: 1.6;
@@ -482,13 +545,14 @@ textarea:focus {
 
 
 /* =========================
-   ACCIONES DEL PEDIDO
+   ACCIONES
 ========================= */
 
 .acciones-pedido {
     margin-top: 15px;
 
     display: flex;
+
     justify-content: flex-end;
 
     gap: 8px;
@@ -498,6 +562,7 @@ textarea:focus {
     border: none;
 
     background: #a9001b;
+
     color: white;
 
     padding: 10px 15px;
@@ -505,6 +570,7 @@ textarea:focus {
     border-radius: 4px;
 
     font-weight: bold;
+
     cursor: pointer;
 }
 
@@ -516,6 +582,7 @@ textarea:focus {
     border: none;
 
     background: #dc2626;
+
     color: white;
 
     padding: 10px 15px;
@@ -523,6 +590,7 @@ textarea:focus {
     border-radius: 4px;
 
     font-weight: bold;
+
     cursor: pointer;
 }
 
@@ -532,16 +600,18 @@ textarea:focus {
 
 
 /* =========================
-   RESULTADOS DE BÚSQUEDA
+   RESULTADOS BÚSQUEDA
 ========================= */
 
 .resultado {
     border: 1px solid #d5dbe3;
+
     border-left: 4px solid #d71920;
 
     border-radius: 7px;
 
     padding: 15px;
+
     margin-top: 12px;
 
     background: #fafafa;
@@ -620,10 +690,6 @@ textarea:focus {
         align-items: stretch;
     }
 
-    .campos-proceso-especial {
-        grid-template-columns: 1fr 1fr;
-    }
-
     .op-cabecera {
         gap: 8px;
         flex-direction: column;
@@ -656,13 +722,468 @@ textarea:focus {
     .btn-cancelar {
         width: 100%;
     }
+}
 
-    .unidades-proceso {
-        gap: 5px;
+#resultado {
+    display: none !important;
+}
+/* =========================================
+   PÁGINA METROS POR FECHA DE ENTREGA
+========================================= */
+
+.cabecera-metros {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.cabecera-metros h1 {
+    margin: 0;
+    color: #172033;
+}
+
+.cabecera-metros p {
+    margin-top: 7px;
+    color: #64748b;
+}
+
+.btn-volver {
+    text-decoration: none;
+    background: #0b3d91;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 5px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.btn-volver:hover {
+    background: #082f75;
+}
+
+.resumen-metros {
+    margin-bottom: 20px;
+}
+
+.texto-fecha {
+    font-size: 19px !important;
+}
+
+.barra-metros {
+    display: flex;
+    align-items: end;
+    gap: 15px;
+}
+
+.barra-metros > div {
+    width: 260px;
+}
+
+.btn-limpiar-fecha {
+    height: 43px;
+    border: none;
+    background: #d71920;
+    color: white;
+    padding: 0 18px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-limpiar-fecha:hover {
+    background: #b9151b;
+}
+
+.tabla-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.tabla-metros {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 650px;
+}
+
+.tabla-metros th {
+    background: #0b3d91;
+    color: white;
+    padding: 13px;
+    text-align: left;
+    font-size: 13px;
+}
+
+.tabla-metros td {
+    border-bottom: 1px solid #e2e8f0;
+    padding: 14px 13px;
+}
+
+.tabla-metros tr:hover {
+    background: #f8fafc;
+}
+
+.metros-destacado {
+    font-size: 17px;
+    font-weight: bold;
+    color: #0b3d91;
+}
+
+.btn-ver-op {
+    border: none;
+    background: #dbeafe;
+    color: #0b3d91;
+    padding: 9px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-ver-op:hover {
+    background: #bfdbfe;
+}
+
+.sin-datos {
+    text-align: center;
+    color: #64748b;
+    padding: 30px !important;
+}
+
+.detalle-metros-op {
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.detalle-metros-op strong {
+    color: #0b3d91;
+    font-size: 18px;
+}
+
+
+/* CELULAR */
+
+@media (max-width: 650px) {
+
+    .cabecera-metros {
+        flex-direction: column;
+        align-items: stretch;
     }
 
-    .unidad-proceso {
-        min-width: 32px;
-        height: 32px;
+    .btn-volver {
+        text-align: center;
+    }
+
+    .barra-metros {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .barra-metros > div {
+        width: 100%;
+    }
+
+    .btn-limpiar-fecha {
+        width: 100%;
+    }
+}
+/* =========================================
+   COTIZACIONES
+========================================= */
+
+.cabecera-cotizacion {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.cabecera-cotizacion h1 {
+    margin: 0;
+    color: #172033;
+}
+
+.cabecera-cotizacion p {
+    margin-top: 7px;
+    color: #64748b;
+}
+
+.datos-cotizacion {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.datos-cotizacion label,
+.fila-cotizacion label {
+    display: block;
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 6px;
+    color: #334155;
+}
+
+.datos-cotizacion input,
+.fila-cotizacion input,
+.fila-cotizacion select {
+    width: 100%;
+    height: 42px;
+    border: 1px solid #cbd5e1;
+    border-radius: 5px;
+    padding: 8px 10px;
+    background: white;
+}
+
+.datos-cotizacion input:focus,
+.fila-cotizacion input:focus,
+.fila-cotizacion select:focus {
+    outline: none;
+    border-color: #0b3d91;
+}
+
+.titulo-cotizacion {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.titulo-cotizacion h2 {
+    margin: 0;
+}
+
+.fila-cotizacion {
+    display: grid;
+    grid-template-columns:
+        1.3fr
+        0.8fr
+        0.8fr
+        0.8fr
+        0.7fr
+        0.8fr
+        0.9fr
+        1fr
+        auto;
+
+    gap: 10px;
+    align-items: end;
+
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+
+    padding: 15px;
+    margin-bottom: 12px;
+}
+
+.cot-metros,
+.cot-subtotal {
+    background: #eaf2ff !important;
+    font-weight: bold;
+}
+
+.contenedor-quitar {
+    display: flex;
+    align-items: end;
+}
+
+.btn-quitar-cotizacion {
+    height: 42px;
+    border: none;
+    background: #d71920;
+    color: white;
+    font-weight: bold;
+    border-radius: 5px;
+    padding: 0 12px;
+    cursor: pointer;
+}
+
+.btn-quitar-cotizacion:hover {
+    background: #b9151b;
+}
+
+.observaciones-cotizacion {
+    width: 100%;
+    min-height: 100px;
+    resize: vertical;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 12px;
+    font-family: Arial, sans-serif;
+}
+
+.resumen-cotizacion {
+    max-width: 500px;
+    margin-left: auto;
+}
+
+.linea-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.linea-total span {
+    font-weight: bold;
+}
+
+.linea-total strong {
+    font-size: 18px;
+}
+
+.igv-linea label {
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.total-final {
+    border-bottom: none;
+    margin-top: 5px;
+    padding: 15px;
+    background: #0b3d91;
+    color: white;
+    border-radius: 6px;
+}
+
+.total-final span {
+    font-size: 18px;
+}
+
+.total-final strong {
+    font-size: 25px;
+}
+
+.acciones-cotizacion {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-bottom: 40px;
+}
+
+.btn-nueva-cotizacion {
+    border: none;
+    background: #475569;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-nueva-cotizacion:hover {
+    background: #334155;
+}
+/* ===============================
+   IMPRESIÓN
+================================ */
+
+@media print {
+
+    header {
+        padding: 10px 20px;
+    }
+
+    .btn-volver,
+    .btn-agregar,
+    .btn-quitar-cotizacion,
+    .acciones-cotizacion {
+        display: none !important;
+    }
+
+    body {
+        background: white;
+    }
+
+    main {
+        width: 100%;
+        max-width: none;
+        margin: 10px auto;
+    }
+
+    .panel {
+        box-shadow: none;
+        border: 1px solid #ddd;
+        break-inside: avoid;
+    }
+
+    .fila-cotizacion {
+        break-inside: avoid;
+    }
+}
+
+
+/* ===============================
+   TABLET
+================================ */
+
+@media (max-width: 1100px) {
+
+    .fila-cotizacion {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .contenedor-quitar {
+        align-items: stretch;
+    }
+
+    .btn-quitar-cotizacion {
+        width: 100%;
+    }
+}
+
+
+/* ===============================
+   CELULAR
+================================ */
+
+@media (max-width: 650px) {
+
+    .cabecera-cotizacion {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .cabecera-cotizacion .btn-volver {
+        text-align: center;
+    }
+
+    .datos-cotizacion {
+        grid-template-columns: 1fr;
+    }
+
+    .titulo-cotizacion {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .titulo-cotizacion .btn-agregar {
+        width: 100%;
+    }
+
+    .fila-cotizacion {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .resumen-cotizacion {
+        max-width: none;
+    }
+
+    .acciones-cotizacion {
+        flex-direction: column;
+    }
+
+    .acciones-cotizacion button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 420px) {
+
+    .fila-cotizacion {
+        grid-template-columns: 1fr;
     }
 }
