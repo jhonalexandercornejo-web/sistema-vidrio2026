@@ -944,42 +944,45 @@ function mostrarProduccion() {
                             )}
 
                         </div>
-      ${crearProceso(
-    pedido,
-    "corte",
-    "CORTE"
-)}
 
-${crearProceso(
-    pedido,
-    "entalle",
-    "ENTALLE"
-)}
+                        <div class="procesos">
 
-${crearProceso(
-    pedido,
-    "limpios",
-    "HORNO"
-)}
+                            ${crearProceso(
+                                pedido,
+                                "corte",
+                                "CORTE"
+                            )}
 
-${crearProceso(
-    pedido,
-    "templado",
-    "TEMPLADO"
-)}
+                            ${crearProceso(
+                                pedido,
+                                "entalle",
+                                "ENTALLE"
+                            )}
 
-${crearProceso(
-    pedido,
-    "terminado",
-    "ENCAJONADO"
-)}
+                            ${crearProceso(
+                                pedido,
+                                "limpios",
+                                "HORNO"
+                            )}
 
-${crearProceso(
-    pedido,
-    "despacho",
-    "ENTREGADO"
-)}
-                       
+                            ${crearProceso(
+                                pedido,
+                                "templado",
+                                "TEMPLADO"
+                            )}
+
+                            ${crearProceso(
+                                pedido,
+                                "terminado",
+                                "ENCAJONADO"
+                            )}
+
+                            ${crearProceso(
+                                pedido,
+                                "despacho",
+                                "ENTREGADO"
+                            )}
+
                         </div>
 
                         <div class="detalle-op">
@@ -1025,7 +1028,6 @@ ${crearProceso(
             })
             .join("");
 }
-
 
 // ===============================
 // CREAR BOTÓN PROCESO
