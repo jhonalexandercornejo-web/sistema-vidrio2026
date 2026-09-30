@@ -1285,3 +1285,57 @@ textarea:focus {
     border-color: #15803d;
     color: white;
 }
+/* =========================================
+   CORREGIR IMPRESIÓN DE COTIZACIÓN
+   SOLO IMPRIME EL DOCUMENTO ZAKATA
+========================================= */
+
+#hojaImpresion {
+    display: none;
+}
+
+@media print {
+
+    /* OCULTAR TODO EL COTIZADOR */
+    body > header,
+    body > main {
+        display: none !important;
+    }
+
+    /* MOSTRAR SOLO LA COTIZACIÓN FORMAL */
+    #hojaImpresion {
+        display: block !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+    }
+
+    @page {
+        size: A4;
+        margin: 8mm;
+    }
+
+    .documento-zakata {
+        display: block !important;
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        background: white !important;
+    }
+
+    .z-encabezado,
+    .z-datos,
+    .z-tabla-area,
+    .z-pie {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+}
