@@ -9,9 +9,7 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>
-        Cotizaciones - Zakata Glass
-    </title>
+    <title>Cotizaciones - Zakata Glass</title>
 
     <link
         rel="stylesheet"
@@ -36,6 +34,7 @@
 
 </header>
 
+
 <main>
 
     <div class="cabecera-cotizacion">
@@ -47,6 +46,7 @@
                 Calcula automáticamente metros cuadrados y precios.
             </p>
         </div>
+
 
         <a
             href="index.html"
@@ -64,9 +64,12 @@
 
         <h2>DATOS DE LA COTIZACIÓN</h2>
 
+
         <div class="datos-cotizacion">
 
+
             <div>
+
                 <label>RUC DEL CLIENTE</label>
 
                 <input
@@ -75,60 +78,92 @@
                     maxlength="11"
                     placeholder="RUC"
                 >
+
             </div>
 
 
             <div>
+
                 <label>DIRECCIÓN DEL CLIENTE</label>
 
                 <input
                     id="direccionCotizacion"
+                    type="text"
                     placeholder="Dirección"
                 >
+
+            </div>
+
+
+            <!-- PROVINCIA -->
+
+            <div>
+
+                <label>PROVINCIA</label>
+
+                <input
+                    id="provinciaCotizacion"
+                    type="text"
+                    placeholder="Ejemplo: Lima"
+                >
+
             </div>
 
 
             <div>
+
                 <label>VENDEDOR</label>
 
                 <input
                     id="vendedorCotizacion"
+                    type="text"
                     placeholder="Vendedor"
                 >
+
             </div>
 
 
             <div>
+
                 <label>N.º DOCUMENTO</label>
 
                 <input
                     id="documentoCotizacion"
+                    type="text"
                     placeholder="1"
                 >
+
             </div>
 
 
             <div>
+
                 <label>OP</label>
 
                 <input
                     id="opCotizacion"
+                    type="text"
                     placeholder="Número de OP"
                 >
+
             </div>
 
 
             <div>
+
                 <label>CPS</label>
 
                 <input
                     id="cpsCotizacion"
+                    type="text"
                     placeholder="CPS"
                 >
+
             </div>
 
 
             <div>
+
                 <label>N° COTIZACIÓN</label>
 
                 <input
@@ -136,10 +171,12 @@
                     type="text"
                     placeholder="Ejemplo: COT-001"
                 >
+
             </div>
 
 
             <div>
+
                 <label>CLIENTE</label>
 
                 <input
@@ -147,28 +184,33 @@
                     type="text"
                     placeholder="Nombre del cliente"
                 >
+
             </div>
 
 
             <div>
+
                 <label>FECHA</label>
 
                 <input
                     id="fechaCotizacion"
                     type="date"
                 >
+
             </div>
 
 
             <!-- MONEDA -->
 
             <div>
+
                 <label>MONEDA</label>
 
                 <select
                     id="monedaCotizacion"
                     onchange="calcularCotizacion()"
                 >
+
                     <option value="PEN">
                         SOLES (S/)
                     </option>
@@ -176,8 +218,11 @@
                     <option value="USD">
                         DÓLARES (US$)
                     </option>
+
                 </select>
+
             </div>
+
 
         </div>
 
@@ -192,6 +237,7 @@
 
             <h2>VIDRIOS A COTIZAR</h2>
 
+
             <button
                 type="button"
                 class="btn-agregar"
@@ -201,6 +247,7 @@
             </button>
 
         </div>
+
 
         <div id="listaCotizacion"></div>
 
@@ -212,6 +259,7 @@
     <section class="panel">
 
         <h2>OBSERVACIONES</h2>
+
 
         <textarea
             id="observacionesCotizacion"
@@ -227,6 +275,7 @@
     <section class="panel">
 
         <div class="resumen-cotizacion">
+
 
             <div class="linea-total">
 
@@ -281,6 +330,7 @@
 
                 </label>
 
+
                 <strong id="igvCotizacion">
                     S/ 0.00
                 </strong>
@@ -298,6 +348,7 @@
 
             </div>
 
+
         </div>
 
     </section>
@@ -307,7 +358,9 @@
 
     <section class="acciones-cotizacion">
 
+
         <button
+            type="button"
             class="btn-principal"
             onclick="imprimirCotizacion()"
         >
@@ -316,11 +369,13 @@
 
 
         <button
+            type="button"
             class="btn-nueva-cotizacion"
             onclick="nuevaCotizacion()"
         >
             + NUEVA COTIZACIÓN
         </button>
+
 
     </section>
 
