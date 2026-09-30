@@ -944,45 +944,42 @@ function mostrarProduccion() {
                             )}
 
                         </div>
+      ${crearProceso(
+    pedido,
+    "corte",
+    "CORTE"
+)}
 
-                        <div class="procesos">
+${crearProceso(
+    pedido,
+    "entalle",
+    "ENTALLE"
+)}
 
-                            ${crearProceso(
-                                pedido,
-                                "corte",
-                                "CORTE"
-                            )}
+${crearProceso(
+    pedido,
+    "limpios",
+    "HORNO"
+)}
 
-                            ${crearProceso(
-                                pedido,
-                                "entalle",
-                                "ENTALLE"
-                            )}
+${crearProceso(
+    pedido,
+    "templado",
+    "TEMPLADO"
+)}
 
-                            ${crearProceso(
-                                pedido,
-                                "limpios",
-                                "LIMPIOS"
-                            )}
+${crearProceso(
+    pedido,
+    "terminado",
+    "ENCAJONADO"
+)}
 
-                            ${crearProceso(
-                                pedido,
-                                "templado",
-                                "TEMPLADO"
-                            )}
-
-                            ${crearProceso(
-                                pedido,
-                                "terminado",
-                                "TERMINADO"
-                            )}
-
-                            ${crearProceso(
-                                pedido,
-                                "despacho",
-                                "DESPACHO"
-                            )}
-
+${crearProceso(
+    pedido,
+    "despacho",
+    "ENTREGADO"
+)}
+                       
                         </div>
 
                         <div class="detalle-op">
