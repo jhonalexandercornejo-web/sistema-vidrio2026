@@ -2092,7 +2092,7 @@ function mostrarProduccion(lista = pedidos) {
     <button
         type="button"
         class="btn-editar"
-        onclick="window.location.href='cotizacion.html?pedido=${pedido.id}'"
+        onclick="window.location.href='cotizaciones.html?pedido=${pedido.id}'"
     >
         COTIZACIÓN
     </button>
