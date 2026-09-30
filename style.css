@@ -1339,3 +1339,261 @@ textarea:focus {
         page-break-inside: avoid;
     }
 }
+/* =====================================================
+   DOCUMENTO FORMAL ZAKATA GLASS - IMPRESIÓN
+===================================================== */
+
+@media print {
+
+    /* HOJA PRINCIPAL */
+    .documento-zakata {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        font-family: Arial, sans-serif !important;
+        font-size: 11px !important;
+        color: #000 !important;
+        background: #fff !important;
+    }
+
+
+    /* =========================
+       ENCABEZADO
+    ========================= */
+
+    .z-encabezado {
+        display: grid !important;
+        grid-template-columns: 110px 1fr 210px !important;
+        align-items: center !important;
+        gap: 12px !important;
+
+        border-bottom: 3px solid #d71920 !important;
+        padding-bottom: 10px !important;
+        margin-bottom: 10px !important;
+    }
+
+    .z-logo {
+        width: 95px !important;
+        height: 75px !important;
+        object-fit: contain !important;
+    }
+
+    .z-empresa {
+        font-size: 10px !important;
+        line-height: 1.45 !important;
+    }
+
+    .z-empresa b {
+        font-size: 13px !important;
+    }
+
+
+    /* RUC + COTIZACIÓN */
+
+    .z-recuadro {
+        border: 2px solid #0b3d91 !important;
+        border-radius: 5px !important;
+
+        text-align: center !important;
+
+        padding: 10px 8px !important;
+
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 6px !important;
+    }
+
+    .z-recuadro b {
+        font-size: 12px !important;
+    }
+
+    .z-recuadro strong {
+        display: block !important;
+
+        background: #0b3d91 !important;
+        color: white !important;
+
+        padding: 6px !important;
+
+        font-size: 15px !important;
+    }
+
+
+    /* =========================
+       DATOS DEL CLIENTE
+    ========================= */
+
+    .z-datos {
+        border: 1px solid #444 !important;
+        margin-bottom: 10px !important;
+    }
+
+    .z-renglon {
+        display: grid !important;
+        grid-template-columns: 2fr 1fr !important;
+
+        border-bottom: 1px solid #aaa !important;
+    }
+
+    .z-renglon:last-child {
+        border-bottom: none !important;
+    }
+
+    .z-renglon span {
+        padding: 5px 7px !important;
+        min-height: 25px !important;
+    }
+
+    .z-renglon span + span {
+        border-left: 1px solid #aaa !important;
+    }
+
+    .z-renglon.z-tres {
+        grid-template-columns: 1fr 1fr 1fr !important;
+    }
+
+
+    /* =========================
+       TABLA
+    ========================= */
+
+    .z-tabla-area {
+        width: 100% !important;
+        margin-top: 8px !important;
+    }
+
+    .z-tabla {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        table-layout: fixed !important;
+    }
+
+    .z-tabla th {
+        background: #0b3d91 !important;
+        color: white !important;
+
+        border: 1px solid #444 !important;
+
+        padding: 6px 4px !important;
+
+        font-size: 10px !important;
+        text-align: center !important;
+
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .z-tabla td {
+        border: 1px solid #777 !important;
+        padding: 6px 5px !important;
+
+        vertical-align: top !important;
+
+        font-size: 10px !important;
+    }
+
+    .z-tabla .numero {
+        text-align: right !important;
+    }
+
+
+    /* =========================
+       CUENTAS BANCARIAS
+    ========================= */
+
+    .z-relleno td {
+        height: 120px !important;
+    }
+
+    .z-bancos {
+        font-size: 9px !important;
+        line-height: 1.5 !important;
+    }
+
+    .z-bancos b {
+        font-size: 10px !important;
+    }
+
+
+    /* =========================
+       PIE / TOTALES
+    ========================= */
+
+    .z-pie {
+        display: grid !important;
+
+        grid-template-columns:
+            1fr
+            310px !important;
+
+        border: 1px solid #444 !important;
+        border-top: none !important;
+    }
+
+    .z-letras {
+        padding: 10px !important;
+
+        font-size: 10px !important;
+        line-height: 1.5 !important;
+    }
+
+    .z-totales {
+        border-left: 1px solid #444 !important;
+    }
+
+    .z-totales > div {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+
+        gap: 10px !important;
+
+        padding: 5px 8px !important;
+
+        border-bottom: 1px solid #aaa !important;
+
+        font-size: 10px !important;
+    }
+
+    .z-totales > div:last-child {
+        border-bottom: none !important;
+    }
+
+    .z-totales b {
+        white-space: nowrap !important;
+    }
+
+
+    /* TOTAL FINAL */
+
+    .z-total-final {
+        background: #0b3d91 !important;
+        color: white !important;
+
+        font-size: 12px !important;
+        font-weight: bold !important;
+
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+
+    /* EVITAR CORTES */
+
+    .z-encabezado,
+    .z-datos,
+    .z-tabla,
+    .z-pie {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+    }
+
+
+    /* CONFIGURACIÓN A4 */
+
+    @page {
+        size: A4 portrait;
+        margin: 8mm;
+    }
+}
