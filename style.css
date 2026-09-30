@@ -1187,3 +1187,35 @@ textarea:focus {
         grid-template-columns: 1fr;
     }
 }
+/* =========================================
+   CANTIDAD POR PROCESO - ENTALLE / LIMPIO
+========================================= */
+
+.cantidades-proceso {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.titulo-cantidad-proceso {
+    font-size: 12px;
+    font-weight: bold;
+    color: #333;
+}
+
+.campos-proceso-especial {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.campos-proceso-especial label {
+    margin: 0;
+    font-size: 11px;
+    color: #475569;
+}
+
+.campos-proceso-especial input {
+    margin-top: 5px;
+    width: 100%;
+}
