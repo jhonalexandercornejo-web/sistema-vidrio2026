@@ -1703,3 +1703,251 @@ textarea:focus {
         height: 125mm !important;
     }
 }
+/* =========================================
+   ETIQUETAS DE VIDRIO - ZAKATA GLASS
+========================================= */
+
+#listaEtiquetas {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 18px;
+}
+
+.etiqueta-vidrio {
+    width: 100%;
+    max-width: 420px;
+    background: white;
+    border: 2px solid #111;
+    border-radius: 4px;
+    padding: 12px;
+    color: #111;
+    font-family: Arial, sans-serif;
+    box-sizing: border-box;
+}
+
+.etiqueta-superior {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #111;
+    padding-bottom: 7px;
+    margin-bottom: 7px;
+}
+
+.etiqueta-marca {
+    font-size: 18px;
+    font-weight: 900;
+    color: #0b3d91;
+}
+
+.etiqueta-numero {
+    background: #111;
+    color: white;
+    padding: 5px 10px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 3px;
+}
+
+.etiqueta-op {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.etiqueta-cliente,
+.etiqueta-dato {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 7px;
+}
+
+.etiqueta-cliente span,
+.etiqueta-dato span {
+    font-size: 10px;
+    font-weight: bold;
+    color: #555;
+}
+
+.etiqueta-cliente strong {
+    font-size: 16px;
+}
+
+.etiqueta-dato strong {
+    font-size: 13px;
+}
+
+.etiqueta-vidrio-info {
+    border-top: 1px solid #999;
+    border-bottom: 1px solid #999;
+    padding: 7px 0;
+    margin: 8px 0;
+    font-size: 15px;
+}
+
+.etiqueta-medida {
+    text-align: center;
+    font-size: 30px;
+    font-weight: 900;
+    margin: 10px 0;
+}
+
+.etiqueta-medida small {
+    font-size: 12px;
+}
+
+.etiqueta-procesos {
+    min-height: 30px;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 9px;
+}
+
+.etiqueta-procesos span {
+    border: 1px solid #555;
+    padding: 4px 7px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.etiqueta-procesos .proceso-activo {
+    background: #111;
+    color: white;
+}
+
+.etiqueta-inferior {
+    border-top: 1px solid #999;
+    padding-top: 7px;
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 10px;
+    font-size: 9px;
+}
+
+.etiqueta-inferior strong {
+    display: block;
+    font-size: 12px;
+    margin-top: 2px;
+}
+
+.codigo-etiqueta {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+
+/* =========================================
+   CELULAR
+========================================= */
+
+@media (max-width: 650px) {
+
+    #listaEtiquetas {
+        grid-template-columns: 1fr;
+    }
+
+    .etiqueta-vidrio {
+        max-width: 100%;
+    }
+
+    .etiqueta-medida {
+        font-size: 25px;
+    }
+}
+
+
+/* =========================================
+   IMPRESIÓN DE ETIQUETAS
+========================================= */
+
+@media print {
+
+    body > header,
+    body > main > *:not(.panel:nth-of-type(4)) {
+        display: none !important;
+    }
+
+    body {
+        background: white !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    main {
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    main .panel {
+        display: none !important;
+    }
+
+    main .panel:nth-of-type(4) {
+        display: block !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    main .panel:nth-of-type(4) > h2 {
+        display: none !important;
+    }
+
+    #listaEtiquetas {
+        display: grid !important;
+        grid-template-columns: repeat(2, 90mm) !important;
+        gap: 5mm !important;
+        justify-content: center !important;
+    }
+
+    .etiqueta-vidrio {
+        width: 90mm !important;
+        height: 60mm !important;
+        padding: 4mm !important;
+        margin: 0 !important;
+        border: 1.5px solid #000 !important;
+        border-radius: 0 !important;
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .etiqueta-marca {
+        font-size: 14px !important;
+    }
+
+    .etiqueta-numero {
+        font-size: 12px !important;
+    }
+
+    .etiqueta-op {
+        font-size: 15px !important;
+    }
+
+    .etiqueta-cliente strong {
+        font-size: 12px !important;
+    }
+
+    .etiqueta-vidrio-info {
+        font-size: 11px !important;
+    }
+
+    .etiqueta-medida {
+        font-size: 22px !important;
+        margin: 4px 0 !important;
+    }
+
+    @page {
+        size: A4 portrait;
+        margin: 8mm;
+    }
+}
