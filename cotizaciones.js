@@ -8,9 +8,7 @@ let contadorFilasCotizacion = 0;
 document.addEventListener(
     "DOMContentLoaded",
     function () {
-
         colocarFechaHoy();
-
         cargarPedidoParaCotizar();
     }
 );
@@ -24,23 +22,19 @@ function colocarFechaHoy() {
 
     const fecha = new Date();
 
-    const anio =
-        fecha.getFullYear();
+    const anio = fecha.getFullYear();
 
-    const mes =
-        String(
-            fecha.getMonth() + 1
-        ).padStart(2, "0");
+    const mes = String(
+        fecha.getMonth() + 1
+    ).padStart(2, "0");
 
-    const dia =
-        String(
-            fecha.getDate()
-        ).padStart(2, "0");
+    const dia = String(
+        fecha.getDate()
+    ).padStart(2, "0");
 
     document.getElementById(
         "fechaCotizacion"
-    ).value =
-        `${anio}-${mes}-${dia}`;
+    ).value = `${anio}-${mes}-${dia}`;
 }
 
 
@@ -64,13 +58,15 @@ function obtenerMoneda() {
 
         return {
             codigo: "USD",
-            simbolo: "US$"
+            simbolo: "US$",
+            nombre: "DÓLARES"
         };
     }
 
     return {
         codigo: "PEN",
-        simbolo: "S/"
+        simbolo: "S/",
+        nombre: "SOLES"
     };
 }
 
@@ -86,16 +82,13 @@ function cargarPedidoParaCotizar() {
             "pedidoParaCotizar"
         );
 
-
     if (!guardado) {
 
         agregarFilaCotizacion();
-
         calcularCotizacion();
 
         return;
     }
-
 
     try {
 
@@ -103,15 +96,11 @@ function cargarPedidoParaCotizar() {
             JSON.parse(guardado);
 
 
-        // CLIENTE
-
         document.getElementById(
             "clienteCotizacion"
         ).value =
             pedido.cliente || "";
 
-
-        // OP
 
         const op =
             document.getElementById(
@@ -124,8 +113,6 @@ function cargarPedidoParaCotizar() {
                 pedido.op || "";
         }
 
-
-        // NÚMERO DE COTIZACIÓN
 
         const numero =
             document.getElementById(
@@ -142,25 +129,20 @@ function cargarPedidoParaCotizar() {
         }
 
 
-        // OBSERVACIONES
-
         const observaciones =
             document.getElementById(
                 "observacionesCotizacion"
             );
 
-
         if (observaciones) {
 
             let texto = "";
-
 
             if (pedido.descripcion) {
 
                 texto +=
                     pedido.descripcion;
             }
-
 
             if (pedido.fechaEntrega) {
 
@@ -174,20 +156,15 @@ function cargarPedidoParaCotizar() {
                     pedido.fechaEntrega;
             }
 
-
             observaciones.value =
                 texto;
         }
 
 
-        // LIMPIAR FILAS
-
         document.getElementById(
             "listaCotizacion"
         ).innerHTML = "";
 
-
-        // CARGAR VIDRIOS
 
         if (
             Array.isArray(
@@ -213,8 +190,6 @@ function cargarPedidoParaCotizar() {
 
         calcularCotizacion();
 
-
-        // BORRAR DATO TEMPORAL
 
         localStorage.removeItem(
             "pedidoParaCotizar"
@@ -346,45 +321,25 @@ function agregarFilaCotizacion(
 
             <select class="cot-espesor">
 
-                <option value="3">
-                    3 mm
-                </option>
+                <option value="3">3 mm</option>
 
-                <option value="4">
-                    4 mm
-                </option>
+                <option value="4">4 mm</option>
 
-                <option value="5">
-                    5 mm
-                </option>
+                <option value="5">5 mm</option>
 
-                <option value="5.5">
-                    5.5 mm
-                </option>
+                <option value="5.5">5.5 mm</option>
 
-                <option value="6">
-                    6 mm
-                </option>
+                <option value="6">6 mm</option>
 
-                <option value="8">
-                    8 mm
-                </option>
+                <option value="8">8 mm</option>
 
-                <option value="10">
-                    10 mm
-                </option>
+                <option value="10">10 mm</option>
 
-                <option value="12">
-                    12 mm
-                </option>
+                <option value="12">12 mm</option>
 
-                <option value="15">
-                    15 mm
-                </option>
+                <option value="15">15 mm</option>
 
-                <option value="19">
-                    19 mm
-                </option>
+                <option value="19">19 mm</option>
 
             </select>
 
@@ -522,6 +477,7 @@ function agregarFilaCotizacion(
             ".cot-tipo"
         );
 
+
     const tipoGuardado =
         datos.tipoVidrio ||
         "INCOLORO";
@@ -577,11 +533,6 @@ function agregarFilaCotizacion(
     ).value =
         datos.cantidad ?? 1;
 
-
-    // Si viene del Control de Pedidos,
-    // los metros anteriores NO se usan
-    // para sustituir ancho y alto.
-    // Los m² se calcularán con las medidas.
 
     fila.querySelector(
         ".cot-metros"
@@ -689,10 +640,6 @@ function calcularCotizacion() {
                 ) || 0;
 
 
-            // ===============================
-            // MM -> M²
-            // ===============================
-
             let metros = 0;
 
 
@@ -708,8 +655,6 @@ function calcularCotizacion() {
                     cantidad;
             }
 
-
-            // Hasta 3 decimales
 
             metrosInput.value =
                 metros.toFixed(3);
@@ -901,10 +846,15 @@ function nuevaCotizacion() {
     [
         "rucCotizacion",
         "direccionCotizacion",
+
+        // PROVINCIA
+        "provinciaCotizacion",
+
         "vendedorCotizacion",
         "documentoCotizacion",
         "opCotizacion",
         "cpsCotizacion"
+
     ].forEach(
         id => {
 
@@ -1105,10 +1055,13 @@ function construirHojaImpresion() {
                             <br>
 
                             <small>
-                                ${seguro(ancho)} ×
-                                ${seguro(alto)} mm
+                                ${seguro(ancho)}
+                                ×
+                                ${seguro(alto)}
+                                mm
                                 -
-                                ${metros.toFixed(3)} m²
+                                ${metros.toFixed(3)}
+                                m²
                             </small>
 
                         </td>
@@ -1185,6 +1138,9 @@ function construirHojaImpresion() {
 
     <article class="documento-zakata">
 
+
+        <!-- ENCABEZADO -->
+
         <div class="z-encabezado">
 
             <img
@@ -1192,6 +1148,7 @@ function construirHojaImpresion() {
                 src="https://maqvid.com/wp-content/uploads/2024/05/Zakata.jpeg"
                 alt="Zakata Glass"
             >
+
 
             <div class="z-empresa">
 
@@ -1237,40 +1194,68 @@ function construirHojaImpresion() {
         </div>
 
 
+        <!-- DATOS CLIENTE -->
+
         <div class="z-datos">
+
 
             <div class="z-renglon">
 
                 <span>
+
                     <b>Señor(es):</b>
+
                     ${seguro(
                         val(
                             "clienteCotizacion"
                         )
                     )}
+
                 </span>
 
+
                 <span>
+
                     <b>RUC:</b>
+
                     ${seguro(
                         val(
                             "rucCotizacion"
                         )
                     )}
+
                 </span>
 
             </div>
 
 
+            <!-- DIRECCIÓN Y PROVINCIA -->
+
             <div class="z-renglon">
 
                 <span>
+
                     <b>Dirección:</b>
+
                     ${seguro(
                         val(
                             "direccionCotizacion"
                         )
                     )}
+
+                </span>
+
+
+                <span>
+
+                    <b>Provincia:</b>
+
+                    ${seguro(
+                        val(
+                            "provinciaCotizacion"
+                        )
+                    )}
+
                 </span>
 
             </div>
@@ -1330,10 +1315,12 @@ function construirHojaImpresion() {
 
                     ${
                         observacion
+
                             ? " — " +
                               seguro(
                                   observacion
                               )
+
                             : ""
                     }
 
@@ -1366,17 +1353,16 @@ function construirHojaImpresion() {
             </div>
 
 
+            <!-- MONEDA -->
+
             <div class="z-renglon">
 
                 <span>
 
                     <b>MONEDA:</b>
 
-                    ${
-                        moneda.codigo === "USD"
-                            ? "DÓLARES (USD)"
-                            : "SOLES (PEN)"
-                    }
+                    ${moneda.nombre}
+                    (${moneda.codigo})
 
                 </span>
 
@@ -1384,6 +1370,8 @@ function construirHojaImpresion() {
 
         </div>
 
+
+        <!-- TABLA -->
 
         <div class="z-tabla-area">
 
@@ -1410,17 +1398,29 @@ function construirHojaImpresion() {
 
                     <tr>
 
-                        <th>CÓDIGO</th>
+                        <th>
+                            CÓDIGO
+                        </th>
 
-                        <th>DESCRIPCIÓN</th>
+                        <th>
+                            DESCRIPCIÓN
+                        </th>
 
-                        <th>UNI</th>
+                        <th>
+                            UNI
+                        </th>
 
-                        <th>CANT</th>
+                        <th>
+                            CANT
+                        </th>
 
-                        <th>VALOR V.</th>
+                        <th>
+                            VALOR V.
+                        </th>
 
-                        <th>V. TOTAL</th>
+                        <th>
+                            V. TOTAL
+                        </th>
 
                     </tr>
 
@@ -1435,6 +1435,7 @@ function construirHojaImpresion() {
                     <tr class="z-relleno">
 
                         <td></td>
+
 
                         <td>
 
@@ -1469,6 +1470,7 @@ function construirHojaImpresion() {
 
                         </td>
 
+
                         <td></td>
                         <td></td>
                         <td></td>
@@ -1483,14 +1485,21 @@ function construirHojaImpresion() {
         </div>
 
 
+        <!-- TOTALES -->
+
         <div class="z-pie">
+
 
             <div class="z-letras">
 
-                <b>SON:</b>
+                <b>
+                    SON:
+                </b>
 
                 ${moneda.simbolo}
+
                 ${dinero(total)}
+
                 ${moneda.codigo}
 
                 <br><br>
@@ -1501,6 +1510,7 @@ function construirHojaImpresion() {
 
 
             <div class="z-totales">
+
 
                 <div>
 
