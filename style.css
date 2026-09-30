@@ -1693,3 +1693,13 @@ textarea:focus {
         font-size: 9px !important;
     }
 }
+@media print {
+
+    .z-relleno {
+        height: 125mm !important;
+    }
+
+    .z-relleno td {
+        height: 125mm !important;
+    }
+}
