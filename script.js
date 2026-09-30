@@ -2202,7 +2202,6 @@ async function cargarDatos() {
     }
 }
 
-
 // ===============================
 // ACTUALIZAR RESUMEN
 // ===============================
@@ -2211,63 +2210,28 @@ async function actualizarResumen() {
 
     try {
 
-        const resumen =
-            await api(
-                "/api/resumen"
-            );
+        const resumen = await api("/api/resumen");
 
-
-        const total =
-            document.getElementById(
-                "totalPedidos"
-            );
-
-
-        const pendientes =
-            document.getElementById(
-                "totalPendientes"
-            );
-
-
-        const proceso =
-            document.getElementById(
-                "totalProceso"
-            );
-
-
-        const terminados =
-            document.getElementById(
-                "totalTerminados"
-            );
-
+        const total = document.getElementById("total");
+        const pendientes = document.getElementById("pendientes");
+        const proceso = document.getElementById("proceso");
+        const terminados = document.getElementById("terminados");
 
         if (total) {
-
-            total.textContent =
-                resumen.total ?? 0;
+            total.textContent = resumen.total ?? 0;
         }
-
 
         if (pendientes) {
-
-            pendientes.textContent =
-                resumen.pendientes ?? 0;
+            pendientes.textContent = resumen.pendientes ?? 0;
         }
-
 
         if (proceso) {
-
-            proceso.textContent =
-                resumen.proceso ?? 0;
+            proceso.textContent = resumen.proceso ?? 0;
         }
-
 
         if (terminados) {
-
-            terminados.textContent =
-                resumen.terminados ?? 0;
+            terminados.textContent = resumen.terminados ?? 0;
         }
-
 
     } catch (error) {
 
