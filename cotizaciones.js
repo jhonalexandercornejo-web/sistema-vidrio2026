@@ -45,6 +45,37 @@ function colocarFechaHoy() {
 
 
 // ===============================
+// MONEDA
+// ===============================
+
+function obtenerMoneda() {
+
+    const selector =
+        document.getElementById(
+            "monedaCotizacion"
+        );
+
+    const moneda =
+        selector
+            ? selector.value
+            : "PEN";
+
+    if (moneda === "USD") {
+
+        return {
+            codigo: "USD",
+            simbolo: "US$"
+        };
+    }
+
+    return {
+        codigo: "PEN",
+        simbolo: "S/"
+    };
+}
+
+
+// ===============================
 // CARGAR PEDIDO DESDE CONTROL
 // ===============================
 
@@ -60,6 +91,8 @@ function cargarPedidoParaCotizar() {
 
         agregarFilaCotizacion();
 
+        calcularCotizacion();
+
         return;
     }
 
@@ -71,18 +104,33 @@ function cargarPedidoParaCotizar() {
 
 
         // CLIENTE
+
         document.getElementById(
             "clienteCotizacion"
         ).value =
             pedido.cliente || "";
 
 
-        // NÚMERO DE COTIZACIÓN / OP
+        // OP
+
+        const op =
+            document.getElementById(
+                "opCotizacion"
+            );
+
+        if (op) {
+
+            op.value =
+                pedido.op || "";
+        }
+
+
+        // NÚMERO DE COTIZACIÓN
+
         const numero =
             document.getElementById(
                 "numeroCotizacion"
             );
-
 
         if (
             numero &&
@@ -95,6 +143,7 @@ function cargarPedidoParaCotizar() {
 
 
         // OBSERVACIONES
+
         const observaciones =
             document.getElementById(
                 "observacionesCotizacion"
@@ -116,9 +165,9 @@ function cargarPedidoParaCotizar() {
             if (pedido.fechaEntrega) {
 
                 if (texto) {
+
                     texto += "\n";
                 }
-
 
                 texto +=
                     "Fecha de entrega: " +
@@ -132,12 +181,14 @@ function cargarPedidoParaCotizar() {
 
 
         // LIMPIAR FILAS
+
         document.getElementById(
             "listaCotizacion"
         ).innerHTML = "";
 
 
         // CARGAR VIDRIOS
+
         if (
             Array.isArray(
                 pedido.vidrios
@@ -164,6 +215,7 @@ function cargarPedidoParaCotizar() {
 
 
         // BORRAR DATO TEMPORAL
+
         localStorage.removeItem(
             "pedidoParaCotizar"
         );
@@ -195,6 +247,12 @@ function agregarFilaCotizacion(
         );
 
 
+    if (!contenedor) {
+
+        return;
+    }
+
+
     const fila =
         document.createElement(
             "div"
@@ -223,8 +281,8 @@ function agregarFilaCotizacion(
                     INCOLORO
                 </option>
 
-                <option value="BRONCE">
-                    BRONCE
+                <option value="INCOLORO AL ACIDO">
+                    INCOLORO AL ACIDO
                 </option>
 
                 <option value="GRIS">
@@ -235,12 +293,36 @@ function agregarFilaCotizacion(
                     VERDE
                 </option>
 
-                <option value="AZUL">
-                    AZUL
+                <option value="BRONCE">
+                    BRONCE
                 </option>
 
-                <option value="REFLECTIVO">
-                    REFLECTIVO
+                <option value="REFLEJANTE AZUL">
+                    REFLEJANTE AZUL
+                </option>
+
+                <option value="GRIS REFLEJANTE">
+                    GRIS REFLEJANTE
+                </option>
+
+                <option value="BRONCE REFLEJANTE">
+                    BRONCE REFLEJANTE
+                </option>
+
+                <option value="INC REFLEJANTE">
+                    INC REFLEJANTE
+                </option>
+
+                <option value="REFL LIGHT BLUE">
+                    REFL LIGHT BLUE (AZUL CLARO)
+                </option>
+
+                <option value="DARCK BLUE">
+                    DARCK BLUE (AZUL CHILLON)
+                </option>
+
+                <option value="ARTIC BLUE">
+                    ARTIC BLUE (VERDOSO)
                 </option>
 
                 <option value="LAMINADO">
@@ -264,12 +346,20 @@ function agregarFilaCotizacion(
 
             <select class="cot-espesor">
 
+                <option value="3">
+                    3 mm
+                </option>
+
                 <option value="4">
                     4 mm
                 </option>
 
                 <option value="5">
                     5 mm
+                </option>
+
+                <option value="5.5">
+                    5.5 mm
                 </option>
 
                 <option value="6">
@@ -304,15 +394,15 @@ function agregarFilaCotizacion(
         <div>
 
             <label>
-                ANCHO (m)
+                ANCHO (mm)
             </label>
 
             <input
                 type="number"
                 class="cot-ancho"
                 min="0"
-                step="0.01"
-                placeholder="1.20"
+                step="1"
+                placeholder="Ej: 150"
                 oninput="calcularCotizacion()"
             >
 
@@ -322,15 +412,15 @@ function agregarFilaCotizacion(
         <div>
 
             <label>
-                ALTO (m)
+                ALTO (mm)
             </label>
 
             <input
                 type="number"
                 class="cot-alto"
                 min="0"
-                step="0.01"
-                placeholder="2.00"
+                step="1"
+                placeholder="Ej: 20"
                 oninput="calcularCotizacion()"
             >
 
@@ -365,9 +455,9 @@ function agregarFilaCotizacion(
                 type="number"
                 class="cot-metros"
                 min="0"
-                step="0.01"
+                step="0.001"
                 value="0"
-                oninput="calcularCotizacion()"
+                readonly
             >
 
         </div>
@@ -384,7 +474,7 @@ function agregarFilaCotizacion(
                 class="cot-precio"
                 min="0"
                 step="0.01"
-                placeholder="S/ 0.00"
+                placeholder="0.00"
                 oninput="calcularCotizacion()"
             >
 
@@ -427,20 +517,59 @@ function agregarFilaCotizacion(
     );
 
 
-    fila.querySelector(
-        ".cot-tipo"
-    ).value =
+    const tipo =
+        fila.querySelector(
+            ".cot-tipo"
+        );
+
+    const tipoGuardado =
         datos.tipoVidrio ||
         "INCOLORO";
 
 
-    fila.querySelector(
-        ".cot-espesor"
-    ).value =
-        String(
-            datos.espesor ||
-            "8"
+    const existeTipo =
+        Array.from(
+            tipo.options
+        ).some(
+            opcion =>
+                opcion.value ===
+                tipoGuardado
         );
+
+
+    tipo.value =
+        existeTipo
+            ? tipoGuardado
+            : "OTRO";
+
+
+    const espesor =
+        fila.querySelector(
+            ".cot-espesor"
+        );
+
+
+    const espesorGuardado =
+        String(
+            datos.espesor || "8"
+        );
+
+
+    const existeEspesor =
+        Array.from(
+            espesor.options
+        ).some(
+            opcion =>
+                opcion.value ===
+                espesorGuardado
+        );
+
+
+    if (existeEspesor) {
+
+        espesor.value =
+            espesorGuardado;
+    }
 
 
     fila.querySelector(
@@ -449,10 +578,14 @@ function agregarFilaCotizacion(
         datos.cantidad ?? 1;
 
 
+    // Si viene del Control de Pedidos,
+    // los metros anteriores NO se usan
+    // para sustituir ancho y alto.
+    // Los m² se calcularán con las medidas.
+
     fila.querySelector(
         ".cot-metros"
-    ).value =
-        datos.metros ?? 0;
+    ).value = "0";
 
 
     calcularCotizacion();
@@ -506,6 +639,10 @@ function calcularCotizacion() {
         );
 
 
+    const moneda =
+        obtenerMoneda();
+
+
     let totalMetros = 0;
 
     let subtotalGeneral = 0;
@@ -552,28 +689,30 @@ function calcularCotizacion() {
                 ) || 0;
 
 
-            let metros =
-                Number(
-                    metrosInput.value
-                ) || 0;
+            // ===============================
+            // MM -> M²
+            // ===============================
+
+            let metros = 0;
 
 
-            // SI ESCRIBES ANCHO Y ALTO,
-            // RECALCULA LOS M²
             if (
                 ancho > 0 &&
-                alto > 0
+                alto > 0 &&
+                cantidad > 0
             ) {
 
                 metros =
-                    ancho *
-                    alto *
+                    (ancho / 1000) *
+                    (alto / 1000) *
                     cantidad;
-
-
-                metrosInput.value =
-                    metros.toFixed(2);
             }
+
+
+            // Hasta 3 decimales
+
+            metrosInput.value =
+                metros.toFixed(3);
 
 
             const subtotal =
@@ -584,7 +723,8 @@ function calcularCotizacion() {
             fila.querySelector(
                 ".cot-subtotal"
             ).value =
-                "S/ " +
+                moneda.simbolo +
+                " " +
                 subtotal.toFixed(2);
 
 
@@ -604,38 +744,67 @@ function calcularCotizacion() {
         ).checked;
 
 
-    const descuento = Math.min(subtotalGeneral, Math.max(0, Number(document.getElementById("descuentoCotizacion").value) || 0));
-    const igv = aplicarIgv ? (subtotalGeneral - descuento) * 0.18 : 0;
+    const descuentoInput =
+        document.getElementById(
+            "descuentoCotizacion"
+        );
 
 
-    const total = subtotalGeneral - descuento + igv;
+    const descuento =
+        Math.min(
+            subtotalGeneral,
+            Math.max(
+                0,
+                Number(
+                    descuentoInput.value
+                ) || 0
+            )
+        );
+
+
+    const base =
+        subtotalGeneral -
+        descuento;
+
+
+    const igv =
+        aplicarIgv
+            ? base * 0.18
+            : 0;
+
+
+    const total =
+        base + igv;
 
 
     document.getElementById(
         "totalMetrosCotizacion"
     ).textContent =
-        totalMetros.toFixed(2) +
+        totalMetros.toFixed(3) +
         " m²";
 
 
     document.getElementById(
         "subtotalCotizacion"
     ).textContent =
-        "S/ " +
+        moneda.simbolo +
+        " " +
         subtotalGeneral.toFixed(2);
 
 
     document.getElementById(
         "igvCotizacion"
     ).textContent =
-        "S/ " +
+        moneda.simbolo +
+        " " +
         igv.toFixed(2);
 
 
     document.getElementById(
         "totalCotizacion"
     ).textContent =
-        "S/ " +
+        moneda.simbolo +
+        " " +
         total.toFixed(2);
 }
 
@@ -680,8 +849,8 @@ function imprimirCotizacion() {
 
     calcularCotizacion();
 
-
     construirHojaImpresion();
+
     window.print();
 }
 
@@ -699,6 +868,7 @@ function nuevaCotizacion() {
 
 
     if (!confirmar) {
+
         return;
     }
 
@@ -728,67 +898,670 @@ function nuevaCotizacion() {
     ).innerHTML = "";
 
 
-    ["rucCotizacion","direccionCotizacion","vendedorCotizacion","documentoCotizacion","opCotizacion","cpsCotizacion"].forEach(id => document.getElementById(id).value = "");
-    document.getElementById("descuentoCotizacion").value = "0";
-    document.getElementById("hojaImpresion").innerHTML = "";
+    [
+        "rucCotizacion",
+        "direccionCotizacion",
+        "vendedorCotizacion",
+        "documentoCotizacion",
+        "opCotizacion",
+        "cpsCotizacion"
+    ].forEach(
+        id => {
+
+            const elemento =
+                document.getElementById(
+                    id
+                );
+
+            if (elemento) {
+
+                elemento.value = "";
+            }
+        }
+    );
+
+
+    document.getElementById(
+        "descuentoCotizacion"
+    ).value = "0";
+
+
+    document.getElementById(
+        "monedaCotizacion"
+    ).value = "PEN";
+
+
+    document.getElementById(
+        "hojaImpresion"
+    ).innerHTML = "";
+
+
     colocarFechaHoy();
+
     agregarFilaCotizacion();
+
+    calcularCotizacion();
 }
 
 
-// PLANTILLA DE IMPRESIÓN A4. El formulario original permanece sin cambios.
+// ===============================
+// HOJA DE IMPRESIÓN
+// ===============================
+
 function construirHojaImpresion() {
-    const val = id => document.getElementById(id)?.value?.trim() || "";
-    const seguro = texto => String(texto ?? "").replace(/[&<>"']/g, c => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-    })[c]);
-    const dinero = n => (Number(n) || 0).toLocaleString("es-PE", {minimumFractionDigits:2, maximumFractionDigits:2});
-    const fecha = val("fechaCotizacion").split("-");
-    const fechaBonita = fecha.length === 3 ? `${fecha[2]}/${fecha[1]}/${fecha[0]}` : "";
+
+    const val =
+        id =>
+            document
+                .getElementById(id)
+                ?.value
+                ?.trim() || "";
+
+
+    const seguro =
+        texto =>
+            String(
+                texto ?? ""
+            ).replace(
+                /[&<>"']/g,
+                c => ({
+                    "&": "&amp;",
+                    "<": "&lt;",
+                    ">": "&gt;",
+                    '"': "&quot;",
+                    "'": "&#39;"
+                })[c]
+            );
+
+
+    const dinero =
+        n =>
+            (Number(n) || 0)
+                .toLocaleString(
+                    "es-PE",
+                    {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }
+                );
+
+
+    const moneda =
+        obtenerMoneda();
+
+
+    const fecha =
+        val(
+            "fechaCotizacion"
+        ).split("-");
+
+
+    const fechaBonita =
+        fecha.length === 3
+
+            ? `${fecha[2]}/${fecha[1]}/${fecha[0]}`
+
+            : "";
+
+
     let suma = 0;
-    const filas = [...document.querySelectorAll(".fila-cotizacion")].map((fila, i) => {
-        const campo = clase => fila.querySelector(clase)?.value || "";
-        const tipo = campo(".cot-tipo"), espesor = campo(".cot-espesor");
-        const cantidad = Number(campo(".cot-cantidad")) || 0;
-        const metros = Number(campo(".cot-metros")) || 0;
-        const precio = Number(campo(".cot-precio")) || 0;
-        const importe = metros * precio;
-        suma += importe;
-        return `<tr><td>ZKT${String(i+1).padStart(4,"0")}</td><td>VIDRIO ${seguro(tipo)} ${seguro(espesor)} mm</td><td>Mt²</td><td class="numero">${seguro(cantidad)}</td><td class="numero">${dinero(precio)}</td><td class="numero">${dinero(importe)}</td></tr>`;
-    }).join("");
-    const descuento = Math.min(suma, Math.max(0, Number(val("descuentoCotizacion")) || 0));
-    const igv = document.getElementById("aplicarIgv").checked ? (suma - descuento)*.18 : 0;
-    const total = suma - descuento + igv;
-    const numero = val("numeroCotizacion");
-    const observacion = val("observacionesCotizacion");
-    document.getElementById("hojaImpresion").innerHTML = `
+
+
+    const filas =
+        [
+            ...document.querySelectorAll(
+                ".fila-cotizacion"
+            )
+        ].map(
+            (fila, i) => {
+
+                const campo =
+                    clase =>
+                        fila.querySelector(
+                            clase
+                        )?.value || "";
+
+
+                const tipo =
+                    campo(
+                        ".cot-tipo"
+                    );
+
+
+                const espesor =
+                    campo(
+                        ".cot-espesor"
+                    );
+
+
+                const ancho =
+                    Number(
+                        campo(
+                            ".cot-ancho"
+                        )
+                    ) || 0;
+
+
+                const alto =
+                    Number(
+                        campo(
+                            ".cot-alto"
+                        )
+                    ) || 0;
+
+
+                const cantidad =
+                    Number(
+                        campo(
+                            ".cot-cantidad"
+                        )
+                    ) || 0;
+
+
+                const metros =
+                    Number(
+                        campo(
+                            ".cot-metros"
+                        )
+                    ) || 0;
+
+
+                const precio =
+                    Number(
+                        campo(
+                            ".cot-precio"
+                        )
+                    ) || 0;
+
+
+                const importe =
+                    metros *
+                    precio;
+
+
+                suma +=
+                    importe;
+
+
+                return `
+
+                    <tr>
+
+                        <td>
+                            ZKT${String(
+                                i + 1
+                            ).padStart(
+                                4,
+                                "0"
+                            )}
+                        </td>
+
+                        <td>
+
+                            VIDRIO
+                            ${seguro(tipo)}
+                            ${seguro(espesor)} mm
+
+                            <br>
+
+                            <small>
+                                ${seguro(ancho)} ×
+                                ${seguro(alto)} mm
+                                -
+                                ${metros.toFixed(3)} m²
+                            </small>
+
+                        </td>
+
+                        <td>
+                            Mt²
+                        </td>
+
+                        <td class="numero">
+                            ${seguro(cantidad)}
+                        </td>
+
+                        <td class="numero">
+                            ${moneda.simbolo}
+                            ${dinero(precio)}
+                        </td>
+
+                        <td class="numero">
+                            ${moneda.simbolo}
+                            ${dinero(importe)}
+                        </td>
+
+                    </tr>
+                `;
+            }
+        ).join("");
+
+
+    const descuento =
+        Math.min(
+            suma,
+            Math.max(
+                0,
+                Number(
+                    val(
+                        "descuentoCotizacion"
+                    )
+                ) || 0
+            )
+        );
+
+
+    const igv =
+        document.getElementById(
+            "aplicarIgv"
+        ).checked
+
+            ? (suma - descuento) * 0.18
+
+            : 0;
+
+
+    const total =
+        suma -
+        descuento +
+        igv;
+
+
+    const numero =
+        val(
+            "numeroCotizacion"
+        );
+
+
+    const observacion =
+        val(
+            "observacionesCotizacion"
+        );
+
+
+    document.getElementById(
+        "hojaImpresion"
+    ).innerHTML = `
+
     <article class="documento-zakata">
-      <div class="z-encabezado">
-        <img class="z-logo" src="https://maqvid.com/wp-content/uploads/2024/05/Zakata.jpeg" alt="Zakata Glass">
-        <div class="z-empresa"><b>CORPORATION ZAKATA GLASS SAC</b><br>
-        Dirección Fiscal: JR. LOS MARTILLOS 5083 URB. INDUSTRIAL INFANTAS - LOS OLIVOS, LIMA<br>
-        Teléfono: 903161015<br>E-mail: corporation.zakataglass@gmail.com</div>
-        <div class="z-recuadro"><b>R.U.C. N° 20610769404</b><strong>COTIZACIÓN</strong><b>N° ${seguro(numero)}</b></div>
-      </div>
-      <div class="z-datos">
-        <div class="z-renglon"><span><b>Señor(es):</b> ${seguro(val("clienteCotizacion"))}</span><span><b>RUC:</b> ${seguro(val("rucCotizacion"))}</span></div>
-        <div class="z-renglon"><span><b>Dirección:</b> ${seguro(val("direccionCotizacion"))}</span></div>
-        <div class="z-renglon z-tres"><span><b>N° Docum.:</b> ${seguro(val("documentoCotizacion"))}</span><span><b>Vendedor:</b> ${seguro(val("vendedorCotizacion"))}</span><span><b>OP:</b> ${seguro(val("opCotizacion") || numero)}</span></div>
-        <div class="z-renglon z-tres"><span><b>OBSERV.:</b> ( PLANTA )${observacion ? " — "+seguro(observacion) : ""}</span><span><b>CPS:</b> ${seguro(val("cpsCotizacion"))}</span><span><b>Fecha:</b> ${seguro(fechaBonita)}</span></div>
-      </div>
-      <div class="z-tabla-area">
-        <table class="z-tabla"><colgroup><col style="width:10%"><col style="width:52%"><col style="width:7%"><col style="width:7%"><col style="width:11%"><col style="width:13%"></colgroup>
-        <thead><tr><th>CÓDIGO</th><th>DESCRIPCIÓN</th><th>UNI</th><th>CANT</th><th>VALOR V.</th><th>V. TOTAL</th></tr></thead>
-        <tbody>${filas}<tr class="z-relleno"><td></td><td><div class="z-bancos"><b>Sírvase abonar a nuestra cuenta corriente:</b><br>
-        BCP SOLES : 191-9978634-0-80 // CCI: 002-191009978634080-54<br>
-        BCP DÓLARES: 191-9986747-1-39 // CCI: 002-191-009986747139-55<br>
-        BBVA - SOLES: 0011-0174-0201177909 // CCI: 01117400020117790903</div></td><td></td><td></td><td></td><td></td></tr></tbody></table>
-      </div>
-      <div class="z-pie">
-        <div class="z-letras"><b>SON:</b> ${dinero(total)} PEN<br><br>Total Peso Kg: —</div>
-        <div class="z-totales"><div><span>Total Valor Venta - Op. Gravadas</span><b>${dinero(suma)}</b></div>
-        <div><span>Dscto.</span><b>${dinero(descuento)}</b></div><div><span>I.G.V.</span><b>${dinero(igv)}</b></div>
-        <div class="z-total-final"><span>Importe Total PEN</span><b>${dinero(total)}</b></div></div>
-      </div>
-    </article>`;
+
+        <div class="z-encabezado">
+
+            <img
+                class="z-logo"
+                src="https://maqvid.com/wp-content/uploads/2024/05/Zakata.jpeg"
+                alt="Zakata Glass"
+            >
+
+            <div class="z-empresa">
+
+                <b>
+                    CORPORATION ZAKATA GLASS SAC
+                </b>
+
+                <br>
+
+                Dirección Fiscal:
+                JR. LOS MARTILLOS 5083
+                URB. INDUSTRIAL INFANTAS -
+                LOS OLIVOS, LIMA
+
+                <br>
+
+                Teléfono: 903161015
+
+                <br>
+
+                E-mail:
+                corporation.zakataglass@gmail.com
+
+            </div>
+
+
+            <div class="z-recuadro">
+
+                <b>
+                    R.U.C. N° 20610769404
+                </b>
+
+                <strong>
+                    COTIZACIÓN
+                </strong>
+
+                <b>
+                    N° ${seguro(numero)}
+                </b>
+
+            </div>
+
+        </div>
+
+
+        <div class="z-datos">
+
+            <div class="z-renglon">
+
+                <span>
+                    <b>Señor(es):</b>
+                    ${seguro(
+                        val(
+                            "clienteCotizacion"
+                        )
+                    )}
+                </span>
+
+                <span>
+                    <b>RUC:</b>
+                    ${seguro(
+                        val(
+                            "rucCotizacion"
+                        )
+                    )}
+                </span>
+
+            </div>
+
+
+            <div class="z-renglon">
+
+                <span>
+                    <b>Dirección:</b>
+                    ${seguro(
+                        val(
+                            "direccionCotizacion"
+                        )
+                    )}
+                </span>
+
+            </div>
+
+
+            <div class="z-renglon z-tres">
+
+                <span>
+
+                    <b>N° Docum.:</b>
+
+                    ${seguro(
+                        val(
+                            "documentoCotizacion"
+                        )
+                    )}
+
+                </span>
+
+
+                <span>
+
+                    <b>Vendedor:</b>
+
+                    ${seguro(
+                        val(
+                            "vendedorCotizacion"
+                        )
+                    )}
+
+                </span>
+
+
+                <span>
+
+                    <b>OP:</b>
+
+                    ${seguro(
+                        val(
+                            "opCotizacion"
+                        ) ||
+                        numero
+                    )}
+
+                </span>
+
+            </div>
+
+
+            <div class="z-renglon z-tres">
+
+                <span>
+
+                    <b>OBSERV.:</b>
+
+                    ( PLANTA )
+
+                    ${
+                        observacion
+                            ? " — " +
+                              seguro(
+                                  observacion
+                              )
+                            : ""
+                    }
+
+                </span>
+
+
+                <span>
+
+                    <b>CPS:</b>
+
+                    ${seguro(
+                        val(
+                            "cpsCotizacion"
+                        )
+                    )}
+
+                </span>
+
+
+                <span>
+
+                    <b>Fecha:</b>
+
+                    ${seguro(
+                        fechaBonita
+                    )}
+
+                </span>
+
+            </div>
+
+
+            <div class="z-renglon">
+
+                <span>
+
+                    <b>MONEDA:</b>
+
+                    ${
+                        moneda.codigo === "USD"
+                            ? "DÓLARES (USD)"
+                            : "SOLES (PEN)"
+                    }
+
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="z-tabla-area">
+
+            <table class="z-tabla">
+
+                <colgroup>
+
+                    <col style="width:10%">
+
+                    <col style="width:52%">
+
+                    <col style="width:7%">
+
+                    <col style="width:7%">
+
+                    <col style="width:11%">
+
+                    <col style="width:13%">
+
+                </colgroup>
+
+
+                <thead>
+
+                    <tr>
+
+                        <th>CÓDIGO</th>
+
+                        <th>DESCRIPCIÓN</th>
+
+                        <th>UNI</th>
+
+                        <th>CANT</th>
+
+                        <th>VALOR V.</th>
+
+                        <th>V. TOTAL</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    ${filas}
+
+
+                    <tr class="z-relleno">
+
+                        <td></td>
+
+                        <td>
+
+                            <div class="z-bancos">
+
+                                <b>
+                                    Sírvase abonar a nuestra cuenta corriente:
+                                </b>
+
+                                <br>
+
+                                BCP SOLES :
+                                191-9978634-0-80 //
+                                CCI:
+                                002-191009978634080-54
+
+                                <br>
+
+                                BCP DÓLARES:
+                                191-9986747-1-39 //
+                                CCI:
+                                002-191-009986747139-55
+
+                                <br>
+
+                                BBVA - SOLES:
+                                0011-0174-0201177909 //
+                                CCI:
+                                01117400020117790903
+
+                            </div>
+
+                        </td>
+
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <div class="z-pie">
+
+            <div class="z-letras">
+
+                <b>SON:</b>
+
+                ${moneda.simbolo}
+                ${dinero(total)}
+                ${moneda.codigo}
+
+                <br><br>
+
+                Total Peso Kg: —
+
+            </div>
+
+
+            <div class="z-totales">
+
+                <div>
+
+                    <span>
+                        Total Valor Venta - Op. Gravadas
+                    </span>
+
+                    <b>
+                        ${moneda.simbolo}
+                        ${dinero(suma)}
+                    </b>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Dscto.
+                    </span>
+
+                    <b>
+                        ${moneda.simbolo}
+                        ${dinero(descuento)}
+                    </b>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        I.G.V.
+                    </span>
+
+                    <b>
+                        ${moneda.simbolo}
+                        ${dinero(igv)}
+                    </b>
+
+                </div>
+
+
+                <div class="z-total-final">
+
+                    <span>
+                        Importe Total
+                        ${moneda.codigo}
+                    </span>
+
+                    <b>
+                        ${moneda.simbolo}
+                        ${dinero(total)}
+                    </b>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </article>
+    `;
 }
