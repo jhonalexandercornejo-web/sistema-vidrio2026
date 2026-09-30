@@ -1301,7 +1301,7 @@ function editarPedido(id) {
             behavior: "smooth"
 
         });
-
+}
 // ===============================
 // CANCELAR EDICIÓN
 // ===============================
