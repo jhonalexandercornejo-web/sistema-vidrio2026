@@ -1953,236 +1953,156 @@ function formatearFechaRegistro(
 // MOSTRAR PRODUCCIÓN
 // ===============================
 
-function mostrarProduccion(
-    lista = pedidos
-) {
+function mostrarProduccion(lista = pedidos) {
 
-    const contenedor =
-        document.getElementById(
-            "listaPedidos"
-        );
-
+    const contenedor = document.getElementById("listaPedidos");
 
     if (!contenedor) {
         return;
     }
 
-
-    if (
-        !Array.isArray(lista)
-        ||
-        lista.length === 0
-    ) {
+    if (!Array.isArray(lista) || lista.length === 0) {
 
         contenedor.innerHTML = `
-
             <div class="sin-resultados">
-
                 No hay pedidos para mostrar.
-
             </div>
-
         `;
 
         return;
     }
 
+    contenedor.innerHTML = lista.map(pedido => {
 
-    contenedor.innerHTML =
-        lista
-            .map(pedido => {
+        return `
+            <div class="op-card">
 
-                return `
+                <div class="op-cabecera">
 
-                    <div class="op-card">
+                    <strong>
+                        OP ${pedido.op}
+                    </strong>
 
+                    <span>
+                        ${pedido.cliente}
+                    </span>
 
-                        <div class="op-cabecera">
+                    <span>
+                        🕐 ${pedido.horaEntrega || "SIN HORA"}
+                    </span>
 
-                            <strong>
-                                OP ${pedido.op}
-                            </strong>
+                    <span>
+                        📅 ${pedido.fechaEntrega || "SIN FECHA"}
+                    </span>
 
-
-                            <span>
-                                ${pedido.cliente}
-                            </span>
-
-
-                            <span>
-
-                                🕐
-
-                                ${
-                                    pedido.horaEntrega
-                                    ||
-                                    "SIN HORA"
-                                }
-
-                            </span>
+                </div>
 
 
-                            <span>
-
-                                📅
-
-                                ${
-                                    pedido.fechaEntrega
-                                    ||
-                                    "SIN FECHA"
-                                }
-
-                            </span>
-
+                ${
+                    pedido.creadoEn
+                    ? `
+                        <div class="registro-automatico">
+                            🕒 Registrado:
+                            ${formatearFechaRegistro(pedido.creadoEn)}
                         </div>
+                    `
+                    : ""
+                }
 
 
-                        ${
-                            pedido.creadoEn
-
-                                ? `
-
-                                    <div class="registro-automatico">
-
-                                        🕒 Registrado:
-
-                                        ${formatearFechaRegistro(
-                                            pedido.creadoEn
-                                        )}
-
-                                    </div>
-
-                                `
-
-                                : ""
-                        }
-
-
-                        ${
-                            pedido.descripcion
-
-                                ? `
-
-                                    <div class="descripcion-pedido">
-
-                                        <strong>
-                                            DESCRIPCIÓN:
-                                        </strong>
-
-                                        ${pedido.descripcion}
-
-                                    </div>
-
-                                `
-
-                                : ""
-                        }
-
-
-                        <!-- =====================
-                             VIDRIOS + NÚMEROS
-                             ===================== -->
-
-                        <div class="resumen-vidrios">
-
-                            ${crearResumenVidrios(
-                                pedido.vidrios
-                            )}
-
+                ${
+                    pedido.descripcion
+                    ? `
+                        <div class="descripcion-card">
+                            <strong>DESCRIPCIÓN:</strong>
+                            ${pedido.descripcion}
                         </div>
+                    `
+                    : ""
+                }
 
 
-                        <!-- =====================
-                             PROCESOS PRINCIPALES
-                             NO LOS CAMBIAMOS
-                             ===================== -->
-
-                        <div class="procesos">
-
-                            ${crearProceso(
-                                pedido,
-                                "corte",
-                                "CORTE"
-                            )}
+                ${crearResumenVidrios(pedido)}
 
 
-                            ${crearProceso(
-                                pedido,
-                                "entalle",
-                                "ENTALLE"
-                            )}
+                <div class="procesos">
+
+                    ${crearProceso(
+                        pedido,
+                        "corte",
+                        "CORTE"
+                    )}
+
+                    ${crearProceso(
+                        pedido,
+                        "entalle",
+                        "ENTALLE"
+                    )}
+
+                    ${crearProceso(
+                        pedido,
+                        "limpios",
+                        "HORNO"
+                    )}
+
+                    ${crearProceso(
+                        pedido,
+                        "templado",
+                        "TEMPLADO"
+                    )}
+
+                    ${crearProceso(
+                        pedido,
+                        "terminado",
+                        "ENCAJONADO"
+                    )}
+
+                    ${crearProceso(
+                        pedido,
+                        "despacho",
+                        "ENTREGADO"
+                    )}
+
+                </div>
 
 
-                            ${crearProceso(
-                                pedido,
-                                "limpios",
-                                "HORNO"
-                            )}
+                <div class="detalle-op">
+
+                    <strong>FECHA DE INGRESO:</strong>
+                    ${pedido.fechaIngreso || "SIN FECHA"}
+
+                    <br>
+
+                    <strong>FECHA DE ENTREGA:</strong>
+                    ${pedido.fechaEntrega || "SIN FECHA"}
+
+                </div>
 
 
-                            ${crearProceso(
-                                pedido,
-                                "templado",
-                                "TEMPLADO"
-                            )}
+                <div class="acciones-pedido">
 
+                    <button
+                        type="button"
+                        class="btn-editar"
+                        onclick="editarPedido(${pedido.id})"
+                    >
+                        EDITAR
+                    </button>
 
-                            ${crearProceso(
-                                pedido,
-                                "terminado",
-                                "ENCAJONADO"
-                            )}
+                    <button
+                        type="button"
+                        class="btn-eliminar"
+                        onclick="eliminarPedido(${pedido.id})"
+                    >
+                        ELIMINAR
+                    </button>
 
+                </div>
 
-                            ${crearProceso(
-                                pedido,
-                                "despacho",
-                                "ENTREGADO"
-                            )}
+            </div>
+        `;
 
-                        </div>
-
-
-                        <div class="acciones-pedido">
-
-                            <button
-                                type="button"
-                                class="btn-editar"
-                                onclick="
-                                    editarPedido(
-                                        ${pedido.id}
-                                    )
-                                "
-                            >
-
-                                ✏️ EDITAR
-
-                            </button>
-
-
-                            <button
-                                type="button"
-                                class="btn-eliminar"
-                                onclick="
-                                    eliminarPedido(
-                                        ${pedido.id}
-                                    )
-                                "
-                            >
-
-                                🗑️ ELIMINAR
-
-                            </button>
-
-                        </div>
-
-
-                    </div>
-
-                `;
-
-            })
-            .join("");
+    }).join("");
 }
 // ===============================
 // CARGAR DATOS
