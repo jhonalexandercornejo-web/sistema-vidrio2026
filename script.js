@@ -2079,27 +2079,33 @@ function mostrarProduccion(lista = pedidos) {
                 </div>
 
 
-                <div class="acciones-pedido">
+               <div class="acciones-pedido">
 
-                    <button
-                        type="button"
-                        class="btn-editar"
-                        onclick="editarPedido(${pedido.id})"
-                    >
-                        EDITAR
-                    </button>
+    <button
+        type="button"
+        class="btn-editar"
+        onclick="editarPedido(${pedido.id})"
+    >
+        EDITAR
+    </button>
 
-                    <button
-                        type="button"
-                        class="btn-eliminar"
-                        onclick="eliminarPedido(${pedido.id})"
-                    >
-                        ELIMINAR
-                    </button>
+    <button
+        type="button"
+        class="btn-editar"
+        onclick="window.location.href='cotizacion.html?pedido=${pedido.id}'"
+    >
+        COTIZACIÓN
+    </button>
 
-                </div>
+    <button
+        type="button"
+        class="btn-eliminar"
+        onclick="eliminarPedido(${pedido.id})"
+    >
+        ELIMINAR
+    </button>
 
-            </div>
+</div>
         `;
 
     }).join("");
